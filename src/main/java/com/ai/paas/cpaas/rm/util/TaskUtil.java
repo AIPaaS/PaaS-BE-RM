@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.HttpEntity;
@@ -54,9 +55,9 @@ public class TaskUtil {
     String url=new String();
     if(type.equals("upload"))
     {
-    	url="http://10.1.241.127:8880/agent-web-api/simpFile/upload";
+    	url=TaskUtil.getSystemProperty("proxy.upload");
     }else{
-    	url="http://10.1.241.127:8880/agent-web-api/simpCommand/exec";
+    	url=TaskUtil.getSystemProperty("proxy.exec");
     }
     HttpPost httpPost = new HttpPost(url);
     httpPost.setEntity(paramEntity);
@@ -148,5 +149,20 @@ public class TaskUtil {
     } finally {
       br.close();
     }
+  }
+  
+  public static String getSystemProperty(String param){
+	  Properties prop = new Properties();
+	  String property=new String();
+	  try {
+	      //load a properties file from class path, inside static method
+	      prop.load(TaskUtil.class.getClassLoader().getResourceAsStream("batch/config.properties"));
+	      //get the property value and print it out
+	      property=prop.getProperty(param);
+	  } 
+	  catch (IOException ex) {
+	      ex.printStackTrace();
+	  }
+	  return property;
   }
 }
