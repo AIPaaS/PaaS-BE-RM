@@ -29,8 +29,9 @@ repositories {
 
 dependencies {
         compile 'com.ai:ipaas-common:0.1-SNAPSHOT'
-		compile 'com.ai:ipaas-base-rm:0.1-SNAPSHOT'
-        compile "org.apache.logging.log4j:log4j-api:2.2"
+		//compile 'com.ai:ipaas-base-rm:0.1-SNAPSHOT'
+		compile 'com.ai:ipaas-base:0.1.1'
+		compile "org.apache.logging.log4j:log4j-api:2.2"
 		compile "org.apache.logging.log4j:log4j-core:2.2"
         compile "commons-beanutils:commons-beanutils:1.8.3"
         compile 'org.apache.httpcomponents:httpclient:4.5.1'

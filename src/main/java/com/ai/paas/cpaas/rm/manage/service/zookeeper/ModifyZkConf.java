@@ -35,7 +35,7 @@ public class ModifyZkConf implements Tasklet {
     configvars.add(lines.toString());
     AnsibleCommand zookeeperinstall = new AnsibleCommand(TaskUtil.filepath + "/zookeeperinstall.yml", "root", configvars);
     StringEntity entity = TaskUtil.genCommandParam(zookeeperinstall.toString());
-    TaskUtil.executeCommand(entity);
+    TaskUtil.executeCommand(entity,"command");
     return RepeatStatus.FINISHED;
   }
 

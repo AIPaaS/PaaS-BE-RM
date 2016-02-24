@@ -45,7 +45,7 @@ public class MaInstall implements Tasklet {
     installvars.add("ansible_become_pass=" + passwd);
     AnsibleCommand installCommand = new AnsibleCommand(TaskUtil.filepath + "marathoninstall.yml", user, installvars);
     StringEntity entity = TaskUtil.genCommandParam(installCommand.toString());
-    TaskUtil.executeCommand(entity);
+    TaskUtil.executeCommand(entity,"command");
     return RepeatStatus.FINISHED;
   }
 

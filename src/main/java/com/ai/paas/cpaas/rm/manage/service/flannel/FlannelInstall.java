@@ -36,7 +36,7 @@ public class FlannelInstall implements Tasklet {
     vars.add("flanneletcd='" + flannelEtcd.toString() + "'");
     AnsibleCommand command = new AnsibleCommand(TaskUtil.filepath + "flannelinstall.yml", "rcflannel", vars);
     StringEntity entity = TaskUtil.genCommandParam(command.toString());
-    TaskUtil.executeCommand(entity);
+    TaskUtil.executeCommand(entity,"command");
     return RepeatStatus.FINISHED;
   }
 

@@ -36,7 +36,7 @@ public class ZookeeperVerify implements Tasklet {
     vars.add("inventory_hosts=" + inventory_hosts.toString());
     AnsibleCommand command = new AnsibleCommand(TaskUtil.filepath + "/zookeeperverify.yml", "root", vars);
     StringEntity entity = TaskUtil.genCommandParam(command.toString());
-    TaskUtil.executeCommand(entity);
+    TaskUtil.executeCommand(entity,"command");
     return RepeatStatus.FINISHED;
   }
 }

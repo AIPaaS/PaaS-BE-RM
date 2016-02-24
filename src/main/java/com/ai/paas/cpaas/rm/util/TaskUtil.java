@@ -49,9 +49,16 @@ public class TaskUtil {
     return new SessionIdentifierGenerator().nextSessionId();
   }
 
-  public static void executeCommand(StringEntity paramEntity) throws ClientProtocolException, IOException, PaasException {
+  public static void executeCommand(StringEntity paramEntity,String type) throws ClientProtocolException, IOException, PaasException {
     HttpClient httpClient = HttpClients.createDefault();
-    HttpPost httpPost = new HttpPost("http://10.1.241.127:8880/agent-web-api/simpFile/upload");
+    String url=new String();
+    if(type.equals("upload"))
+    {
+    	url="http://10.1.241.127:8880/agent-web-api/simpFile/upload";
+    }else{
+    	url="http://10.1.241.127:8880/agent-web-api/simpCommand/exec";
+    }
+    HttpPost httpPost = new HttpPost(url);
     httpPost.setEntity(paramEntity);
     HttpResponse response = httpClient.execute(httpPost);
     HttpEntity entity = response.getEntity();
@@ -86,7 +93,7 @@ public class TaskUtil {
 
   public static StringEntity genCommandParam(String command) throws UnsupportedEncodingException {
     JsonObject object = new JsonObject();
-    object.addProperty("aid", "A");
+    object.addProperty("aid", "dev");
     object.addProperty("command", command);
     StringEntity entity = new StringEntity(object.toString(), "application/json", "UTF-8");
     return entity;
@@ -103,16 +110,16 @@ public class TaskUtil {
 
     // 传输执行文件
     StringEntity fileEntity = TaskUtil.genFileParam(content, filename, TaskUtil.filepath);
-    TaskUtil.executeCommand(fileEntity);
+    TaskUtil.executeCommand(fileEntity,"upload");
 
 
     // 更改文件权限
     StringEntity addExEntity = TaskUtil.genCommandParam("chmod u+x " + TaskUtil.filepath + "/configAnsibleHosts");
-    TaskUtil.executeCommand(addExEntity);
+    TaskUtil.executeCommand(addExEntity,"command");
 
     // 执行文件
     StringEntity exFileEntity = TaskUtil.genCommandParam("bash " + TaskUtil.filepath + "/configAnsibleHosts");
-    TaskUtil.executeCommand(exFileEntity);
+    TaskUtil.executeCommand(exFileEntity,"command");
   }
 
   public static String genMasterName(int i) {

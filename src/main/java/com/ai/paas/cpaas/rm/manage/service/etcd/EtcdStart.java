@@ -29,7 +29,7 @@ public class EtcdStart implements Tasklet {
     vars.add("etcdhost='" + url + "'");
     AnsibleCommand command = new AnsibleCommand(TaskUtil.filepath + "etcdstart.yml", "rcflannel", vars);
     StringEntity entity = TaskUtil.genCommandParam(command.toString());
-    TaskUtil.executeCommand(entity);
+    TaskUtil.executeCommand(entity,"command");
     return RepeatStatus.FINISHED;
   }
 

@@ -24,7 +24,7 @@ public class OpenPortUtil {
     portVars.add(portParam);
     AnsibleCommand openPortCommand = new AnsibleCommand(TaskUtil.filepath + "/openport.yml", user, portVars);
     StringEntity entity = TaskUtil.genCommandParam(openPortCommand.toString());
-    TaskUtil.executeCommand(entity);
+    TaskUtil.executeCommand(entity,"command");
     return RepeatStatus.FINISHED;
   }
 }

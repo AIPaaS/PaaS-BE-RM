@@ -27,7 +27,7 @@ public class DockerInstallService implements Tasklet {
     configvars.add("ansible_become_pass=" + password);
     AnsibleCommand dockerinstall = new AnsibleCommand(TaskUtil.filepath + "/dockerinstall.yml", instance.getRoot(), configvars);
     StringEntity entity = TaskUtil.genCommandParam(dockerinstall.toString());
-    TaskUtil.executeCommand(entity);
+    TaskUtil.executeCommand(entity,"command");
     return RepeatStatus.FINISHED;
   }
 

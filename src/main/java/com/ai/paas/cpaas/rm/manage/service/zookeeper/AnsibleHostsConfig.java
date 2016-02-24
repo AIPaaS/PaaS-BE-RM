@@ -25,14 +25,14 @@ public class AnsibleHostsConfig implements Tasklet {
     List<MesosInstance> mesosmaster = openParam.getMesosMaster();
     List<MesosSlave> mesosSlave = openParam.getMesosSlave();
     for (int i = 0; i < mesosmaster.size(); i++) {
-      String masterName = "[" + TaskUtil.genMasterName(i + 1) + "]";
+      String masterName = TaskUtil.genMasterName(i + 1);
       String ip = mesosmaster.get(i).getIp();
 
       shellContext.append(masterName);
       shellContext.append(System.lineSeparator());
       shellContext.append(ip);
       shellContext.append(System.lineSeparator());
-      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put(ip, masterName);
+      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put(ip,"[" +  masterName + "]");
 
     }
     shellContext.append("[master]");
@@ -43,16 +43,14 @@ public class AnsibleHostsConfig implements Tasklet {
     }
 
     for (int i = 0; i < mesosSlave.size(); i++) {
-      String slaveName = "[" + TaskUtil.genSlaveName(i + 1) + "]";
+      String slaveName =  TaskUtil.genSlaveName(i + 1) ;
       String ip = mesosSlave.get(i).getIp();
 
       shellContext.append(slaveName);
       shellContext.append(System.lineSeparator());
       shellContext.append(ip);
       shellContext.append(System.lineSeparator());
-
-      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put(ip, slaveName);
-
+      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put(ip, "[" +slaveName+ "]");
     }
     shellContext.append("[slave]");
     shellContext.append(System.lineSeparator());
