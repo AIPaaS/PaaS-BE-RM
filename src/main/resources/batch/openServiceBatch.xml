@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<beans:beans xmlns ="http://www.springframework.org/schema/batch" 
+xmlns:beans="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+http://www.springframework.org/schema/batch 
+http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
+	<beans:import resource="context.xml" />
+	<beans:bean id="ansibleHostsConfig" class="com.ai.paas.cpaas.mgmt.manage.service.zookeeper.AnsibleHostsConfig"/>
+	<beans:bean id="changeHostNameStep" class="com.ai.paas.cpaas.mgmt.manage.service.zookeeper.ChangeHostNameStep"/> 
+	<beans:bean id="configHostsStep" class="com.ai.paas.cpaas.mgmt.manage.service.zookeeper.ConfigHostsStep"/> 
+	<beans:bean id="genZkUserStep" class="com.ai.paas.cpaas.mgmt.manage.service.zookeeper.GenZkUser"/>
+	<beans:bean id="openZkPortStep" class="com.ai.paas.cpaas.mgmt.manage.service.zookeeper.OpenZkPort"/>
+	<beans:bean id="modifyZkConfStep" class="com.ai.paas.cpaas.mgmt.manage.service.zookeeper.ModifyZkConf"/>
+	<beans:bean id="startZkServiceStep" class="com.ai.paas.cpaas.mgmt.manage.service.zookeeper.StartZkService"/>
+	<beans:bean id="zookeeperVerifyStep" class="com.ai.paas.cpaas.mgmt.manage.service.zookeeper.ZookeeperVerify"/>
+	<beans:bean id="dockerInstallService" class="com.ai.paas.cpaas.mgmt.manage.service.docker.DockerInstallService"/> 
+	<beans:bean id="genMaUser" class="com.ai.paas.cpaas.mgmt.manage.service.marathon.GenMaUser"/> 
+	<beans:bean id="openMaPort" class="com.ai.paas.cpaas.mgmt.manage.service.marathon.OpenMaPort"/> 
+	<beans:bean id="maInstall" class="com.ai.paas.cpaas.mgmt.manage.service.marathon.MaInstall"/> 
+	<beans:bean id="maStart" class="com.ai.paas.cpaas.mgmt.manage.service.marathon.MaStart"/> 
+	<beans:bean id="meUser" class="com.ai.paas.cpaas.mgmt.manage.service.mesos.MeUser"/>
+	<beans:bean id="meMasterInstall" class="com.ai.paas.cpaas.mgmt.manage.service.mesos.MeMasterInstall"/>
+	<beans:bean id="meMasterOpenPort" class="com.ai.paas.cpaas.mgmt.manage.service.mesos.MasterOpenPort"/>
+	<beans:bean id="meMasterStart" class="com.ai.paas.cpaas.mgmt.manage.service.mesos.MeMasterStart"/>
+	<beans:bean id="meSlaveStep" class="com.ai.paas.cpaas.mgmt.manage.service.mesos.MesosSlaveStep"/>
+	<beans:bean id="openEtcdPort" class="com.ai.paas.cpaas.mgmt.manage.service.etcd.OpenEtcdPort"/>
+	<beans:bean id="genEtcdUser" class="com.ai.paas.cpaas.mgmt.manage.service.etcd.GenEtcdUser"/>
+	<beans:bean id="etcdInstall" class="com.ai.paas.cpaas.mgmt.manage.service.etcd.EtcdInstall"/>
+	<beans:bean id="etcdStart" class="com.ai.paas.cpaas.mgmt.manage.service.etcd.EtcdStart"/>
+	<beans:bean id="flannelInstall" class="com.ai.paas.cpaas.mgmt.manage.service.flannel.FlannelInstall"/>
+	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
+	    <flow id="installzookeeper" parent="zookeeper" next="installDocker"/>
+		<flow id="installDocker" parent="docker" next="installMesos"/>
+		<flow id="installMesos" parent="mesos" next="installMarathon"/>
+		<flow id="installMarathon" parent="marathon" next="installEtcd"/>
+		<flow id="installEtcd" parent="etcd" next="installFlannel"/>
+		<flow id="installFlannel" parent="flannel"/>
+	</job>
+	<flow id="flannel">
+		<step id="etcdInstallStep">
+				<tasklet ref="flannelInstall"/>
+		</step>
+	</flow>
+	<flow id="etcd">
+    	<step id="openEtcdPortStep" next="genEtcdUserStep">
+	    	<tasklet ref="openEtcdPort"/>
+		</step>
+		<step id="genEtcdUserStep" next="etcdInstallStep">
+				<tasklet ref="genEtcdUser"/>
+		</step>
+		<step id="etcdInstallStep" next="etcdStartStep">
+				<tasklet ref="etcdInstall"/>
+		</step>
+		<step id="etcdStartStep">
+				<tasklet ref="etcdStart"/>
+		</step>
+	</flow>
+	<flow id="zookeeper">
+    	<step id="configAnsibleHosts" next="configHostname">
+	    	<tasklet ref="ansibleHostsConfig"/>
+		</step>
+		<step id="configHostname" next="configHosts">
+				<tasklet ref="changeHostNameStep"/>
+		</step>
+		<step id="configHosts" next="openZookeeper">
+				<tasklet ref="configHostsStep"/>
+		</step>
+		<step id="genZkUser" next="openZkPort">
+				<tasklet ref="genZkUserStep"/>
+		</step>
+		<step id="openZkPort" next="modifyZkConf">
+				<tasklet ref="openZkPortStep"/>
+		</step>
+		<step id="modifyZkConf" next="startZkService">
+				<tasklet ref="modifyZkConfStep"/>
+		</step>
+		<step id="startZkService" next="zookeeperVerify">
+				<tasklet ref="startZkServiceStep"/>
+		</step>
+		<step id="zookeeperVerify">
+				<tasklet ref="zookeeperVerifyStep"/>
+		</step>
+	</flow>
+	<flow id="docker">
+		<step id="dockerInstall">
+				<tasklet ref="dockerInstallService"/>
+		</step>
+	</flow>
+	<flow id="mesos">
+		<step id="mesosUser" next="mesosMasterInstall">
+				<tasklet ref="meUser"/>
+		</step>
+		<step id="mesosMasterInstall" next="mesosMasterOpenPort">
+				<tasklet ref="meMasterInstall"/>
+		</step>
+		<step id="mesosMasterOpenPort" next="mesosMasterStart">
+				<tasklet ref="meMasterOpenPort"/>
+		</step>
+		<step id="mesosMasterStart" next="mesosSlaveStep">
+				<tasklet ref="meMasterStart"/>
+		</step>
+		<step id="mesosSlaveStep">
+				<tasklet ref="meSlaveStep"/>
+		</step>
+	</flow>
+	<flow id="marathon">
+		<step id="marathonUser" next="marathonPort">
+			<tasklet ref="genMaUser"/>
+		</step>
+		<step id="marathonPort" next="installMarathon">
+			<tasklet ref="openMaPort"/>
+		</step>
+		<step id="installMarathon" next="startMarathon">
+			<tasklet ref="maInstall"/>
+		</step>
+		<step id="startMarathon">
+			<tasklet ref="maStart"/>
+		</step>
+	</flow>
+</beans:beans>
