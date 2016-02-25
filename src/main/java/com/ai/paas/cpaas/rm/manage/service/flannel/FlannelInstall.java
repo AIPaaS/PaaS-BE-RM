@@ -19,10 +19,11 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 public class FlannelInstall implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/flannel/flannelinstall.yml");
     TaskUtil.uploadFile("flannelinstall.yml", in);
-    
+
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance masternode = mesosMaster.get(0);
@@ -39,9 +40,17 @@ public class FlannelInstall implements Tasklet {
     vars.add("ansible_ssh_pass=" + password);
     vars.add("ansible_become_pass=" + password);
     vars.add("flanneletcd='" + flannelEtcd.toString() + "'");
-    AnsibleCommand command = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/flannelinstall.yml", "rcflannel", vars);
+    // 需要在参数中指定docker的启动位置，并且添加etcd master的ip地址
+    StringBuffer execstart = new StringBuffer("execstart='ExecStart=/usr/bin/docker daemon -g  ");
+    execstart.append(openParam.getImagePath()).append("  -H fd:// --cluster-store=etcd://");
+    execstart.append(masternode.getIp());
+    execstart.append("'");
+    vars.add(execstart.toString());
+    AnsibleCommand command =
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/flannelinstall.yml",
+            "rcflannel", vars);
     StringEntity entity = TaskUtil.genCommandParam(command.toString());
-    TaskUtil.executeCommand(entity,"command");
+    TaskUtil.executeCommand(entity, "command");
     return RepeatStatus.FINISHED;
   }
 

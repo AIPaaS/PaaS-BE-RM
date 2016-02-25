@@ -21,10 +21,10 @@
       lineinfile: dest=/etc/mesos-master/quorum line={{quorum}} regexp='\d?' state=present
       sudo: yes
     - name: stop mesos-slave service
-      service: name=mesos-slave state=stopped enabled=no
+      service: name=mesos-slave state=stopped  enabled=yes
       sudo: yes
     - name: restart mesos-master
-      service: name=mesos-master state=restarted
+      service: name=mesos-master state=restarted  enabled=yes
       sudo: yes
     - name: make user rczkp01 own the /etc/zookeeper dir
       command: chown -R {{user}} {{directory}}

@@ -17,11 +17,14 @@
      - name: modify docker.service
        lineinfile: dest=/usr/lib/systemd/system/docker.service line="{{execstart}}" regexp='ExecStart?' state=present
      - name: restart flannel
-       service: name=flanneld state=restarted
+       service: name=flanneld state=restarted  enabled=yes
        sudo: yes
      - name: reload daemon-reload
        command: systemctl daemon-reload
        sudo: yes
+     - name: insert image path and flannel info
+       lineinfile: dest=/usr/lib/systemd/system/docker.service  line="{{ execstart }}" regexp='^ExecStart?' state=present
+       sudo: yes
      - name: restart docker
-       service: name=docker state=restarted
+       service: name=docker state=restarted  enabled=yes
        sudo: yes

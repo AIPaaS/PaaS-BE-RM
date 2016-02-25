@@ -12,5 +12,5 @@
        lineinfile: dest={{dir}} line={{myid}}
        sudo: yes
      - name: start zookeeper service 
-       service: name=zookeeper state=restarted
+       service: name=zookeeper state=restarted  enabled=yes
        sudo: yes

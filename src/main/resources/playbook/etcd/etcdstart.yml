@@ -4,7 +4,7 @@
   vars:
   tasks:
      - name: restart etcd service
-       service: name=etcd state=restarted
+       service: name=etcd state=restarted  enabled=yes
        sudo: yes
      - name: publish flannel config to etcd
        command: "etcdctl -C='{{ etcdhost }}' set /coreos.com/network/config '{\"Network\": \"172.18.0.0/16\", \"Backend\": { \"Type\": \"vxlan\",\"Port\": 8472 } }'"

@@ -9,5 +9,5 @@
      - name: modify hostname for mesos-master
        lineinfile: dest=/etc/mesos-master/hostname line={{hostname}}
      - name: restart mesos-master service
-       service: name=mesos-master state=restarted
+       service: name=mesos-master state=restarted  enabled=yes
        sudo: yes

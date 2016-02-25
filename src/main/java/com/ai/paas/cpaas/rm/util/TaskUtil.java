@@ -25,16 +25,17 @@ import com.google.gson.JsonObject;
 
 public class TaskUtil {
 
-  //public static String filepath = "/root/test";
+  // public static String filepath = "/root/test";
   private static final AtomicInteger counter = new AtomicInteger();
 
   public static int nextValue() {
     return counter.getAndIncrement();
   }
 
-  
+
   public static OpenResourceParamVo createOpenParam(ChunkContext chunkContext) {
-    String openParameter = (String) chunkContext.getStepContext().getJobParameters().get("openParameter");
+    String openParameter =
+        (String) chunkContext.getStepContext().getJobParameters().get("openParameter");
     Gson gson = new Gson();
     OpenResourceParamVo openParam = gson.fromJson(openParameter, OpenResourceParamVo.class);
     return openParam;
@@ -51,14 +52,14 @@ public class TaskUtil {
     return new SessionIdentifierGenerator().nextSessionId();
   }
 
-  public static void executeCommand(StringEntity paramEntity,String type) throws ClientProtocolException, IOException, PaasException {
+  public static void executeCommand(StringEntity paramEntity, String type)
+      throws ClientProtocolException, IOException, PaasException {
     HttpClient httpClient = HttpClients.createDefault();
-    String url=new String();
-    if(type.equals("upload"))
-    {
-    	url=TaskUtil.getSystemProperty("proxy.upload");
-    }else{
-    	url=TaskUtil.getSystemProperty("proxy.exec");
+    String url = new String();
+    if (type.equals("upload")) {
+      url = TaskUtil.getSystemProperty("proxy.upload");
+    } else {
+      url = TaskUtil.getSystemProperty("proxy.exec");
     }
     HttpPost httpPost = new HttpPost(url);
     httpPost.setEntity(paramEntity);
@@ -78,12 +79,14 @@ public class TaskUtil {
     Gson gson = new Gson();
     TransResultVo resultVo = gson.fromJson(result, TransResultVo.class);
     if (resultVo.getCode().equals(ExceptionCodeConstants.TransServiceCode.ERROR_CODE)) {
-      throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE, resultVo.getMsg());
+      throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+          resultVo.getMsg());
     }
 
   }
 
-  public static StringEntity genFileParam(String content, String filename, String path) throws UnsupportedEncodingException {
+  public static StringEntity genFileParam(String content, String filename, String path)
+      throws UnsupportedEncodingException {
     JsonObject object = new JsonObject();
     object.addProperty("aid", "dev");
     object.addProperty("content", content);
@@ -101,40 +104,35 @@ public class TaskUtil {
     return entity;
   }
 
-  public static void addExPermission(String fileName) throws ClientProtocolException, IOException {
-    StringBuffer command = new StringBuffer();
-    command.append("chmod u+x ");
-    command.append(fileName);
-    TaskUtil.genCommandParam(command.toString());
-  }
 
-  public static void executeFile(String filename, String content) throws ClientProtocolException, IOException, PaasException {
 
-	String filepath=TaskUtil.getSystemProperty("filepath");
+  public static void executeFile(String filename, String content) throws ClientProtocolException,
+      IOException, PaasException {
+
+    String filepath = TaskUtil.getSystemProperty("filepath");
     // 传输执行文件
-    StringEntity fileEntity = TaskUtil.genFileParam(content, filename,filepath );
-    TaskUtil.executeCommand(fileEntity,"upload");
-
+    StringEntity fileEntity = TaskUtil.genFileParam(content, filename, filepath);
+    TaskUtil.executeCommand(fileEntity, "upload");
 
     // 更改文件权限
-    StringEntity addExEntity = TaskUtil.genCommandParam("chmod u+x " + filepath + "/configAnsibleHosts");
-    TaskUtil.executeCommand(addExEntity,"command");
+    StringEntity addExEntity = TaskUtil.genCommandParam("chmod u+x " + filepath + "/" + filename);
+    TaskUtil.executeCommand(addExEntity, "command");
 
     // 执行文件
-    StringEntity exFileEntity = TaskUtil.genCommandParam("bash " + filepath + "/configAnsibleHosts");
-    TaskUtil.executeCommand(exFileEntity,"command");
+    StringEntity exFileEntity = TaskUtil.genCommandParam("bash " + filepath + "/" + filename);
+    TaskUtil.executeCommand(exFileEntity, "command");
   }
 
-  public static void uploadFile(String filename,InputStream in) throws ClientProtocolException, IOException, PaasException
-  {
-	  String filepath=TaskUtil.getSystemProperty("filepath");
-	  // 传输执行文件
-	  String content=TaskUtil.getFile(in);
-	  StringEntity fileEntity = TaskUtil.genFileParam(content, filename,filepath );
-	  TaskUtil.executeCommand(fileEntity,"upload");
+  public static void uploadFile(String filename, InputStream in) throws ClientProtocolException,
+      IOException, PaasException {
+    String filepath = TaskUtil.getSystemProperty("filepath");
+    // 传输执行文件
+    String content = TaskUtil.getFile(in);
+    StringEntity fileEntity = TaskUtil.genFileParam(content, filename, filepath);
+    TaskUtil.executeCommand(fileEntity, "upload");
 
   }
-  
+
   public static String genMasterName(int i) {
     return "mesos-master" + i;
   }
@@ -145,7 +143,7 @@ public class TaskUtil {
 
   public static String getFile(InputStream in) throws IOException {
     // InputStream in = TaskUtil.class.getResourceAsStream("/batch/river.yml");
-    //InputStream in = TaskUtil.class.getResourceAsStream(path);
+    // InputStream in = TaskUtil.class.getResourceAsStream(path);
     BufferedReader br = new BufferedReader(new InputStreamReader(in));
     StringBuilder sb = new StringBuilder();
     try {
@@ -161,19 +159,18 @@ public class TaskUtil {
     }
     return sb.toString();
   }
-  
-  public static String getSystemProperty(String param){
-	  Properties prop = new Properties();
-	  String property=new String();
-	  try {
-	      //load a properties file from class path, inside static method
-	      prop.load(TaskUtil.class.getClassLoader().getResourceAsStream("batch/config.properties"));
-	      //get the property value and print it out
-	      property=prop.getProperty(param);
-	  } 
-	  catch (IOException ex) {
-	      ex.printStackTrace();
-	  }
-	  return property;
+
+  public static String getSystemProperty(String param) {
+    Properties prop = new Properties();
+    String property = new String();
+    try {
+      // load a properties file from class path, inside static method
+      prop.load(TaskUtil.class.getClassLoader().getResourceAsStream("batch/config.properties"));
+      // get the property value and print it out
+      property = prop.getProperty(param);
+    } catch (IOException ex) {
+      ex.printStackTrace();
+    }
+    return property;
   }
 }

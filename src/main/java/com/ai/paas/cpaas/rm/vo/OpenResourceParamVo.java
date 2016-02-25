@@ -11,6 +11,27 @@ public class OpenResourceParamVo implements Serializable {
   private String domain;
   private String externalDomain;
   private String loadVirtualIP;
+  private String imagePath;
+  private Boolean useAgent;
+
+  public String getImagePath() {
+    return imagePath;
+  }
+
+  public void setImagePath(String imagePath) {
+    this.imagePath = imagePath;
+  }
+
+  public Boolean getUseAgent() {
+    return useAgent;
+  }
+
+  public void setUseAgent(Boolean useAgent) {
+    this.useAgent = useAgent;
+  }
+
+
+
   private List<MesosInstance> mesosMaster;
   private List<MesosSlave> mesosSlave;
 

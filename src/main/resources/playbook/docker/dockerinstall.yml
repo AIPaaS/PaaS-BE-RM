@@ -7,5 +7,5 @@
        yum: name=docker-engine state=latest
        sudo: yes
      - name: restart docker service
-       service: name=docker state=restarted
+       service: name=docker state=restarted  enabled=yes
        sudo: yes

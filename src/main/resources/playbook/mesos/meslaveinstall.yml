@@ -32,4 +32,4 @@
             chdir: /etc/mesos-slave
       sudo: yes
     - name: start mesos-slave
-      service: name=mesos-slave state=restarted
+      service: name=mesos-slave state=restarted  enabled=yes

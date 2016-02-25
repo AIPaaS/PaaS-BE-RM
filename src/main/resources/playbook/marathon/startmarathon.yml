@@ -9,4 +9,4 @@
             chdir: /etc/marathon/conf
        sudo: yes
      - name: start marathon service
-       service: name=marathon state=restarted
+       service: name=marathon state=restarted  enabled=yes
