@@ -1,5 +1,6 @@
 package com.ai.paas.cpaas.rm.manage.service.zookeeper;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import com.ai.paas.cpaas.rm.util.AnsibleCommand;
+import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
@@ -18,6 +20,9 @@ public class ZookeeperVerify implements Tasklet {
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/zookeeper/zookeeperverify.yml");
+    TaskUtil.uploadFile("zookeeperverify.yml", in);
+    
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     List<String> vars = new ArrayList<String>();
@@ -34,7 +39,7 @@ public class ZookeeperVerify implements Tasklet {
     }
     inventory_hosts.append("]");
     vars.add("inventory_hosts=" + inventory_hosts.toString());
-    AnsibleCommand command = new AnsibleCommand(TaskUtil.filepath + "/zookeeperverify.yml", "root", vars);
+    AnsibleCommand command = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/zookeeperverify.yml", "root", vars);
     StringEntity entity = TaskUtil.genCommandParam(command.toString());
     TaskUtil.executeCommand(entity,"command");
     return RepeatStatus.FINISHED;

@@ -1,0 +1,42 @@
+---
+- hosts: master
+  user: rcflannel
+  vars: 
+      initial_cluster_state: ETCD_INITIAL_CLUSTER_STATE="new"
+      initial_cluster_token: ETCD_INITIAL_CLUSTER_TOKEN="etcd-cluster-01"
+      etcd_debug: ETCD_DEBUG="true"
+      log_package_levels: ETCD_LOG_PACKAGE_LEVELS="etcdserver=WARNING,security=DEBUG"
+  tasks:
+      - name: yum install etcd
+        yum: name=etcd state=latest
+        sudo: yes 
+      - name: modify etcd.conf
+        lineinfile: dest=/etc/etcd/etcd.conf line="{{etcd_name}}" regexp='^#?ETCD_NAME?'  state=present
+        sudo: yes  
+      - name: modify etcd.conf
+        lineinfile: dest=/etc/etcd/etcd.conf line="{{listen_peer_urls}}" regexp='^#?ETCD_LISTEN_PEER_URLS?'  state=present
+        sudo: yes
+      - name: modify etcd.conf
+        lineinfile: dest=/etc/etcd/etcd.conf line="{{listen_client_urls}}" regexp='^#?ETCD_LISTEN_CLIENT_URLS?'  state=present
+        sudo: yes
+      - name: modify etcd.conf
+        lineinfile: dest=/etc/etcd/etcd.conf line="{{initial_advertise_peer_urls}}" regexp='^#?ETCD_INITIAL_ADVERTISE_PEER_URLS?'  state=present
+        sudo: yes
+      - name: modify etcd.conf
+        lineinfile: dest=/etc/etcd/etcd.conf line="{{initial_cluster}}" regexp='^#?ETCD_INITIAL_CLUSTER?'  state=present
+        sudo: yes
+      - name: modify etcd.conf
+        lineinfile: dest=/etc/etcd/etcd.conf line="{{initial_cluster_state}}" regexp='^#?ETCD_INITIAL_CLUSTER_STATE?'  state=present
+        sudo: yes	
+      - name: modify etcd.conf
+        lineinfile: dest=/etc/etcd/etcd.conf line="{{initial_cluster_token}}" regexp='^#?ETCD_INITIAL_CLUSTER_TOKEN?'  state=present
+        sudo: yes	
+      - name: modify etcd.conf
+        lineinfile: dest=/etc/etcd/etcd.conf line="{{advertise_client_urls}}" regexp='^#?ETCD_ADVERTISE_CLIENT_URLS?'  state=present
+        sudo: yes		
+      - name: modify etcd.conf
+        lineinfile: dest=/etc/etcd/etcd.conf line="{{etcd_debug}}" regexp='^#?ETCD_DEBUG?'  state=present
+        sudo: yes		
+      - name: modify etcd.conf
+        lineinfile: dest=/etc/etcd/etcd.conf line="{{log_package_levels}}" regexp='^#?ETCD_LOG_PACKAGE_LEVELS?'  state=present
+        sudo: yes				

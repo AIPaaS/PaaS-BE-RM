@@ -1,5 +1,6 @@
 package com.ai.paas.cpaas.rm.manage.service.mesos;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -9,6 +10,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import com.ai.paas.cpaas.rm.util.AnsibleCommand;
+import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.MesosSlave;
@@ -18,6 +20,9 @@ public class MesosSlaveStep implements Tasklet {
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/mesos/messlaveinstall.yml");
+    TaskUtil.uploadFile("messlaveinstall.yml", in);
+    
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosSlave> slavenodes = openParam.getMesosSlave();
@@ -45,7 +50,7 @@ public class MesosSlaveStep implements Tasklet {
       vars.add("hostname=" + node.getIp());
       vars.add("ip=" + node.getIp());
       vars.add("hosts" + node.getIp());
-      AnsibleCommand command = new AnsibleCommand(TaskUtil.filepath + "/mesosinstall.yml", "rcmesos", vars);
+      AnsibleCommand command = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/messlaveinstall.yml", "rcmesos", vars);
       vars.remove(7);
       vars.remove(6);
       vars.remove(5);

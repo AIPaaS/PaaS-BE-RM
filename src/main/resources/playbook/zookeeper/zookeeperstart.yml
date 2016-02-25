@@ -1,0 +1,16 @@
+---
+- hosts: '{{hosts}}'
+  user: root
+  vars:
+     ansible_become_pass: root
+     dir: /home/rczkp01/zookeeper/data/myid
+  tasks:
+     - name: creat myid file
+       file: path={{dir}} state=touch owner=root mode=0744
+       sudo: yes
+     - name: assign a integer value to myid
+       lineinfile: dest={{dir}} line={{myid}}
+       sudo: yes
+     - name: start zookeeper service 
+       service: name=zookeeper state=restarted
+       sudo: yes

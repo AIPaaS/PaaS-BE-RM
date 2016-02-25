@@ -1,0 +1,36 @@
+---
+- hosts: master
+  user: root
+  vars:
+    zoocfg: export ZOOCFGDIR=/etc/zookeeper/conf
+    zkbin: export PATH=$PATH:/opt/mesosphere/zookeeper/bin
+    ticktime: tickTime=2000
+  tasks:
+    - name: yum install mesosphere-zookeeper
+      yum: name=mesosphere-zookeeper state=latest
+      sudo: yes 
+    - name: mv zoo.cfg
+      command: mv /etc/zookeeper/conf/zoo.cfg /etc/zookeeper/conf/zoo.cfg.bak
+    - name: touch zoo.cfg
+      shell: echo "{{ticktime}}" > zoo.cfg
+      args: 
+            chdir: /etc/zookeeper/conf
+      sudo: yes
+    - name: insert master nodes info to zoo.cfg
+      lineinfile: dest=/etc/zookeeper/conf/zoo.cfg  line={{item}}
+      with_items: lines
+      sudo: yes
+    - name: change user of zoo.cfg
+      file: src=/etc/zookeeper/conf/zoo.cfg owner=rczk01 mode="u=rw,g=rw,o=rw"
+      sudo: yes
+    - name: export zookeeper config file variable
+      lineinfile: dest=/etc/profile line="{{zoocfg}}"
+      sudo: yes
+    - name: export zookeeper bin variable
+      lineinfile: dest=/etc/profile line="{{zkbin}}"
+      sudo: yes
+    - name: reload variable
+      shell: source /etc/profile
+      sudo: no
+      args:
+           executable: /bin/bash

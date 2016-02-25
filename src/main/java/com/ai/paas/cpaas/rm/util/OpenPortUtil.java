@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,9 @@ public class OpenPortUtil {
 
   public static RepeatStatus openPort(ChunkContext chunkContext, String portParam, String user) throws ClientProtocolException, IOException,
       PaasException {
+    //上传openport.yml
+    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/openport.yml");
+    TaskUtil.uploadFile("openport.yml", in);
     String password = (String) chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().get("mesosPassword");
     // 开放指定端口
     List<String> portVars = new ArrayList<String>();
@@ -22,7 +26,7 @@ public class OpenPortUtil {
     portVars.add("ansible_become_pass=" + password);
     // portVars.add("ports=[5050,8080]");
     portVars.add(portParam);
-    AnsibleCommand openPortCommand = new AnsibleCommand(TaskUtil.filepath + "/openport.yml", user, portVars);
+    AnsibleCommand openPortCommand = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/openport.yml", user, portVars);
     StringEntity entity = TaskUtil.genCommandParam(openPortCommand.toString());
     TaskUtil.executeCommand(entity,"command");
     return RepeatStatus.FINISHED;

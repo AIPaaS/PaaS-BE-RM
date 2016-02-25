@@ -28,11 +28,11 @@ public class AnsibleHostsConfig implements Tasklet {
       String masterName = TaskUtil.genMasterName(i + 1);
       String ip = mesosmaster.get(i).getIp();
 
-      shellContext.append(masterName);
+      shellContext.append("["+masterName+"]");
       shellContext.append(System.lineSeparator());
       shellContext.append(ip);
       shellContext.append(System.lineSeparator());
-      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put(ip,"[" +  masterName + "]");
+      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put(ip,masterName);
 
     }
     shellContext.append("[master]");
@@ -46,11 +46,11 @@ public class AnsibleHostsConfig implements Tasklet {
       String slaveName =  TaskUtil.genSlaveName(i + 1) ;
       String ip = mesosSlave.get(i).getIp();
 
-      shellContext.append(slaveName);
+      shellContext.append("["+slaveName+"]");
       shellContext.append(System.lineSeparator());
       shellContext.append(ip);
       shellContext.append(System.lineSeparator());
-      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put(ip, "[" +slaveName+ "]");
+      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put(ip,slaveName);
     }
     shellContext.append("[slave]");
     shellContext.append(System.lineSeparator());

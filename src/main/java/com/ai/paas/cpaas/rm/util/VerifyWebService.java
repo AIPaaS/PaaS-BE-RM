@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -16,6 +17,10 @@ public class VerifyWebService {
 
 	public static void checkwebService(ChunkContext chunkContext,String port) throws ClientProtocolException, IOException, PaasException
 	{
+	  
+	    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/checkwebservice.yml");
+	    TaskUtil.uploadFile("checkwebservice.yml", in);
+	    
 		OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
 	    List<MesosInstance> mesosMaster = openParam.getMesosMaster();
 	    List<String> vars = new ArrayList<String>();
@@ -32,7 +37,7 @@ public class VerifyWebService {
 	    }
 	    inventory_hosts.append("]");
 	    vars.add("inventory_hosts=" + inventory_hosts.toString());
-	    AnsibleCommand command = new AnsibleCommand(TaskUtil.filepath + "/checkwebservice.yml", "root", vars);
+	    AnsibleCommand command = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/checkwebservice.yml", "root", vars);
 	    StringEntity entity = TaskUtil.genCommandParam(command.toString());
 	    TaskUtil.executeCommand(entity,"command");
 	}

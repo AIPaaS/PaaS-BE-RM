@@ -1,0 +1,9 @@
+---
+- hosts: slave
+  user: root
+  vars:
+  tasks:
+    - action: uri url={{ item }} return_content=yes
+      register: webpage
+      with_items:
+         - "{{ inventory_hosts }}"

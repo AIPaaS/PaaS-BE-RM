@@ -1,0 +1,10 @@
+---
+- hosts: master
+  user: root
+  vars:
+  tasks:
+    - name: check zookeeper cluster status
+      wait_for: host={{item}} port=2181 timeout=5
+      delegate_to: localhost 
+      with_items:
+         - "{{ inventory_hosts }}"

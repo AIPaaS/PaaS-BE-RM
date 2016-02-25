@@ -1,0 +1,11 @@
+---
+- hosts: nodes
+  user: root
+  vars:
+  tasks:
+     - name: yum install docker
+       yum: name=docker-engine state=latest
+       sudo: yes
+     - name: restart docker service
+       service: name=docker state=restarted
+       sudo: yes

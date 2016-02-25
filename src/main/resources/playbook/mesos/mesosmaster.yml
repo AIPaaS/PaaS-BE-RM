@@ -1,0 +1,34 @@
+---
+- hosts: master
+  user: rcmesos
+  vars:
+      user: rczkp01
+      directory: /etc/zookeeper
+  tasks:
+    - name: yum install mesos
+      yum: name=mesos state=latest
+      sudo: yes
+    - name: touch /etc/mesos/zk
+      file: path=/etc/mesos/zk state=touch owner=root mode=0744
+      sudo: yes
+    - name: modify zookeeper info to zk
+      lineinfile: dest=/etc/mesos/zk line={{zk}} regexp='zk?'  state=present
+      sudo: yes
+    - name: touch  /etc/mesos-master/quorum
+      file: path=/etc/mesos-master/quorum state=touch owner=root mode=0744
+      sudo: yes
+    - name: assign value to quorum
+      lineinfile: dest=/etc/mesos-master/quorum line={{quorum}} regexp='\d?' state=present
+      sudo: yes
+    - name: stop mesos-slave service
+      service: name=mesos-slave state=stopped enabled=no
+      sudo: yes
+    - name: restart mesos-master
+      service: name=mesos-master state=restarted
+      sudo: yes
+    - name: make user rczkp01 own the /etc/zookeeper dir
+      command: chown -R {{user}} {{directory}}
+      sudo: yes
+    - name: giver user full read and write permissions
+      command: chmod -R u+rX {{directory}}
+      sudo: yes

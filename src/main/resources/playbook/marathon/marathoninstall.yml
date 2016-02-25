@@ -1,0 +1,33 @@
+---
+- hosts: master
+  user: rcmarathon
+  vars:
+      ansible_become_pass: root
+      subscriber: http_callback
+  tasks:
+      - name: yum install marathon
+        yum: name=marathon state=latest
+        sudo: yes
+      - name: echo event_subscriber
+        shell: echo "{{subscriber}}" > event_subscriber
+        args:
+             chdir: /etc/marathon/conf
+        sudo: yes
+      - name: echo master
+        shell: echo "{{master}}" > master
+        args:
+             chdir: /etc/marathon/conf
+        sudo: yes
+      - name: echo zk 
+        shell: echo "{{zk}}" > zk
+        args:
+             chdir: /etc/marathon/conf
+        sudo: yes
+      - name: open 8080 port
+        commad: firewall-cmd --zone=public --add-port={{item}}/tcp --permanent
+        with_items:
+                - 8080
+        sudo: yes
+      - name: reload firewall-cmd
+        command: firewall-cmd --reload
+        sudo: yes

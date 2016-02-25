@@ -1,5 +1,6 @@
 package com.ai.paas.cpaas.rm.manage.service.zookeeper;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +19,10 @@ public class ChangeHostNameStep implements Tasklet {
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+    //ÉÏ´«hostnamectl.yml
+    InputStream in = ChangeHostNameStep.class.getResourceAsStream("/playbook/hostnamectl.yml");
+    TaskUtil.uploadFile("hostnamectl.yml", in);
+    
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     List<MesosSlave> mesosSlave = openParam.getMesosSlave();
@@ -49,7 +54,7 @@ public class ChangeHostNameStep implements Tasklet {
     vars.add(hostname.toString());
     vars.add(password);
     vars.add(hostsParam);
-    AnsibleCommand ansibleCommand = new AnsibleCommand(TaskUtil.filepath + "/hostnamectl.yml", instance.getRoot(), vars);
+    AnsibleCommand ansibleCommand = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/hostnamectl.yml", instance.getRoot(), vars);
     shellContext.append(ansibleCommand.toString());
     shellContext.append(System.lineSeparator());
   }

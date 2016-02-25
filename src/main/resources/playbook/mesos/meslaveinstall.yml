@@ -1,0 +1,35 @@
+---
+- hosts: '{{hosts}}'
+  user: rcmesos
+  vars:
+  tasks:
+    - name: install mesos rpm from a local file
+      yum: name=mesos state=present
+      sudo: yes
+    - name: cpoy zookeeper config file to dest machine
+      shell: echo "{{zk}}" > zk
+      args:
+            chdir: /etc/mesos
+      sudo: yes
+    - name: copy containerizers file to dest
+      shell: echo "{{containerizers}}" > containerizers
+      args:
+            chdir: /etc/mesos-slave
+      sudo: yes
+    - name: copy executor_registration_timeout to dest
+      shell: echo "{{timeout}}" > executor_registration_timeout
+      args:
+            chdir: /etc/mesos-slave
+      sudo: yes
+    - name: copy hostname to dest
+      shell: echo "{{hostname}}" > hostname
+      args:
+            chdir: /etc/mesos-slave
+      sudo: yes
+    - name: copy ip to dest
+      shell: echo "{{ip}}" > ip
+      args:
+            chdir: /etc/mesos-slave
+      sudo: yes
+    - name: start mesos-slave
+      service: name=mesos-slave state=restarted

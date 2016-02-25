@@ -25,13 +25,14 @@ import com.google.gson.JsonObject;
 
 public class TaskUtil {
 
-  public static String filepath = "/root/test";
+  //public static String filepath = "/root/test";
   private static final AtomicInteger counter = new AtomicInteger();
 
   public static int nextValue() {
     return counter.getAndIncrement();
   }
 
+  
   public static OpenResourceParamVo createOpenParam(ChunkContext chunkContext) {
     String openParameter = (String) chunkContext.getStepContext().getJobParameters().get("openParameter");
     Gson gson = new Gson();
@@ -109,20 +110,31 @@ public class TaskUtil {
 
   public static void executeFile(String filename, String content) throws ClientProtocolException, IOException, PaasException {
 
+	String filepath=TaskUtil.getSystemProperty("filepath");
     // 传输执行文件
-    StringEntity fileEntity = TaskUtil.genFileParam(content, filename, TaskUtil.filepath);
+    StringEntity fileEntity = TaskUtil.genFileParam(content, filename,filepath );
     TaskUtil.executeCommand(fileEntity,"upload");
 
 
     // 更改文件权限
-    StringEntity addExEntity = TaskUtil.genCommandParam("chmod u+x " + TaskUtil.filepath + "/configAnsibleHosts");
+    StringEntity addExEntity = TaskUtil.genCommandParam("chmod u+x " + filepath + "/configAnsibleHosts");
     TaskUtil.executeCommand(addExEntity,"command");
 
     // 执行文件
-    StringEntity exFileEntity = TaskUtil.genCommandParam("bash " + TaskUtil.filepath + "/configAnsibleHosts");
+    StringEntity exFileEntity = TaskUtil.genCommandParam("bash " + filepath + "/configAnsibleHosts");
     TaskUtil.executeCommand(exFileEntity,"command");
   }
 
+  public static void uploadFile(String filename,InputStream in) throws ClientProtocolException, IOException, PaasException
+  {
+	  String filepath=TaskUtil.getSystemProperty("filepath");
+	  // 传输执行文件
+	  String content=TaskUtil.getFile(in);
+	  StringEntity fileEntity = TaskUtil.genFileParam(content, filename,filepath );
+	  TaskUtil.executeCommand(fileEntity,"upload");
+
+  }
+  
   public static String genMasterName(int i) {
     return "mesos-master" + i;
   }
@@ -131,12 +143,12 @@ public class TaskUtil {
     return "mesos-slave" + i;
   }
 
-  public static void getFile(String path) throws IOException {
+  public static String getFile(InputStream in) throws IOException {
     // InputStream in = TaskUtil.class.getResourceAsStream("/batch/river.yml");
-    InputStream in = TaskUtil.class.getResourceAsStream(path);
+    //InputStream in = TaskUtil.class.getResourceAsStream(path);
     BufferedReader br = new BufferedReader(new InputStreamReader(in));
+    StringBuilder sb = new StringBuilder();
     try {
-      StringBuilder sb = new StringBuilder();
       String line = br.readLine();
 
       while (line != null) {
@@ -144,11 +156,10 @@ public class TaskUtil {
         sb.append(System.lineSeparator());
         line = br.readLine();
       }
-      String everything = sb.toString();
-      System.out.println(everything);
     } finally {
       br.close();
     }
+    return sb.toString();
   }
   
   public static String getSystemProperty(String param){

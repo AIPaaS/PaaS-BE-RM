@@ -1,5 +1,6 @@
 package com.ai.paas.cpaas.rm.manage.service.marathon;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import com.ai.paas.cpaas.rm.util.AnsibleCommand;
+import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
@@ -18,6 +20,9 @@ public class MaInstall implements Tasklet {
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/marathon/marathoninstall.yml");
+    TaskUtil.uploadFile("marathoninstall.yml", in);
+    
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance mesosInstance = mesosMaster.get(0);
@@ -43,7 +48,7 @@ public class MaInstall implements Tasklet {
     installvars.add(master.toString());
     installvars.add("ansible_ssh_pass=" + passwd);
     installvars.add("ansible_become_pass=" + passwd);
-    AnsibleCommand installCommand = new AnsibleCommand(TaskUtil.filepath + "marathoninstall.yml", user, installvars);
+    AnsibleCommand installCommand = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/marathoninstall.yml", user, installvars);
     StringEntity entity = TaskUtil.genCommandParam(installCommand.toString());
     TaskUtil.executeCommand(entity,"command");
     return RepeatStatus.FINISHED;

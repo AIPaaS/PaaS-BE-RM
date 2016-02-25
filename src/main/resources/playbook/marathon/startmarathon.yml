@@ -1,0 +1,12 @@
+--- 
+- hosts: '{{hosts}}'
+  user: rcmarathon
+  vars: 
+  tasks:
+     - name: echo hostname file
+       shell: echo "{{hostname}}" > hostname
+       args:
+            chdir: /etc/marathon/conf
+       sudo: yes
+     - name: start marathon service
+       service: name=marathon state=restarted

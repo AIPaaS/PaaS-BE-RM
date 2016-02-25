@@ -1,5 +1,6 @@
 package com.ai.paas.cpaas.rm.manage.service.zookeeper;
 
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,6 +11,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import com.ai.paas.cpaas.rm.util.AnsibleCommand;
+import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
@@ -18,6 +20,9 @@ public class ModifyZkConf implements Tasklet {
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/zookeeper/zookeeperinstall.yml");
+    TaskUtil.uploadFile("zookeeperinstall.yml", in);
+    
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance instance = mesosMaster.get(0);
@@ -33,7 +38,7 @@ public class ModifyZkConf implements Tasklet {
     }
     lines.append("]");
     configvars.add(lines.toString());
-    AnsibleCommand zookeeperinstall = new AnsibleCommand(TaskUtil.filepath + "/zookeeperinstall.yml", "root", configvars);
+    AnsibleCommand zookeeperinstall = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/zookeeperinstall.yml", "root", configvars);
     StringEntity entity = TaskUtil.genCommandParam(zookeeperinstall.toString());
     TaskUtil.executeCommand(entity,"command");
     return RepeatStatus.FINISHED;

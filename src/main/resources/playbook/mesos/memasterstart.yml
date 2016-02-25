@@ -1,0 +1,13 @@
+---
+- hosts: '{{hosts}}'
+  user: rcmesos
+  vars:
+  tasks:
+     - name: touch /etc/mesos-master/hostname
+       file: path=/etc/mesos-master/hostname state=touch owner=root mode=0744
+       sudo: yes
+     - name: modify hostname for mesos-master
+       lineinfile: dest=/etc/mesos-master/hostname line={{hostname}}
+     - name: restart mesos-master service
+       service: name=mesos-master state=restarted
+       sudo: yes

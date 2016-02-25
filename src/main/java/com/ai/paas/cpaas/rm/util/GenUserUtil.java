@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.util;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,6 +16,9 @@ public class GenUserUtil {
 
   public static void genUser(ChunkContext chunkContext, String fileName, String user, String hosts) throws ClientProtocolException, IOException,
       PaasException {
+    //上传hostnamectl.yml
+    InputStream in = GenUserUtil.class.getResourceAsStream("/playbook/adduser.yml");
+    TaskUtil.uploadFile("adduser.yml", in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
@@ -27,7 +31,6 @@ public class GenUserUtil {
     userVars.add("username=" + user);
     userVars.add("hosts=" + hosts);
     userVars.add("line='" + user + "    ALL=(ALL)      ALL'");
-    // TODO
     // 获取密码
     String password = TaskUtil.generatePasswd();
     // 将生成密码存入上下文中
@@ -36,7 +39,7 @@ public class GenUserUtil {
         + "')\"`");
     shellContext.append(System.lineSeparator());
     userVars.add("password=$passwd");
-    AnsibleCommand genUserCommand = new AnsibleCommand(TaskUtil.filepath + "/adduser.yml", mesosInstance.getRoot(), userVars);
+    AnsibleCommand genUserCommand = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/adduser.yml", mesosInstance.getRoot(), userVars);
     shellContext.append(genUserCommand.toString());
     shellContext.append(System.lineSeparator());
     TaskUtil.executeFile(fileName, shellContext.toString());

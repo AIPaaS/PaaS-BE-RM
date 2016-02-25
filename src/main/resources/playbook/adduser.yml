@@ -1,0 +1,16 @@
+---
+- hosts: '{{ hosts }}'
+  user: root
+  vars:
+  tasks:
+    - name: add user rcflannel and rcmesos
+      user: name={{ username }}  state=present  groups="root" password={{ password }}
+    - name: copy sudoers file for safety
+      command: cp -f /etc/sudoers /etc/sudoers.tmp
+    - name: create sudoers file backup
+      command: cp -f /etc/sudoers /etc/sudoers.bak
+    - file: path=/etc/sudoers.tmp owner=root group=root mode=0744
+    - name: modify /etc/sudoers.tmp insert lines
+      lineinfile:  dest=/etc/sudoers.tmp  insertafter="root *" line='{{ line }}'
+    - name: final sudoers file check
+      shell: visudo -q -c -f /etc/sudoers.tmp && cp -f /etc/sudoers.tmp /etc/sudoers
