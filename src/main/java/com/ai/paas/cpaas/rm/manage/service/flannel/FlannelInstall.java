@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.entity.StringEntity;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -22,9 +21,10 @@ public class FlannelInstall implements Tasklet {
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/flannel/flannelinstall.yml");
-    TaskUtil.uploadFile("flannelinstall.yml", in);
-
+    String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    Boolean useAgent = openParam.getUseAgent();
+    TaskUtil.uploadFile("flannelinstall.yml", content, useAgent);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance masternode = mesosMaster.get(0);
     StringBuffer flannelEtcd = new StringBuffer("FLANNEL_ETCD=");
@@ -49,8 +49,7 @@ public class FlannelInstall implements Tasklet {
     AnsibleCommand command =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/flannelinstall.yml",
             "rcflannel", vars);
-    StringEntity entity = TaskUtil.genCommandParam(command.toString());
-    TaskUtil.executeCommand(entity, "command");
+    TaskUtil.executeCommand(command.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

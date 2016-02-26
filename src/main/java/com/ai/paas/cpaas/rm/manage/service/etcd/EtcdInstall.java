@@ -18,12 +18,15 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 public class EtcdInstall implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/etcd/etcdinstall.yml");
-    TaskUtil.uploadFile("etcdinstall.yml", in);
+    String content = TaskUtil.getFile(in);
+    OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    Boolean useAgent = openParam.getUseAgent();
+    TaskUtil.uploadFile("etcdinstall.yml", content, useAgent);
     // 构建执行文件
     StringBuffer shellContext = TaskUtil.createBashFile();
-    OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance masternode = mesosMaster.get(0);
     String passwd = masternode.getPasswd();
@@ -51,11 +54,13 @@ public class EtcdInstall implements Tasklet {
       vars.add("initial_advertise_peer_urls='ETCD_INITIAL_ADVERTISE_PEER_URLS=" + url + ":2380'");
       vars.add("advertise_client_urls='ETCD_ADVERTISE_CLIENT_URLS=" + url + ":2379'");
 
-      AnsibleCommand command = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/etcdinstall.yml", "root", vars);
+      AnsibleCommand command =
+          new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/etcdinstall.yml", "root",
+              vars);
       shellContext.append(command.toString());
       shellContext.append(System.lineSeparator());
     }
-    TaskUtil.executeFile("etcdInstall", shellContext.toString());
+    TaskUtil.executeFile("etcdInstall", shellContext.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

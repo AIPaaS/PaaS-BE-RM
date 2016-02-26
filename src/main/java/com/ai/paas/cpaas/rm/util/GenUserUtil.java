@@ -14,12 +14,15 @@ import com.ai.paas.ipaas.PaasException;
 
 public class GenUserUtil {
 
-  public static void genUser(ChunkContext chunkContext, String fileName, String user, String hosts) throws ClientProtocolException, IOException,
-      PaasException {
-    //上传hostnamectl.yml
-    InputStream in = GenUserUtil.class.getResourceAsStream("/playbook/adduser.yml");
-    TaskUtil.uploadFile("adduser.yml", in);
+  public static void genUser(ChunkContext chunkContext, String fileName, String user, String hosts)
+      throws ClientProtocolException, IOException, PaasException {
+
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    InputStream in = GenUserUtil.class.getResourceAsStream("/playbook/adduser.yml");
+    String content = TaskUtil.getFile(in);
+    Boolean useAgent = openParam.getUseAgent();
+    TaskUtil.uploadFile("adduser.yml", content, useAgent);
+
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     // 创建用户
@@ -34,14 +37,18 @@ public class GenUserUtil {
     // 获取密码
     String password = TaskUtil.generatePasswd();
     // 将生成密码存入上下文中
-    chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put("password", password);
-    shellContext.append("passwd=`python -c \"from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.encrypt('" + password
-        + "')\"`");
+    chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext()
+        .put("password", password);
+    shellContext
+        .append("passwd=`python -c \"from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.encrypt('"
+            + password + "')\"`");
     shellContext.append(System.lineSeparator());
     userVars.add("password=$passwd");
-    AnsibleCommand genUserCommand = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/adduser.yml", mesosInstance.getRoot(), userVars);
+    AnsibleCommand genUserCommand =
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/adduser.yml",
+            mesosInstance.getRoot(), userVars);
     shellContext.append(genUserCommand.toString());
     shellContext.append(System.lineSeparator());
-    TaskUtil.executeFile(fileName, shellContext.toString());
+    TaskUtil.executeFile(fileName, shellContext.toString(), useAgent);
   }
 }

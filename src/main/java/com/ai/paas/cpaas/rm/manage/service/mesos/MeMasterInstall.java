@@ -18,18 +18,23 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 public class MeMasterInstall implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/mesos/mesosmaster.yml");
-    TaskUtil.uploadFile("mesosmaster.yml", in);
-    
+    String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    Boolean useAgent = openParam.getUseAgent();
+    TaskUtil.uploadFile("mesosmaster.yml", content, useAgent);
+
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     // 创建mesos用户
     MesosInstance mesosInstance = mesosMaster.get(0);
     // mesos master 安装
     List<String> installVars = new ArrayList<String>();
-    String password = (String) chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().get("password");
+    String password =
+        (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
+            .getExecutionContext().get("password");
     installVars.add("ansible_ssh_pass=" + password);
     installVars.add("ansible_become_pass=" + password);
     StringBuffer zkMessage = new StringBuffer();
@@ -42,10 +47,12 @@ public class MeMasterInstall implements Tasklet {
     zkMessage.append("/mesos");
     installVars.add(zkMessage.toString());
     installVars.add("quorum=1");
-    AnsibleCommand mesosMasterCommand = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/mesosmaster.yml", "rcmesos", installVars);
+    AnsibleCommand mesosMasterCommand =
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/mesosmaster.yml", "rcmesos",
+            installVars);
     shellContext.append(mesosMasterCommand.toString());
     shellContext.append(System.lineSeparator());
-    TaskUtil.executeFile("mesosMasterInstall", shellContext.toString());
+    TaskUtil.executeFile("mesosMasterInstall", shellContext.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

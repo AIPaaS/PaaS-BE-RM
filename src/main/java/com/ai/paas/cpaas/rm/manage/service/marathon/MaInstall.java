@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.entity.StringEntity;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -19,11 +18,14 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 public class MaInstall implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/marathon/marathoninstall.yml");
-    TaskUtil.uploadFile("marathoninstall.yml", in);
-    
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
+    InputStream in =
+        OpenPortUtil.class.getResourceAsStream("/playbook/marathon/marathoninstall.yml");
+    String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    Boolean useAgent = openParam.getUseAgent();
+    TaskUtil.uploadFile("marathoninstall.yml", content, useAgent);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance mesosInstance = mesosMaster.get(0);
     String user = mesosInstance.getRoot();
@@ -48,9 +50,10 @@ public class MaInstall implements Tasklet {
     installvars.add(master.toString());
     installvars.add("ansible_ssh_pass=" + passwd);
     installvars.add("ansible_become_pass=" + passwd);
-    AnsibleCommand installCommand = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/marathoninstall.yml", user, installvars);
-    StringEntity entity = TaskUtil.genCommandParam(installCommand.toString());
-    TaskUtil.executeCommand(entity,"command");
+    AnsibleCommand installCommand =
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/marathoninstall.yml", user,
+            installvars);
+    TaskUtil.executeCommand(installCommand.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

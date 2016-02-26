@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.entity.StringEntity;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -19,19 +18,24 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 public class DockerInstallService implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/docker/dockerinstall.yml");
-    TaskUtil.uploadFile("dockerinstall.yml", in);
+    String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    Boolean useAgent = openParam.getUseAgent();
+    TaskUtil.uploadFile("dockerinstall.yml", content, useAgent);
+
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance instance = mesosMaster.get(0);
     String password = instance.getPasswd();
     List<String> configvars = new ArrayList<String>();
     configvars.add("ansible_ssh_pass=" + password);
     configvars.add("ansible_become_pass=" + password);
-    AnsibleCommand dockerinstall = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/dockerinstall.yml", instance.getRoot(), configvars);
-    StringEntity entity = TaskUtil.genCommandParam(dockerinstall.toString());
-    TaskUtil.executeCommand(entity,"command");
+    AnsibleCommand dockerinstall =
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/dockerinstall.yml",
+            instance.getRoot(), configvars);
+    TaskUtil.executeCommand(dockerinstall.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

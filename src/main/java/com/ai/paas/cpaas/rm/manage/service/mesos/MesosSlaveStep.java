@@ -19,11 +19,14 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 public class MesosSlaveStep implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/mesos/messlaveinstall.yml");
-    TaskUtil.uploadFile("messlaveinstall.yml", in);
-    
+    String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    Boolean useAgent = openParam.getUseAgent();
+    TaskUtil.uploadFile("messlaveinstall.yml", content, useAgent);
+
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosSlave> slavenodes = openParam.getMesosSlave();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
@@ -31,7 +34,9 @@ public class MesosSlaveStep implements Tasklet {
 
     List<String> vars = new ArrayList<String>();
 
-    String password = (String) chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().get("password");
+    String password =
+        (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
+            .getExecutionContext().get("password");
     vars.add("ansible_ssh_pass=" + password);
     vars.add("ansible_become_pass=" + password);
 
@@ -50,13 +55,15 @@ public class MesosSlaveStep implements Tasklet {
       vars.add("hostname=" + node.getIp());
       vars.add("ip=" + node.getIp());
       vars.add("hosts" + node.getIp());
-      AnsibleCommand command = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/messlaveinstall.yml", "rcmesos", vars);
+      AnsibleCommand command =
+          new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/messlaveinstall.yml",
+              "rcmesos", vars);
       vars.remove(7);
       vars.remove(6);
       vars.remove(5);
       shellContext.append(command.toString());
     }
-    TaskUtil.executeFile("mesosSlaveStep", shellContext.toString());
+    TaskUtil.executeFile("mesosSlaveStep", shellContext.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

@@ -4,7 +4,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.apache.http.entity.StringEntity;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -19,11 +18,15 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 public class ModifyZkConf implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/zookeeper/zookeeperinstall.yml");
-    TaskUtil.uploadFile("zookeeperinstall.yml", in);
-    
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
+    InputStream in =
+        OpenPortUtil.class.getResourceAsStream("/playbook/zookeeper/zookeeperinstall.yml");
+    String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    Boolean useAgent = openParam.getUseAgent();
+    TaskUtil.uploadFile("zookeeperinstall.yml", content, useAgent);
+
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance instance = mesosMaster.get(0);
     String password = instance.getPasswd();
@@ -38,9 +41,10 @@ public class ModifyZkConf implements Tasklet {
     }
     lines.append("]");
     configvars.add(lines.toString());
-    AnsibleCommand zookeeperinstall = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/zookeeperinstall.yml", "root", configvars);
-    StringEntity entity = TaskUtil.genCommandParam(zookeeperinstall.toString());
-    TaskUtil.executeCommand(entity,"command");
+    AnsibleCommand zookeeperinstall =
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/zookeeperinstall.yml",
+            "root", configvars);
+    TaskUtil.executeCommand(zookeeperinstall.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

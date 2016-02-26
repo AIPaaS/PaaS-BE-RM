@@ -15,7 +15,8 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 public class AnsibleHostsConfig implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     // 构建执行文件
     StringBuffer shellContext = TaskUtil.createBashFile();
@@ -28,11 +29,12 @@ public class AnsibleHostsConfig implements Tasklet {
       String masterName = TaskUtil.genMasterName(i + 1);
       String ip = mesosmaster.get(i).getIp();
 
-      shellContext.append("["+masterName+"]");
+      shellContext.append("[" + masterName + "]");
       shellContext.append(System.lineSeparator());
       shellContext.append(ip);
       shellContext.append(System.lineSeparator());
-      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put(ip,masterName);
+      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext()
+          .put(ip, masterName);
 
     }
     shellContext.append("[master]");
@@ -43,14 +45,15 @@ public class AnsibleHostsConfig implements Tasklet {
     }
 
     for (int i = 0; i < mesosSlave.size(); i++) {
-      String slaveName =  TaskUtil.genSlaveName(i + 1) ;
+      String slaveName = TaskUtil.genSlaveName(i + 1);
       String ip = mesosSlave.get(i).getIp();
 
-      shellContext.append("["+slaveName+"]");
+      shellContext.append("[" + slaveName + "]");
       shellContext.append(System.lineSeparator());
       shellContext.append(ip);
       shellContext.append(System.lineSeparator());
-      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().put(ip,slaveName);
+      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext()
+          .put(ip, slaveName);
     }
     shellContext.append("[slave]");
     shellContext.append(System.lineSeparator());
@@ -70,7 +73,7 @@ public class AnsibleHostsConfig implements Tasklet {
     }
     shellContext.append("EOL");
     shellContext.append(System.lineSeparator());
-    TaskUtil.executeFile("configAnsibleHosts", shellContext.toString());
+    TaskUtil.executeFile("configAnsibleHosts", shellContext.toString(), openParam.getUseAgent());
 
     return RepeatStatus.FINISHED;
   }

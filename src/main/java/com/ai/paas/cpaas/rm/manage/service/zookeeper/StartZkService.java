@@ -18,11 +18,15 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 public class StartZkService implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/zookeeper/zookeeperstart.yml");
-    TaskUtil.uploadFile("zookeeperstart.yml", in);
-    
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
+    InputStream in =
+        OpenPortUtil.class.getResourceAsStream("/playbook/zookeeper/zookeeperstart.yml");
+    String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    Boolean useAgent = openParam.getUseAgent();
+    TaskUtil.uploadFile("zookeeperstart.yml", content, useAgent);
+
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance instance = mesosMaster.get(0);
@@ -34,11 +38,13 @@ public class StartZkService implements Tasklet {
       startvars.add("ansible_become_pass=" + password);
       startvars.add("myid=" + (i + 1));
       startvars.add("hosts=mesos-master" + (i + 1));
-      AnsibleCommand startzkCommand = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/zookeeperstart.yml", "root", startvars);
+      AnsibleCommand startzkCommand =
+          new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/zookeeperstart.yml",
+              "root", startvars);
       shellContext.append(startzkCommand.toString());
       shellContext.append(System.lineSeparator());
     }
-    TaskUtil.executeFile("StartZkServiceStep", shellContext.toString());
+    TaskUtil.executeFile("StartZkServiceStep", shellContext.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

@@ -18,14 +18,18 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 public class MeMasterStart implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/mesos/memasterstart.yml");
-    TaskUtil.uploadFile("memasterstart.yml", in);
-    
+    String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    Boolean useAgent = openParam.getUseAgent();
+    TaskUtil.uploadFile("memasterstart.yml", content, useAgent);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     StringBuffer shellContext = TaskUtil.createBashFile();
-    String password = (String) chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().get("password");
+    String password =
+        (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
+            .getExecutionContext().get("password");
     // 添加hostname文件，并启动mesos master
     for (int i = 0; i < mesosMaster.size(); i++) {
       MesosInstance masterInstance = mesosMaster.get(i);
@@ -34,11 +38,13 @@ public class MeMasterStart implements Tasklet {
       startVars.add("ansible_become_pass=" + password);
       startVars.add("hosts=" + TaskUtil.genMasterName(i + 1));
       startVars.add("hostname=" + masterInstance.getIp());
-      AnsibleCommand masterStart = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/memasterstart.yml", "rcmesos", startVars);
+      AnsibleCommand masterStart =
+          new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/memasterstart.yml",
+              "rcmesos", startVars);
       shellContext.append(masterStart.toString());
       shellContext.append(System.lineSeparator());
     }
-    TaskUtil.executeFile("mesosMasterStart", shellContext.toString());
+    TaskUtil.executeFile("mesosMasterStart", shellContext.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 }

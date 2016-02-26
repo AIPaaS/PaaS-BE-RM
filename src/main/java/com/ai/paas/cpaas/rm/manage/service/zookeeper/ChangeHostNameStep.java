@@ -18,29 +18,35 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 public class ChangeHostNameStep implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-    //上传hostnamectl.yml
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
+    // 上传hostnamectl.yml
     InputStream in = ChangeHostNameStep.class.getResourceAsStream("/playbook/hostnamectl.yml");
-    TaskUtil.uploadFile("hostnamectl.yml", in);
-    
+    String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    Boolean useAgent = openParam.getUseAgent();
+    TaskUtil.uploadFile("hostnamectl.yml", content, useAgent);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     List<MesosSlave> mesosSlave = openParam.getMesosSlave();
     StringBuffer shellContext = TaskUtil.createBashFile();
     for (int i = 0; i < mesosMaster.size(); i++) {
       MesosInstance instance = mesosMaster.get(i);
       String ip = instance.getIp();
-      String name = (String) chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().get(ip);
+      String name =
+          (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
+              .getExecutionContext().get(ip);
       this.genCommand(instance, shellContext, name);
     }
     for (int i = 0; i < mesosSlave.size(); i++) {
       MesosSlave instance = mesosSlave.get(i);
       String ip = instance.getIp();
-      String name = (String) chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().get(ip);
+      String name =
+          (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
+              .getExecutionContext().get(ip);
       this.genCommand(instance, shellContext, name);
     }
     // 将shellContext传到服务端，并执行
-    TaskUtil.executeFile("changehostnames", shellContext.toString());
+    TaskUtil.executeFile("changehostnames", shellContext.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 
@@ -54,7 +60,9 @@ public class ChangeHostNameStep implements Tasklet {
     vars.add(hostname.toString());
     vars.add(password);
     vars.add(hostsParam);
-    AnsibleCommand ansibleCommand = new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/hostnamectl.yml", instance.getRoot(), vars);
+    AnsibleCommand ansibleCommand =
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/hostnamectl.yml",
+            instance.getRoot(), vars);
     shellContext.append(ansibleCommand.toString());
     shellContext.append(System.lineSeparator());
   }

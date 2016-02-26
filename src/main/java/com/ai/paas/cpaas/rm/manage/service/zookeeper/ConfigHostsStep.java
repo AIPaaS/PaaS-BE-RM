@@ -15,7 +15,8 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 public class ConfigHostsStep implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     List<MesosSlave> mesosSlave = openParam.getMesosSlave();
@@ -29,18 +30,22 @@ public class ConfigHostsStep implements Tasklet {
     for (int i = 0; i < mesosMaster.size(); i++) {
       MesosInstance instance = mesosMaster.get(i);
       String ip = instance.getIp();
-      String name = (String) chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().get(ip);
+      String name =
+          (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
+              .getExecutionContext().get(ip);
       this.genHostsLine(instance, name, shellContext);
     }
     for (int i = 0; i < mesosSlave.size(); i++) {
       MesosSlave instance = mesosSlave.get(i);
       String ip = instance.getIp();
-      String name = (String) chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().get(ip);
+      String name =
+          (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
+              .getExecutionContext().get(ip);
       this.genHostsLine(instance, name, shellContext);
     }
     shellContext.append("EOL");
     shellContext.append(System.lineSeparator());
-    TaskUtil.executeFile("confighosts", shellContext.toString());
+    TaskUtil.executeFile("confighosts", shellContext.toString(), openParam.getUseAgent());
     return RepeatStatus.FINISHED;
   }
 
