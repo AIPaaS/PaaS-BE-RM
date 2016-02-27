@@ -20,8 +20,10 @@ public class AnsibleHostsConfig implements Tasklet {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     // 构建执行文件
     StringBuffer shellContext = TaskUtil.createBashFile();
-    shellContext.append("mv /etc/ansible/hosts /etc/ansible/hosts.bak\n");
-    shellContext.append("cat >/etc/ansible/hosts <<EOL\n");
+    shellContext.append("mv /etc/ansible/hosts /etc/ansible/hosts.bak");
+    shellContext.append(System.lineSeparator());
+    shellContext.append("cat >/etc/ansible/hosts <<-EOL");
+    shellContext.append(System.lineSeparator());
 
     List<MesosInstance> mesosmaster = openParam.getMesosMaster();
     List<MesosSlave> mesosSlave = openParam.getMesosSlave();
@@ -71,6 +73,7 @@ public class AnsibleHostsConfig implements Tasklet {
       shellContext.append(mesosSlave.get(i).getIp());
       shellContext.append(System.lineSeparator());
     }
+    // TODO
     shellContext.append("EOL");
     shellContext.append(System.lineSeparator());
     TaskUtil.executeFile("configAnsibleHosts", shellContext.toString(), openParam.getUseAgent());

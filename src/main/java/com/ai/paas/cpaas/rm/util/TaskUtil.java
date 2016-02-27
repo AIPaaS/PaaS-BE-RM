@@ -37,7 +37,10 @@ public class TaskUtil {
 
   public static StringBuffer createBashFile() {
     StringBuffer shellContext = new StringBuffer();
-    shellContext.append("#!/bin/bash\n");
+    // TODO
+    // shellContext.append("#!/bin/bash");
+    shellContext.append("#!/bin/bash");
+    shellContext.append("\n");
     return shellContext;
   }
 
@@ -132,5 +135,14 @@ public class TaskUtil {
       ex.printStackTrace();
     }
     return property;
+  }
+
+  // Ìæ»»windows»»ÐÐ·û
+  public static String replaceIllegalCharacter(String source) {
+    if (source == null) return source;
+    /*
+     * String reg = "[\n-\r]"; Pattern p = Pattern.compile(reg); Matcher m = p.matcher(source);
+     */
+    return source.replaceAll("\r\n", "\n");
   }
 }

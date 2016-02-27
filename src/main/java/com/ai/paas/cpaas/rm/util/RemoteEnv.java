@@ -18,6 +18,7 @@ import com.ai.paas.cpaas.rm.vo.TransResultVo;
 import com.ai.paas.ipaas.PaasException;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
 
 public class RemoteEnv implements ExecuteEnv {
 
@@ -51,7 +52,18 @@ public class RemoteEnv implements ExecuteEnv {
     }
     Gson gson = new Gson();
     TransResultVo resultVo = gson.fromJson(result, TransResultVo.class);
-    if (resultVo.getCode().equals(ExceptionCodeConstants.TransServiceCode.ERROR_CODE)) {
+
+    // TODO
+    // 在ansible执行命令中，resultcode无法作为唯一判定结果，需要对stdout进行分析，
+    if (!resultVo.getCode().equals(ExceptionCodeConstants.TransServiceCode.SUCCESS_CODE)) {
+      // TODO
+      String excResult = resultVo.getMsg();
+      JsonParser parser = new JsonParser();
+      JsonObject o = parser.parse(excResult).getAsJsonObject();
+      String stderr = o.get("stderr").getAsString();
+      String stdout = o.get("stdout").getAsString();
+      System.out.println(stderr + " " + stdout);
+
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
           resultVo.getMsg());
     }
@@ -62,6 +74,8 @@ public class RemoteEnv implements ExecuteEnv {
   public String executeFile(String filename, String content) throws ClientProtocolException,
       IOException, PaasException {
     String filepath = TaskUtil.getSystemProperty("filepath");
+    // TODO
+    // TaskUtil.replaceIllegalCharacter(content);
     // 传输执行文件
     this.uploadFile(filename, content);
 

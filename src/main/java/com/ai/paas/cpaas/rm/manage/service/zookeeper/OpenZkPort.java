@@ -10,9 +10,10 @@ import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 public class OpenZkPort implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
     String user = "rczkp01";
-    String portParam = "ports=[2888,3888]";
+    String portParam = " ports=[2888,3888]";
     return OpenPortUtil.openPort(chunkContext, portParam, user);
   }
 

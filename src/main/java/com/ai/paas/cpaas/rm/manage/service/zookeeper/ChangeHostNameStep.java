@@ -64,6 +64,6 @@ public class ChangeHostNameStep implements Tasklet {
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/hostnamectl.yml",
             instance.getRoot(), vars);
     shellContext.append(ansibleCommand.toString());
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
   }
 }

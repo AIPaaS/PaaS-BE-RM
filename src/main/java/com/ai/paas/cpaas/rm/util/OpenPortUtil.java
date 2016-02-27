@@ -24,9 +24,15 @@ public class OpenPortUtil {
     TaskUtil.uploadFile("openport.yml", content, useAgent);
     String password =
         (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
-            .getExecutionContext().get("mesosPassword");
+            .getExecutionContext().get("password");
     // 开放指定端口
     List<String> portVars = new ArrayList<String>();
+
+    // 对rczkp01做特殊处理
+    if (user.equals("rczkp01")) {
+      user = "root";
+      password = openParam.getMesosMaster().get(0).getPasswd();
+    }
     portVars.add("ansible_ssh_pass=" + password);
     portVars.add("ansible_become_pass=" + password);
     // portVars.add("ports=[5050,8080]");

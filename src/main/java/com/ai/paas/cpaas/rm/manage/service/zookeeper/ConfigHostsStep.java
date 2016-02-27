@@ -23,7 +23,7 @@ public class ConfigHostsStep implements Tasklet {
     StringBuffer shellContext = TaskUtil.createBashFile();
     shellContext.append("mv /etc/hosts /etc/hosts.bak");
     shellContext.append(System.lineSeparator());
-    shellContext.append("cat >/etc/hosts <<EOL");
+    shellContext.append("cat >/etc/hosts <<-EOL");
     shellContext.append(System.lineSeparator());
     shellContext.append("127.0.0.1 localhost ");
     shellContext.append(System.lineSeparator());
