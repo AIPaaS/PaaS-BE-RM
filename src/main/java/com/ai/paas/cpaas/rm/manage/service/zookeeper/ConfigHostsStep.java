@@ -22,11 +22,11 @@ public class ConfigHostsStep implements Tasklet {
     List<MesosSlave> mesosSlave = openParam.getMesosSlave();
     StringBuffer shellContext = TaskUtil.createBashFile();
     shellContext.append("mv /etc/hosts /etc/hosts.bak");
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
     shellContext.append("cat >/etc/hosts <<-EOL");
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
     shellContext.append("127.0.0.1 localhost ");
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
     for (int i = 0; i < mesosMaster.size(); i++) {
       MesosInstance instance = mesosMaster.get(i);
       String ip = instance.getIp();
@@ -44,7 +44,7 @@ public class ConfigHostsStep implements Tasklet {
       this.genHostsLine(instance, name, shellContext);
     }
     shellContext.append("EOL");
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
     TaskUtil.executeFile("confighosts", shellContext.toString(), openParam.getUseAgent());
     return RepeatStatus.FINISHED;
   }
@@ -52,6 +52,6 @@ public class ConfigHostsStep implements Tasklet {
   public void genHostsLine(MesosInstance instance, String name, StringBuffer shellContext) {
     String ip = instance.getIp();
     shellContext.append(ip + "  " + name);
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
   }
 }

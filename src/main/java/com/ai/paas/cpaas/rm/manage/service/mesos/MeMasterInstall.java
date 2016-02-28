@@ -51,7 +51,7 @@ public class MeMasterInstall implements Tasklet {
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/mesosmaster.yml", "rcmesos",
             installVars);
     shellContext.append(mesosMasterCommand.toString());
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
     TaskUtil.executeFile("mesosMasterInstall", shellContext.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }

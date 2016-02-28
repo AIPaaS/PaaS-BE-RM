@@ -42,13 +42,13 @@ public class GenUserUtil {
     shellContext
         .append("passwd=`python -c \"from passlib.hash import sha512_crypt; import getpass; print sha512_crypt.encrypt('"
             + password + "')\"`");
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
     userVars.add("password=$passwd");
     AnsibleCommand genUserCommand =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/adduser.yml",
             mesosInstance.getRoot(), userVars);
     shellContext.append(genUserCommand.toString());
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
     TaskUtil.executeFile(fileName, shellContext.toString(), useAgent);
   }
 }

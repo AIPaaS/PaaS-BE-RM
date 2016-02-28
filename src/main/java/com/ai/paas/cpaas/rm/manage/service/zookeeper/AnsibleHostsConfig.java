@@ -21,9 +21,9 @@ public class AnsibleHostsConfig implements Tasklet {
     // 构建执行文件
     StringBuffer shellContext = TaskUtil.createBashFile();
     shellContext.append("mv /etc/ansible/hosts /etc/ansible/hosts.bak");
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
     shellContext.append("cat >/etc/ansible/hosts <<-EOL");
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
 
     List<MesosInstance> mesosmaster = openParam.getMesosMaster();
     List<MesosSlave> mesosSlave = openParam.getMesosSlave();
@@ -32,18 +32,18 @@ public class AnsibleHostsConfig implements Tasklet {
       String ip = mesosmaster.get(i).getIp();
 
       shellContext.append("[" + masterName + "]");
-      shellContext.append(System.lineSeparator());
+      shellContext.append("\n");
       shellContext.append(ip);
-      shellContext.append(System.lineSeparator());
+      shellContext.append("\n");
       chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext()
           .put(ip, masterName);
 
     }
     shellContext.append("[master]");
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
     for (int i = 0; i < mesosmaster.size(); i++) {
       shellContext.append(mesosmaster.get(i).getIp());
-      shellContext.append(System.lineSeparator());
+      shellContext.append("\n");
     }
 
     for (int i = 0; i < mesosSlave.size(); i++) {
@@ -51,31 +51,31 @@ public class AnsibleHostsConfig implements Tasklet {
       String ip = mesosSlave.get(i).getIp();
 
       shellContext.append("[" + slaveName + "]");
-      shellContext.append(System.lineSeparator());
+      shellContext.append("\n");
       shellContext.append(ip);
-      shellContext.append(System.lineSeparator());
+      shellContext.append("\n");
       chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext()
           .put(ip, slaveName);
     }
     shellContext.append("[slave]");
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
     for (int i = 0; i < mesosSlave.size(); i++) {
       shellContext.append(mesosSlave.get(i).getIp());
-      shellContext.append(System.lineSeparator());
+      shellContext.append("\n");
     }
     shellContext.append("[nodes]");
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
     for (int i = 0; i < mesosmaster.size(); i++) {
       shellContext.append(mesosmaster.get(i).getIp());
-      shellContext.append(System.lineSeparator());
+      shellContext.append("\n");
     }
     for (int i = 0; i < mesosSlave.size(); i++) {
       shellContext.append(mesosSlave.get(i).getIp());
-      shellContext.append(System.lineSeparator());
+      shellContext.append("\n");
     }
     // TODO
     shellContext.append("EOL");
-    shellContext.append(System.lineSeparator());
+    shellContext.append("\n");
     TaskUtil.executeFile("configAnsibleHosts", shellContext.toString(), openParam.getUseAgent());
 
     return RepeatStatus.FINISHED;

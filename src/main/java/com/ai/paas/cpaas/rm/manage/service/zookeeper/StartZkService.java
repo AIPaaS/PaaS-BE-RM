@@ -42,7 +42,7 @@ public class StartZkService implements Tasklet {
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/zookeeperstart.yml",
               "root", startvars);
       shellContext.append(startzkCommand.toString());
-      shellContext.append(System.lineSeparator());
+      shellContext.append("\n");
     }
     TaskUtil.executeFile("StartZkServiceStep", shellContext.toString(), useAgent);
     return RepeatStatus.FINISHED;

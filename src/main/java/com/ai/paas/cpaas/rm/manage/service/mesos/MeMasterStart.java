@@ -42,7 +42,7 @@ public class MeMasterStart implements Tasklet {
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/memasterstart.yml",
               "rcmesos", startVars);
       shellContext.append(masterStart.toString());
-      shellContext.append(System.lineSeparator());
+      shellContext.append("\n");
     }
     TaskUtil.executeFile("mesosMasterStart", shellContext.toString(), useAgent);
     return RepeatStatus.FINISHED;

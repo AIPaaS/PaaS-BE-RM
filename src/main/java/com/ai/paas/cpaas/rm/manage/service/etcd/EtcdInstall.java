@@ -58,7 +58,7 @@ public class EtcdInstall implements Tasklet {
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/etcdinstall.yml", "root",
               vars);
       shellContext.append(command.toString());
-      shellContext.append(System.lineSeparator());
+      shellContext.append("\n");
     }
     TaskUtil.executeFile("etcdInstall", shellContext.toString(), useAgent);
     return RepeatStatus.FINISHED;

@@ -41,7 +41,7 @@ public class MaStart implements Tasklet {
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/startmarathon.yml",
               "rcmarathon", startVars);
       shellContext.append(masterStart.toString());
-      shellContext.append(System.lineSeparator());
+      shellContext.append("\n");
     }
     TaskUtil.executeFile("marathonStart", shellContext.toString(), useAgent);
     return RepeatStatus.FINISHED;
