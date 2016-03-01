@@ -8,6 +8,9 @@
       - name: yum install marathon
         yum: name=marathon state=latest
         sudo: yes
+      - name: create dir /etc/marathon/conf
+        file: path=/etc/marathon/conf state=directory mode=0755
+        sudo: yes
       - name: echo event_subscriber
         shell: echo "{{subscriber}}" > event_subscriber
         args:
@@ -24,7 +27,7 @@
              chdir: /etc/marathon/conf
         sudo: yes
       - name: open 8080 port
-        commad: firewall-cmd --zone=public --add-port={{item}}/tcp --permanent
+        firewalld: port={{ item }}/tcp permanent=true state=enabled
         with_items:
                 - 8080
         sudo: yes

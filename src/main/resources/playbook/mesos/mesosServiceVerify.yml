@@ -1,0 +1,19 @@
+---
+- hosts: slave
+  user: root
+  tasks:
+    - name: Wait for Mesosphere to be up
+      wait_for: host={{ item }} port=5050 state=started delay=3 timeout=5
+      with_items:
+         - "{{ inventory_hosts }}"
+      sudo: yes
+    - name: Test for Mesosphere metrics endpoint
+      get_url: 
+        url="http://{{ item }}:5050/metrics/snapshot" 
+        dest=/tmp/mesos-metrics
+        force=yes
+      with_items:
+         - "{{ inventory_hosts }}"
+      register: status
+      failed_when: "'OK' not in status.msg"
+      sudo: yes

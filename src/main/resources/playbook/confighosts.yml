@@ -1,0 +1,12 @@
+---
+- hosts: nodes
+  user: root
+  tasks:
+     - name: cp /etc/hosts to /etc/hosts.bak
+       command: cp /etc/hosts /etc/hosts.bak
+       sudo: yes
+     - name: insert master and slave ip into hosts
+       lineinfile: dest=/etc/hosts line="{{ item }}" state=present
+       with_items:
+         - "{{ lines }}"
+       sudo: yes

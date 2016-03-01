@@ -21,46 +21,42 @@ public class MesosSlaveStep implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
-    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/mesos/messlaveinstall.yml");
+    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/mesos/meslaveinstall.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("messlaveinstall.yml", content, useAgent);
+    TaskUtil.uploadFile("meslaveinstall.yml", content, useAgent);
 
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosSlave> slavenodes = openParam.getMesosSlave();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance masternode = mesosMaster.get(0);
 
-    List<String> vars = new ArrayList<String>();
-
     String password =
         (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
             .getExecutionContext().get("password");
-    vars.add("ansible_ssh_pass=" + password);
-    vars.add("ansible_become_pass=" + password);
+
 
     StringBuffer zkMessage = new StringBuffer();
     zkMessage.append("zk=zk://");
     zkMessage.append(masternode.getIp() + ":2181");
-    for (MesosInstance mesos : mesosMaster) {
-      zkMessage.append("," + mesos.getIp() + ":2181");
+    for (int i = 1; i < mesosMaster.size(); i++) {
+      zkMessage.append("," + mesosMaster.get(i).getIp() + ":2181");
     }
     zkMessage.append("/mesos");
-    vars.add(zkMessage.toString());
-    vars.add("containerizers=docker,mesos");
-    vars.add("timeout=5mins");
-
     for (MesosSlave node : slavenodes) {
+      List<String> vars = new ArrayList<String>();
+      vars.add("ansible_ssh_pass=" + password);
+      vars.add("ansible_become_pass=" + password);
+      vars.add(zkMessage.toString());
+      vars.add("containerizers=docker,mesos");
+      vars.add("timeout=5mins");
       vars.add("hostname=" + node.getIp());
       vars.add("ip=" + node.getIp());
       vars.add("hosts" + node.getIp());
       AnsibleCommand command =
-          new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/messlaveinstall.yml",
+          new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/meslaveinstall.yml",
               "rcmesos", vars);
-      vars.remove(7);
-      vars.remove(6);
-      vars.remove(5);
       shellContext.append(command.toString());
     }
     TaskUtil.executeFile("mesosSlaveStep", shellContext.toString(), useAgent);

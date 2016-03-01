@@ -1,5 +1,5 @@
 ---
-- hosts: '{{hosts}}'
+- hosts: slave
   user: rcmesos
   vars:
   tasks:
@@ -33,3 +33,4 @@
       sudo: yes
     - name: start mesos-slave
       service: name=mesos-slave state=restarted  enabled=yes
+      sudo: yes

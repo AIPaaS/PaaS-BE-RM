@@ -10,3 +10,4 @@
        sudo: yes
      - name: start marathon service
        service: name=marathon state=restarted  enabled=yes
+       sudo: yes

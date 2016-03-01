@@ -28,13 +28,14 @@ public class MaStart implements Tasklet {
 
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
-    MesosInstance mesosInstance = openParam.getMesosMaster().get(0);
-    String passwd = mesosInstance.getPasswd();
+    String password =
+        (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
+            .getExecutionContext().get("password");
     for (int i = 0; i < mesosMaster.size(); i++) {
       MesosInstance masterInstance = mesosMaster.get(i);
       List<String> startVars = new ArrayList<String>();
-      startVars.add("ansible_ssh_pass=" + passwd);
-      startVars.add("ansible_become_pass=" + passwd);
+      startVars.add("ansible_ssh_pass=" + password);
+      startVars.add("ansible_become_pass=" + password);
       startVars.add("hosts=mesos-master" + (i + 1));
       startVars.add("hostname=" + masterInstance.getIp());
       AnsibleCommand masterStart =

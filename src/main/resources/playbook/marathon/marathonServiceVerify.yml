@@ -1,0 +1,18 @@
+---
+- hosts: slave
+  tasks:
+    - name: Wait for Marathon to be up
+      wait_for: host={{ item }} port=8080 state=started delay=3 timeout=15
+      with_items:
+        - "{{ inventory_hosts }}"
+      sudo: yes
+    - name: Test for Marathon info endpoint
+      get_url: 
+        url="http://{{ item }}:8080/v2/info" 
+        dest=/tmp/marathon-info
+        force=yes
+      with_items:
+        - "{{ inventory_hosts }}"
+      register: status
+      failed_when: "'OK' not in status.msg"
+      sudo: yes

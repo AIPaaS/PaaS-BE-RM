@@ -14,13 +14,13 @@ import com.ai.paas.ipaas.PaasException;
 
 public class VerifyWebService {
 
-  public static void checkwebService(ChunkContext chunkContext, String port)
-      throws ClientProtocolException, IOException, PaasException {
+  public static void checkwebService(ChunkContext chunkContext, String port, String filename,
+      String path) throws ClientProtocolException, IOException, PaasException {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
-    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/checkwebservice.yml");
+    InputStream in = OpenPortUtil.class.getResourceAsStream(path);
     String content = TaskUtil.getFile(in);
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("checkwebservice.yml", content, useAgent);
+    TaskUtil.uploadFile(filename, content, useAgent);
 
 
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
@@ -31,7 +31,7 @@ public class VerifyWebService {
     vars.add("ansible_become_pass=" + passwd);
     StringBuffer inventory_hosts = new StringBuffer();
     inventory_hosts.append("[");
-    inventory_hosts.append("'" + VerifyWebService.genUrl(masternode.getIp(), port) + "'");
+    inventory_hosts.append("'" + masternode.getIp() + "'");
     for (int i = 1; i < mesosMaster.size(); i++) {
       inventory_hosts.append(",");
       inventory_hosts.append("'").append(mesosMaster.get(i).getIp()).append("'");
@@ -39,12 +39,9 @@ public class VerifyWebService {
     inventory_hosts.append("]");
     vars.add("inventory_hosts=" + inventory_hosts.toString());
     AnsibleCommand command =
-        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/checkwebservice.yml", "root",
-            vars);
-    TaskUtil.executeCommand(command.toString(), useAgent);
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/" + filename, "root", vars);
+    TaskUtil.executeFile(filename + ".sh", command.toString(), useAgent);
+    // TaskUtil.executeCommand(command.toString(), useAgent);
   }
 
-  public static String genUrl(String host, String port) {
-    return "http://" + host + ":" + port;
-  }
 }

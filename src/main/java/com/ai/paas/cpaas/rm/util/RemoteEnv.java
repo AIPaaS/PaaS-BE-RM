@@ -14,6 +14,7 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
+import org.hsqldb.lib.StringUtil;
 
 import com.ai.paas.cpaas.rm.vo.TransResultVo;
 import com.ai.paas.ipaas.PaasException;
@@ -79,6 +80,12 @@ public class RemoteEnv implements ExecuteEnv {
       if (stdout.contains("failed") && !stdout.contains("failed=0")) {
         System.out.println(stdout);
         logger.error(stdout);
+        throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+            resultVo.getMsg());
+      }
+      if (!StringUtil.isEmpty(stderr)) {
+        System.out.println(stderr);
+        logger.error(stderr);
         throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
             resultVo.getMsg());
       }

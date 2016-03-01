@@ -28,8 +28,9 @@ public class MaInstall implements Tasklet {
     TaskUtil.uploadFile("marathoninstall.yml", content, useAgent);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance mesosInstance = mesosMaster.get(0);
-    String user = mesosInstance.getRoot();
-    String passwd = mesosInstance.getPasswd();
+    String password =
+        (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
+            .getExecutionContext().get("password");
     StringBuffer zkMessage = new StringBuffer();
     zkMessage.append(mesosInstance.getIp() + ":2181");
     for (int i = 1; i < mesosMaster.size(); i++) {
@@ -48,11 +49,11 @@ public class MaInstall implements Tasklet {
     List<String> installvars = new ArrayList<String>();
     installvars.add(zk.toString());
     installvars.add(master.toString());
-    installvars.add("ansible_ssh_pass=" + passwd);
-    installvars.add("ansible_become_pass=" + passwd);
+    installvars.add("ansible_ssh_pass=" + password);
+    installvars.add("ansible_become_pass=" + password);
     AnsibleCommand installCommand =
-        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/marathoninstall.yml", user,
-            installvars);
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/marathoninstall.yml",
+            "rcmarathon", installvars);
     // TaskUtil.executeCommand(installCommand.toString(), useAgent);
     TaskUtil.executeFile("marathoninstall", installCommand.toString(), useAgent);
     return RepeatStatus.FINISHED;

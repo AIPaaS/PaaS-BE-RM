@@ -9,12 +9,12 @@ import com.ai.paas.cpaas.rm.util.VerifyWebService;
 
 public class MeServiceVerify implements Tasklet {
 
-	@Override
-	public RepeatStatus execute(StepContribution contribution,
-			ChunkContext chunkContext) throws Exception {
-		VerifyWebService.checkwebService(chunkContext, "5050");
-	    return RepeatStatus.FINISHED;
-	}
+  @Override
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
+    VerifyWebService.checkwebService(chunkContext, "5050", "mesosServiceVerify.yml",
+        "/playbook/mesos/mesosServiceVerify.yml");
+    return RepeatStatus.FINISHED;
+  }
 
-	
 }

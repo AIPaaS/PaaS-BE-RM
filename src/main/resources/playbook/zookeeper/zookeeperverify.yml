@@ -1,10 +1,15 @@
 ---
-- hosts: master
+- hosts: slave
+  gather_facts: false
   user: root
-  vars:
   tasks:
-    - name: check zookeeper cluster status
-      wait_for: host={{item}} port=2181 timeout=5
-      delegate_to: localhost 
+    - wait_for: host={{ item }} port=2181 state=started delay=1
       with_items:
          - "{{ inventory_hosts }}"
+      sudo: yes
+    - shell: echo stat | nc {{ item }} 2181
+      with_items:
+         - "{{ inventory_hosts }}"
+      register: status
+      failed_when: status.rc != 0
+      sudo: yes
