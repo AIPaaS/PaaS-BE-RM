@@ -38,7 +38,8 @@ public class EtcdStart implements Tasklet {
     AnsibleCommand command =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "etcdstart.yml", "rcflannel",
             vars);
-    TaskUtil.executeCommand(command.toString(), useAgent);
+    // TaskUtil.executeCommand(command.toString(), useAgent);
+    TaskUtil.executeFile("etcdStart", command.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

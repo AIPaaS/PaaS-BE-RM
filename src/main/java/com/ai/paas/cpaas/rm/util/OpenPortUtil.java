@@ -39,7 +39,9 @@ public class OpenPortUtil {
     portVars.add(portParam);
     AnsibleCommand openPortCommand =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/openport.yml", user, portVars);
-    TaskUtil.executeCommand(openPortCommand.toString(), useAgent);
+    // TODO
+    // TaskUtil.executeCommand(openPortCommand.toString(), useAgent);
+    TaskUtil.executeFile("openportUtil", openPortCommand.toString(), openParam.getUseAgent());
     return RepeatStatus.FINISHED;
   }
 }

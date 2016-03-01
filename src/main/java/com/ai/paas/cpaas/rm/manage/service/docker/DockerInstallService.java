@@ -35,7 +35,8 @@ public class DockerInstallService implements Tasklet {
     AnsibleCommand dockerinstall =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/dockerinstall.yml",
             instance.getRoot(), configvars);
-    TaskUtil.executeCommand(dockerinstall.toString(), useAgent);
+    // TaskUtil.executeCommand(dockerinstall.toString(), useAgent);
+    TaskUtil.executeFile("dockerinstall", dockerinstall.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

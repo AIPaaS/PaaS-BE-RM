@@ -37,8 +37,6 @@ public class TaskUtil {
 
   public static StringBuffer createBashFile() {
     StringBuffer shellContext = new StringBuffer();
-    // TODO
-    // shellContext.append("#!/bin/bash");
     shellContext.append("#!/bin/bash");
     shellContext.append("\n");
     return shellContext;

@@ -5,6 +5,11 @@
      ansible_become_pass: root
      dir: /home/rczkp01/zookeeper/data/myid
   tasks:
+     - name: create zookeeper data directory
+       file: path=/home/rczkp01/zookeeper/data state=directory owner=root mode=0755 recurse=yes
+       sudo: yes
+     - name: create zookeeper log directory
+       file: path=/home/rczkp01/zookeeper/log state=directory owner=root mode=0755 recurse=yes
      - name: creat myid file
        file: path={{dir}} state=touch owner=root mode=0744
        sudo: yes

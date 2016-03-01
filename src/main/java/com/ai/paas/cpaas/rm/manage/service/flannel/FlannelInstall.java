@@ -49,7 +49,8 @@ public class FlannelInstall implements Tasklet {
     AnsibleCommand command =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/flannelinstall.yml",
             "rcflannel", vars);
-    TaskUtil.executeCommand(command.toString(), useAgent);
+    // TaskUtil.executeCommand(command.toString(), useAgent);
+    TaskUtil.executeFile("flannelinstall", command.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

@@ -35,8 +35,24 @@ public class MgmtOpenServiceTest {
     master.setIp("10.1.241.127");
     master.setRoot("root");
     master.setPasswd("abc@123");
+
+    MesosInstance master1 = new MesosInstance();
+    master1.setId(0);
+    master1.setIp("10.1.241.128");
+    master1.setRoot("root");
+    master1.setPasswd("abc@123");
+
+
+    MesosInstance master2 = new MesosInstance();
+    master2.setId(0);
+    master2.setIp("10.1.241.129");
+    master2.setRoot("root");
+    master2.setPasswd("abc@123");
+
     List<MesosInstance> masters = new ArrayList<MesosInstance>();
     masters.add(master);
+    masters.add(master1);
+    masters.add(master2);
 
     MesosSlave slave = new MesosSlave();
     slave.setId(0);

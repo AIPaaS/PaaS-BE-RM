@@ -38,14 +38,15 @@ public class ZookeeperVerify implements Tasklet {
     inventory_hosts.append("'" + masternode.getIp() + "'");
     for (int i = 1; i < mesosMaster.size(); i++) {
       inventory_hosts.append(",");
-      inventory_hosts.append(mesosMaster.get(i).getIp());
+      inventory_hosts.append("'").append(mesosMaster.get(i).getIp()).append("'");
     }
     inventory_hosts.append("]");
     vars.add("inventory_hosts=" + inventory_hosts.toString());
     AnsibleCommand command =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/zookeeperverify.yml", "root",
             vars);
-    TaskUtil.executeCommand(command.toString(), useAgent);
+    TaskUtil.executeFile("zookeeperverify", command.toString(), useAgent);
+    // TaskUtil.executeCommand(command.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 }

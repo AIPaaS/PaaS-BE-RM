@@ -13,7 +13,7 @@ public class OpenZkPort implements Tasklet {
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
     String user = "rczkp01";
-    String portParam = " ports=[2888,3888]";
+    String portParam = "ports=[2888,3888,2181]";
     return OpenPortUtil.openPort(chunkContext, portParam, user);
   }
 

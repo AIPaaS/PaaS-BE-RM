@@ -21,7 +21,7 @@
       with_items: lines
       sudo: yes
     - name: change user of zoo.cfg
-      file: src=/etc/zookeeper/conf/zoo.cfg owner=rczk01 mode="u=rw,g=rw,o=rw"
+      file: path=/etc/zookeeper/conf/zoo.cfg owner=rczkp01 mode="u=rw,g=rw,o=rw"
       sudo: yes
     - name: export zookeeper config file variable
       lineinfile: dest=/etc/profile line="{{zoocfg}}"

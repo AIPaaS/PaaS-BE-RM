@@ -53,7 +53,8 @@ public class MaInstall implements Tasklet {
     AnsibleCommand installCommand =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/marathoninstall.yml", user,
             installvars);
-    TaskUtil.executeCommand(installCommand.toString(), useAgent);
+    // TaskUtil.executeCommand(installCommand.toString(), useAgent);
+    TaskUtil.executeFile("marathoninstall", installCommand.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

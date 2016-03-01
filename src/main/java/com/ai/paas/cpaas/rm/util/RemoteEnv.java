@@ -13,6 +13,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.log4j.Logger;
 
 import com.ai.paas.cpaas.rm.vo.TransResultVo;
 import com.ai.paas.ipaas.PaasException;
@@ -21,6 +22,8 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class RemoteEnv implements ExecuteEnv {
+
+  private static Logger logger = Logger.getLogger(RemoteEnv.class);
 
   @Override
   public void uploadFile(String filename, String content) throws ClientProtocolException,
@@ -53,20 +56,36 @@ public class RemoteEnv implements ExecuteEnv {
     Gson gson = new Gson();
     TransResultVo resultVo = gson.fromJson(result, TransResultVo.class);
 
-    // TODO
-    // 在ansible执行命令中，resultcode无法作为唯一判定结果，需要对stdout进行分析，
-    if (!resultVo.getCode().equals(ExceptionCodeConstants.TransServiceCode.SUCCESS_CODE)) {
-      // TODO
+    if (!url.contains("upload")) {
       String excResult = resultVo.getMsg();
       JsonParser parser = new JsonParser();
       JsonObject o = parser.parse(excResult).getAsJsonObject();
       String stderr = o.get("stderr").getAsString();
       String stdout = o.get("stdout").getAsString();
-      System.out.println(stderr + " " + stdout);
-
-      throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
-          resultVo.getMsg());
+      // 在ansible执行命令中，resultcode无法作为唯一判定结果，需要对stdout进行分析，
+      if (!resultVo.getCode().equals(ExceptionCodeConstants.TransServiceCode.SUCCESS_CODE)) {
+        System.out.println(stderr);
+        logger.error(stderr);
+        throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+            resultVo.getMsg());
+      }
+      // 对stdout进行分析，
+      if (stdout.contains("unreachable") && !stdout.contains("unreachable=0")) {
+        System.out.println(stdout);
+        logger.error(stdout);
+        throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+            resultVo.getMsg());
+      }
+      if (stdout.contains("failed") && !stdout.contains("failed=0")) {
+        System.out.println(stdout);
+        logger.error(stdout);
+        throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+            resultVo.getMsg());
+      }
+      System.out.println("code:" + resultVo.getCode() + ";stderr:" + stdout + ";stderr:" + stderr);
+      logger.debug("code:" + resultVo.getCode() + ";stderr:" + stdout + ";stderr:" + stderr);
     }
+
     return result;
   }
 
@@ -74,8 +93,6 @@ public class RemoteEnv implements ExecuteEnv {
   public String executeFile(String filename, String content) throws ClientProtocolException,
       IOException, PaasException {
     String filepath = TaskUtil.getSystemProperty("filepath");
-    // TODO
-    // TaskUtil.replaceIllegalCharacter(content);
     // 传输执行文件
     this.uploadFile(filename, content);
 
@@ -112,6 +129,8 @@ public class RemoteEnv implements ExecuteEnv {
     String url = TaskUtil.getSystemProperty("proxy.exec");
     StringEntity paramEntity = RemoteEnv.genCommandParam(content);
     String result = RemoteEnv.sendRequest(url, paramEntity);
+    System.out.println("command content:" + content);
+    logger.debug("command content:" + content);
     return result;
   }
 }

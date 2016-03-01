@@ -4,7 +4,7 @@
   vars: 
   tasks:
       - name: open port 
-        command: firewall-cmd --zone=public --add-port={{item}}/tcp --permanent
+        firewalld: port={{ item }}/tcp permanent=true state=enabled
         with_items:
            - "{{ ports }}"
         sudo: yes
