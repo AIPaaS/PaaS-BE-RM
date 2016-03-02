@@ -32,25 +32,18 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="genEtcdUser" class="com.ai.paas.cpaas.rm.manage.service.etcd.GenEtcdUser"/>
 	<beans:bean id="etcdInstall" class="com.ai.paas.cpaas.rm.manage.service.etcd.EtcdInstall"/>
 	<beans:bean id="etcdStart" class="com.ai.paas.cpaas.rm.manage.service.etcd.EtcdStart"/>
+	<beans:bean id="configFlannelParam" class="com.ai.paas.cpaas.rm.manage.service.etcd.ConfigFlannelParam"/>	
 	<beans:bean id="flannelInstall" class="com.ai.paas.cpaas.rm.manage.service.flannel.FlannelInstall"/>
+	<beans:bean id="openflannelPort" class="com.ai.paas.cpaas.rm.manage.service.flannel.OpenFlannelPort"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
-		<flow id="installMarathon" parent="marathon"/>
+		<flow id="installFlannel" parent="flannel"/>
 	</job>
-	<flow id="marathon">
-		<step id="marathonUser" next="marathonPort">
-			<tasklet ref="genMaUser"/>
+	<flow id="flannel">
+		<step id="flannelInstallStep" next="flannelPortStep">
+				<tasklet ref="flannelInstall"/>
 		</step>
-		<step id="marathonPort" next="installMarathonStep">
-			<tasklet ref="openMaPort"/>
-		</step>
-		<step id="installMarathonStep" next="startMarathon">
-			<tasklet ref="maInstall"/>
-		</step>
-		<step id="startMarathon" next="verifyMarathon">
-			<tasklet ref="maStart"/>
-		</step>
-		<step id="verifyMarathon">
-			<tasklet ref="maServiceVerify"/>
+		<step id="flannelPortStep">
+				<tasklet ref="openflannelPort"/>
 		</step>
 	</flow>
 </beans:beans>

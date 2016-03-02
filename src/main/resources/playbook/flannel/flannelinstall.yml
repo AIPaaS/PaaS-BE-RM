@@ -1,18 +1,20 @@
 ---
-- hosts: slave
-  user: rcflannel
+- hosts: nodes
+  user: root
   vars:
      flanneletcdkey: FLANNEL_ETCD_KEY="/coreos.com/network"
-     execstart: ExecStart=/usr/bin/docker daemon -H fd:// $DOCKER_OPTS $DOCKER_OPT_BIP $DOCKER_OPT_MTU $DOCKER_OPT_IPMASQ
   tasks:
      - name: yum install flannel
        yum: name=flannel state=latest
        sudo: yes
+     - name: mv /etc/sysconfig/flanneld
+       command: mv /etc/sysconfig/flanneld /etc/sysconfig/flanneld.bak
+       sudo: yes
      - name: change flannel-etcd
-       lineinfile: dest=/etc/sysconfig/flanneld line="{{flanneletcd}}"  regexp='^FLANNEL_ETCD?' state=present
+       lineinfile: dest=/etc/sysconfig/flanneld line="{{flanneletcd}}"  regexp='FLANNEL_ETCD?' state=present create=yes
        sudo: yes
      - name: change flannel-etcd-key
-       lineinfile: dest=/etc/sysconfig/flanneld line="{{flanneletcdkey}}" regexp='^FLANNEL_ETCD_KEY?' state=present
+       lineinfile: dest=/etc/sysconfig/flanneld line="{{flanneletcdkey}}" regexp='FLANNEL_ETCD_KEY?' state=present
        sudo: yes
      - name: modify docker.service
        lineinfile: dest=/usr/lib/systemd/system/docker.service line="{{execstart}}" regexp='ExecStart?' state=present
@@ -21,9 +23,6 @@
        sudo: yes
      - name: reload daemon-reload
        command: systemctl daemon-reload
-       sudo: yes
-     - name: insert image path and flannel info
-       lineinfile: dest=/usr/lib/systemd/system/docker.service  line="{{ execstart }}" regexp='^ExecStart?' state=present
        sudo: yes
      - name: restart docker
        service: name=docker state=restarted  enabled=yes

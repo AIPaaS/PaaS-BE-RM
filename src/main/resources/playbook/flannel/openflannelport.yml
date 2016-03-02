@@ -1,0 +1,11 @@
+---
+- hosts: nodes
+  user: root
+  vars: 
+  tasks:
+      - name: open port 
+        firewalld: port=8285/tcp permanent=true state=enabled
+        sudo: yes
+      - name: reload firewall-cmd
+        command: firewall-cmd --reload
+        sudo: yes

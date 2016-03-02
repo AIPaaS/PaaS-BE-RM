@@ -29,22 +29,25 @@ public class EtcdInstall implements Tasklet {
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance masternode = mesosMaster.get(0);
-    String passwd = masternode.getPasswd();
+    String passwd =
+        (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
+            .getExecutionContext().get("password");
 
     // Æ´½Óinitial_cluster²ÎÊý
     StringBuffer initial_cluster = new StringBuffer("ETCD_INITIAL_CLUSTER=");
-    initial_cluster.append("etcd-01=http://" + masternode.getIp());
+    initial_cluster.append("etcd-01=http://" + masternode.getIp()).append(":2380");
     for (int i = 1; i < mesosMaster.size(); i++) {
       initial_cluster.append(",");
       initial_cluster.append(this.genEtcdName(i));
       initial_cluster.append("=http://");
-      initial_cluster.append(mesosMaster.get(i));
+      initial_cluster.append(mesosMaster.get(i).getIp()).append(":2380");
     }
 
     for (int i = 0; i < mesosMaster.size(); i++) {
       String url = "http://" + mesosMaster.get(i).getIp();
 
       List<String> vars = new ArrayList<String>();
+      vars.add("hosts=mesos-master" + (i + 1));
       vars.add("ansible_ssh_pass=" + passwd);
       vars.add("ansible_become_pass=" + passwd);
       vars.add("initial_cluster='" + initial_cluster + "'");

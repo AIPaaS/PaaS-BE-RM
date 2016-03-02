@@ -10,7 +10,6 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import com.ai.paas.cpaas.rm.util.AnsibleCommand;
-import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
@@ -20,7 +19,8 @@ public class FlannelInstall implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
-    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/flannel/flannelinstall.yml");
+    InputStream in =
+        FlannelInstall.class.getResourceAsStream("/playbook/flannel/flannelinstall.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     Boolean useAgent = openParam.getUseAgent();
@@ -28,14 +28,15 @@ public class FlannelInstall implements Tasklet {
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance masternode = mesosMaster.get(0);
     StringBuffer flannelEtcd = new StringBuffer("FLANNEL_ETCD=");
-    flannelEtcd.append("http://" + masternode.getIp());
+    flannelEtcd.append("http://" + masternode.getIp()).append(":2379");
     for (int i = 1; i < mesosMaster.size(); i++) {
       flannelEtcd.append(",http://");
-      flannelEtcd.append(mesosMaster.get(i));
+      flannelEtcd.append(mesosMaster.get(i).getIp()).append(":2379");
     }
     // TODO
     // 从数据库中获取rcflannel用户的密码，解密后使用
-    String password = new String();
+    // String password = new String();
+    String password = masternode.getPasswd();
     List<String> vars = new ArrayList<String>();
     vars.add("ansible_ssh_pass=" + password);
     vars.add("ansible_become_pass=" + password);

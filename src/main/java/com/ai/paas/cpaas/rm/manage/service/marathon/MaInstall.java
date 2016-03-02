@@ -38,11 +38,11 @@ public class MaInstall implements Tasklet {
       zkMessage.append("," + mesos.getIp() + ":2181");
     }
     StringBuffer zk = new StringBuffer();
-    zk.append("zk= zk://");
+    zk.append("zk=zk://");
     zk.append(zkMessage.toString());
     zk.append("/marathon");
     StringBuffer master = new StringBuffer();
-    master.append("master= zk://");
+    master.append("master=zk://");
     master.append(zkMessage.toString());
     master.append("/mesos");
     // °²×°marathon

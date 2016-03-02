@@ -15,16 +15,16 @@ import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 
-public class EtcdStart implements Tasklet {
+public class ConfigFlannelParam implements Tasklet {
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
-    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/etcd/etcdstart.yml");
+    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/etcd/flannelConfig.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("etcdstart.yml", content, useAgent);
+    TaskUtil.uploadFile("flannelConfig.yml", content, useAgent);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance masternode = mesosMaster.get(0);
     String url = "http://" + masternode.getIp() + ":2379";
@@ -34,12 +34,12 @@ public class EtcdStart implements Tasklet {
     List<String> vars = new ArrayList<String>();
     vars.add("ansible_ssh_pass=" + password);
     vars.add("ansible_become_pass=" + password);
+    vars.add("hosts=" + masternode.getIp());
     vars.add("etcdhost='" + url + "'");
     AnsibleCommand command =
-        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/etcdstart.yml", "rcflannel",
-            vars);
-    // TaskUtil.executeCommand(command.toString(), useAgent);
-    TaskUtil.executeFile("etcdStart", command.toString(), useAgent);
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/flannelConfig.yml",
+            "rcflannel", vars);
+    TaskUtil.executeFile("flannelConfig", command.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

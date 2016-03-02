@@ -1,5 +1,5 @@
 ---
-- hosts: master
+- hosts: '{{ hosts }}'
   user: rcflannel
   vars: 
       initial_cluster_state: ETCD_INITIAL_CLUSTER_STATE="new"
@@ -23,16 +23,16 @@
         lineinfile: dest=/etc/etcd/etcd.conf line="{{initial_advertise_peer_urls}}" regexp='^#?ETCD_INITIAL_ADVERTISE_PEER_URLS?'  state=present
         sudo: yes
       - name: modify etcd.conf
-        lineinfile: dest=/etc/etcd/etcd.conf line="{{initial_cluster}}" regexp='^#?ETCD_INITIAL_CLUSTER?'  state=present
+        lineinfile: dest=/etc/etcd/etcd.conf line="{{initial_cluster}}" regexp='^#?ETCD_INITIAL_CLUSTER?' insertafter="ETCD_INITIAL_CLUSTER_TOKEN?"  state=present
         sudo: yes
       - name: modify etcd.conf
         lineinfile: dest=/etc/etcd/etcd.conf line="{{initial_cluster_state}}" regexp='^#?ETCD_INITIAL_CLUSTER_STATE?'  state=present
         sudo: yes	
       - name: modify etcd.conf
-        lineinfile: dest=/etc/etcd/etcd.conf line="{{initial_cluster_token}}" regexp='^#?ETCD_INITIAL_CLUSTER_TOKEN?'  state=present
+        lineinfile: dest=/etc/etcd/etcd.conf line="{{initial_cluster_token}}" regexp='^#?ETCD_INITIAL_CLUSTER_TOKEN?'  insertafter="ETCD_INITIAL_CLUSTER_STATE?" state=present
         sudo: yes	
       - name: modify etcd.conf
-        lineinfile: dest=/etc/etcd/etcd.conf line="{{advertise_client_urls}}" regexp='^#?ETCD_ADVERTISE_CLIENT_URLS?'  state=present
+        lineinfile: dest=/etc/etcd/etcd.conf line="{{advertise_client_urls}}" regexp='^#?ETCD_ADVERTISE_CLIENT_URLS?' insertafter="ETCD_INITIAL_CLUSTER_STATE?"  state=present
         sudo: yes		
       - name: modify etcd.conf
         lineinfile: dest=/etc/etcd/etcd.conf line="{{etcd_debug}}" regexp='^#?ETCD_DEBUG?'  state=present
