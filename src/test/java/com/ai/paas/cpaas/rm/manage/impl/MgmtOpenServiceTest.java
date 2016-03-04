@@ -97,5 +97,6 @@ public class MgmtOpenServiceTest {
     Gson gson = new Gson();
     String param = gson.toJson(paramVo);
     service.openService(param);
+
   }
 }
