@@ -83,7 +83,6 @@ public class MgmtOpenServiceTest {
     Attributes attributes3 = new Attributes();
     attributes3.setZone("center");
     attributes3.setNetwork("172.20.0.0/16");
-
     List<Attributes> attributesList = new ArrayList<Attributes>();
     attributesList.add(attributes1);
     attributesList.add(attributes2);
