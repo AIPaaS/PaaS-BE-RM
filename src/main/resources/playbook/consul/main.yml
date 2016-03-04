@@ -1,0 +1,42 @@
+
+consul_version: '0.6.3'
+consul_package: "{{ consul_packages[consul_version][ansible_system][ansible_architecture] }}"
+consul_package_name: "{{ consul_package.name }}"
+consul_package_checksum: "{{ consul_package.sha256sum }}"
+consul_package_repository: https://releases.hashicorp.com/consul
+consul_package_url: "{{ consul_package_repository }}/{{ consul_version }}/{{ consul_package_name }}"
+
+consul_webui_package: "{{ consul_webui_packages[consul_version] }}"
+consul_webui_package_name: "{{ consul_webui_package.name }}"
+consul_webui_package_checksum: "{{ consul_webui_package.sha256sum }}"
+consul_webui_package_url: "{{ consul_package_repository }}/{{ consul_version }}/{{ consul_webui_package_name }}"
+
+consul_group: consul
+consul_user: consul
+consul_install_path: '/usr/local/bin'
+consul_data_path: '/opt/consul'
+consul_webui_path: '/opt/consul-webui'
+consul_config_path: '/etc/consul.d'
+
+consul_install_mode: 'client'
+consul_install_webui: False
+
+consul_conf_datacenter: 'dc1'
+consul_conf_bootstrap: false
+consul_conf_bind_addr: 0.0.0.0
+consul_conf_client_addr: 127.0.0.1
+consul_conf_addresses_dns: "{{ consul_conf_client_addr }}"
+consul_conf_addresses_http: "{{ ansible_default_ipv4.address }}"
+consul_conf_addresses_https: "{{ ansible_default_ipv4.address }}"
+consul_conf_addresses_rpc: "{{ consul_conf_client_addr }}"
+consul_conf_data_dir: "{{ consul_data_path }}"
+consul_conf_log_level: 'info'
+consul_conf_node_name: "{{ consul_install_mode }}-{{ ansible_hostname | regex_replace('\\.', '_') }}"
+consul_conf_leave_on_terminate: true
+consul_conf_start_join:
+  - "{{ ansible_default_ipv4.address }}"
+consul_conf_retry_join:
+  - "{{ ansible_default_ipv4.address }}"
+consul_conf_retry_interval: 30s
+consul_conf_disable_update_check: true
+
