@@ -5,6 +5,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -71,17 +73,31 @@ public class RemoteEnv implements ExecuteEnv {
             resultVo.getMsg());
       }
       // 对stdout进行分析，
-      if (stdout.contains("unreachable") && !stdout.contains("unreachable=0")) {
-        System.out.println(stdout);
-        logger.error(stdout);
-        throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
-            resultVo.getMsg());
+      if (stdout.contains("unreachable")) {
+        String pattern = "unreachable=[1-9]";
+        // 创建 Pattern 对象
+        Pattern r = Pattern.compile(pattern);
+        // 现在创建 matcher 对象
+        Matcher m = r.matcher(stdout);
+        if (m.find()) {
+          System.out.println(stdout);
+          logger.error(stdout);
+          throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+              resultVo.getMsg());
+        }
       }
-      if (stdout.contains("failed") && !stdout.contains("failed=0")) {
-        System.out.println(stdout);
-        logger.error(stdout);
-        throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
-            resultVo.getMsg());
+      if (stdout.contains("failed")) {
+        String pattern = "failed=[1-9]";
+        // 创建 Pattern 对象
+        Pattern r = Pattern.compile(pattern);
+        // 现在创建 matcher 对象
+        Matcher m = r.matcher(stdout);
+        if (m.find()) {
+          System.out.println(stdout);
+          logger.error(stdout);
+          throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+              resultVo.getMsg());
+        }
       }
       if (!StringUtil.isEmpty(stderr)) {
         System.out.println(stderr);

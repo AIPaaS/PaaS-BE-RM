@@ -3,7 +3,7 @@
 <mapper namespace="com.ai.paas.cpaas.rm.dao.interfaces.ResReqInfoMapper" >
   <resultMap id="BaseResultMap" type="com.ai.paas.cpaas.rm.dao.mapper.bo.ResReqInfo" >
     <id column="req_id" property="reqId" jdbcType="INTEGER" />
-    <result column="job_id" property="jobId" jdbcType="INTEGER" />
+    <result column="cluster_id" property="clusterId" jdbcType="INTEGER" />
     <result column="req_type" property="reqType" jdbcType="INTEGER" />
     <result column="req_cnt" property="reqCnt" jdbcType="VARCHAR" />
     <result column="req_resp" property="reqResp" jdbcType="VARCHAR" />
@@ -70,7 +70,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    req_id, job_id, req_type, req_cnt, req_resp, req_time, resp_time, req_state
+    req_id, cluster_id, req_type, req_cnt, req_resp, req_time, resp_time, req_state
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResReqInfoCriteria" >
     select
@@ -106,10 +106,10 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResReqInfo" >
-    insert into res_req_info (req_id, job_id, req_type, 
+    insert into res_req_info (req_id, cluster_id, req_type, 
       req_cnt, req_resp, req_time, 
       resp_time, req_state)
-    values (#{reqId,jdbcType=INTEGER}, #{jobId,jdbcType=INTEGER}, #{reqType,jdbcType=INTEGER}, 
+    values (#{reqId,jdbcType=INTEGER}, #{clusterId,jdbcType=INTEGER}, #{reqType,jdbcType=INTEGER}, 
       #{reqCnt,jdbcType=VARCHAR}, #{reqResp,jdbcType=VARCHAR}, #{reqTime,jdbcType=TIMESTAMP}, 
       #{respTime,jdbcType=TIMESTAMP}, #{reqState,jdbcType=INTEGER})
   </insert>
@@ -119,8 +119,8 @@
       <if test="reqId != null" >
         req_id,
       </if>
-      <if test="jobId != null" >
-        job_id,
+      <if test="clusterId != null" >
+        cluster_id,
       </if>
       <if test="reqType != null" >
         req_type,
@@ -145,8 +145,8 @@
       <if test="reqId != null" >
         #{reqId,jdbcType=INTEGER},
       </if>
-      <if test="jobId != null" >
-        #{jobId,jdbcType=INTEGER},
+      <if test="clusterId != null" >
+        #{clusterId,jdbcType=INTEGER},
       </if>
       <if test="reqType != null" >
         #{reqType,jdbcType=INTEGER},
@@ -180,8 +180,8 @@
       <if test="record.reqId != null" >
         req_id = #{record.reqId,jdbcType=INTEGER},
       </if>
-      <if test="record.jobId != null" >
-        job_id = #{record.jobId,jdbcType=INTEGER},
+      <if test="record.clusterId != null" >
+        cluster_id = #{record.clusterId,jdbcType=INTEGER},
       </if>
       <if test="record.reqType != null" >
         req_type = #{record.reqType,jdbcType=INTEGER},
@@ -209,7 +209,7 @@
   <update id="updateByExample" parameterType="map" >
     update res_req_info
     set req_id = #{record.reqId,jdbcType=INTEGER},
-      job_id = #{record.jobId,jdbcType=INTEGER},
+      cluster_id = #{record.clusterId,jdbcType=INTEGER},
       req_type = #{record.reqType,jdbcType=INTEGER},
       req_cnt = #{record.reqCnt,jdbcType=VARCHAR},
       req_resp = #{record.reqResp,jdbcType=VARCHAR},
@@ -223,8 +223,8 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResReqInfo" >
     update res_req_info
     <set >
-      <if test="jobId != null" >
-        job_id = #{jobId,jdbcType=INTEGER},
+      <if test="clusterId != null" >
+        cluster_id = #{clusterId,jdbcType=INTEGER},
       </if>
       <if test="reqType != null" >
         req_type = #{reqType,jdbcType=INTEGER},
@@ -249,7 +249,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResReqInfo" >
     update res_req_info
-    set job_id = #{jobId,jdbcType=INTEGER},
+    set cluster_id = #{clusterId,jdbcType=INTEGER},
       req_type = #{reqType,jdbcType=INTEGER},
       req_cnt = #{reqCnt,jdbcType=VARCHAR},
       req_resp = #{reqResp,jdbcType=VARCHAR},

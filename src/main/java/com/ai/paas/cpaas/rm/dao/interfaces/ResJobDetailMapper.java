@@ -16,21 +16,15 @@ public interface ResJobDetailMapper {
 
     int insertSelective(ResJobDetail record);
 
-    List<ResJobDetail> selectByExampleWithBLOBs(ResJobDetailCriteria example);
-
     List<ResJobDetail> selectByExample(ResJobDetailCriteria example);
 
     ResJobDetail selectByPrimaryKey(Integer taskId);
 
     int updateByExampleSelective(@Param("record") ResJobDetail record, @Param("example") ResJobDetailCriteria example);
 
-    int updateByExampleWithBLOBs(@Param("record") ResJobDetail record, @Param("example") ResJobDetailCriteria example);
-
     int updateByExample(@Param("record") ResJobDetail record, @Param("example") ResJobDetailCriteria example);
 
     int updateByPrimaryKeySelective(ResJobDetail record);
-
-    int updateByPrimaryKeyWithBLOBs(ResJobDetail record);
 
     int updateByPrimaryKey(ResJobDetail record);
 }

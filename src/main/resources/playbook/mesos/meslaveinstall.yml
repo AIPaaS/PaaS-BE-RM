@@ -31,6 +31,11 @@
       args:
             chdir: /etc/mesos-slave
       sudo: yes
+    - name: copy ip to dest
+      shell: echo "{{attributes}}" > attributes
+      args:
+            chdir: /etc/mesos-slave
+      sudo: yes
     - name: start mesos-slave
       service: name=mesos-slave state=restarted  enabled=yes
       sudo: yes

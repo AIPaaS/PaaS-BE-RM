@@ -12,6 +12,7 @@ import org.springframework.batch.repeat.RepeatStatus;
 import com.ai.paas.cpaas.rm.util.AnsibleCommand;
 import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
+import com.ai.paas.cpaas.rm.vo.Attributes;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 
@@ -25,21 +26,29 @@ public class ConfigFlannelParam implements Tasklet {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     Boolean useAgent = openParam.getUseAgent();
     TaskUtil.uploadFile("flannelConfig.yml", content, useAgent);
+    StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance masternode = mesosMaster.get(0);
     String url = "http://" + masternode.getIp() + ":2379";
-    String password =
-        (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
-            .getExecutionContext().get("password");
-    List<String> vars = new ArrayList<String>();
-    vars.add("ansible_ssh_pass=" + password);
-    vars.add("ansible_become_pass=" + password);
-    vars.add("hosts=" + masternode.getIp());
-    vars.add("etcdhost='" + url + "'");
-    AnsibleCommand command =
-        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/flannelConfig.yml",
-            "rcflannel", vars);
-    TaskUtil.executeFile("flannelConfig", command.toString(), useAgent);
+    // String password =(String)
+    // chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().get("password");
+    String password = masternode.getPasswd();
+
+    List<Attributes> attributesList = openParam.getAttributesList();
+    for (Attributes attributes : attributesList) {
+      List<String> vars = new ArrayList<String>();
+      vars.add("ansible_ssh_pass=" + password);
+      vars.add("ansible_become_pass=" + password);
+      vars.add("hosts=" + masternode.getIp());
+      vars.add("etcdhost='" + url + "'");
+      vars.add("path=" + TaskUtil.genEtcdParam(openParam, attributes.getZone()));
+      vars.add("subnet=" + attributes.getNetwork());
+      AnsibleCommand command =
+          new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/flannelConfig.yml", "root",
+              vars);
+      shellContext.append(command.toString()).append("\n");
+    }
+    TaskUtil.executeFile("flannelConfig", shellContext.toString(), useAgent);
     return RepeatStatus.FINISHED;
   }
 

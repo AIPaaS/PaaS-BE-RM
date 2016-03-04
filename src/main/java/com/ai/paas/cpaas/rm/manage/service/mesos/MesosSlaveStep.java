@@ -54,6 +54,7 @@ public class MesosSlaveStep implements Tasklet {
       vars.add("hostname=" + node.getIp());
       vars.add("ip=" + node.getIp());
       vars.add("hosts" + node.getIp());
+      vars.add("attributes='zone:" + node.getZone() + "'");
       AnsibleCommand command =
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/meslaveinstall.yml",
               "rcmesos", vars);

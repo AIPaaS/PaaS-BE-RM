@@ -36,14 +36,29 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="flannelInstall" class="com.ai.paas.cpaas.rm.manage.service.flannel.FlannelInstall"/>
 	<beans:bean id="openflannelPort" class="com.ai.paas.cpaas.rm.manage.service.flannel.OpenFlannelPort"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
+		<flow id="installEtcd" parent="etcd" next="installFlannel"/>
 		<flow id="installFlannel" parent="flannel"/>
 	</job>
 	<flow id="flannel">
-		<step id="flannelInstallStep" next="flannelPortStep">
+		<step id="flannelInstallStep">
 				<tasklet ref="flannelInstall"/>
 		</step>
-		<step id="flannelPortStep">
-				<tasklet ref="openflannelPort"/>
+	</flow>
+	<flow id="etcd">
+    	<step id="genEtcdUserStep" next="openEtcdPortStep">
+				<tasklet ref="genEtcdUser"/>
+		</step>
+    	<step id="openEtcdPortStep" next="etcdInstallStep">
+	    	<tasklet ref="openEtcdPort"/>
+		</step>
+		<step id="etcdInstallStep" next="etcdStartStep">
+				<tasklet ref="etcdInstall"/>
+		</step>
+		<step id="etcdStartStep" next="configflannelStep">
+				<tasklet ref="etcdStart"/>
+		</step>
+		<step id="configflannelStep">
+				<tasklet ref="configFlannelParam"/>
 		</step>
 	</flow>
 </beans:beans>

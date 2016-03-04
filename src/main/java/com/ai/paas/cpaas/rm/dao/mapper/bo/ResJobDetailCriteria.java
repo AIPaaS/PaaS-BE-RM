@@ -185,63 +185,63 @@ public class ResJobDetailCriteria {
             return (Criteria) this;
         }
 
-        public Criteria andJobIdIsNull() {
-            addCriterion("job_id is null");
+        public Criteria andClusterIdIsNull() {
+            addCriterion("cluster_id is null");
             return (Criteria) this;
         }
 
-        public Criteria andJobIdIsNotNull() {
-            addCriterion("job_id is not null");
+        public Criteria andClusterIdIsNotNull() {
+            addCriterion("cluster_id is not null");
             return (Criteria) this;
         }
 
-        public Criteria andJobIdEqualTo(Integer value) {
-            addCriterion("job_id =", value, "jobId");
+        public Criteria andClusterIdEqualTo(Integer value) {
+            addCriterion("cluster_id =", value, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andJobIdNotEqualTo(Integer value) {
-            addCriterion("job_id <>", value, "jobId");
+        public Criteria andClusterIdNotEqualTo(Integer value) {
+            addCriterion("cluster_id <>", value, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andJobIdGreaterThan(Integer value) {
-            addCriterion("job_id >", value, "jobId");
+        public Criteria andClusterIdGreaterThan(Integer value) {
+            addCriterion("cluster_id >", value, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andJobIdGreaterThanOrEqualTo(Integer value) {
-            addCriterion("job_id >=", value, "jobId");
+        public Criteria andClusterIdGreaterThanOrEqualTo(Integer value) {
+            addCriterion("cluster_id >=", value, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andJobIdLessThan(Integer value) {
-            addCriterion("job_id <", value, "jobId");
+        public Criteria andClusterIdLessThan(Integer value) {
+            addCriterion("cluster_id <", value, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andJobIdLessThanOrEqualTo(Integer value) {
-            addCriterion("job_id <=", value, "jobId");
+        public Criteria andClusterIdLessThanOrEqualTo(Integer value) {
+            addCriterion("cluster_id <=", value, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andJobIdIn(List<Integer> values) {
-            addCriterion("job_id in", values, "jobId");
+        public Criteria andClusterIdIn(List<Integer> values) {
+            addCriterion("cluster_id in", values, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andJobIdNotIn(List<Integer> values) {
-            addCriterion("job_id not in", values, "jobId");
+        public Criteria andClusterIdNotIn(List<Integer> values) {
+            addCriterion("cluster_id not in", values, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andJobIdBetween(Integer value1, Integer value2) {
-            addCriterion("job_id between", value1, value2, "jobId");
+        public Criteria andClusterIdBetween(Integer value1, Integer value2) {
+            addCriterion("cluster_id between", value1, value2, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andJobIdNotBetween(Integer value1, Integer value2) {
-            addCriterion("job_id not between", value1, value2, "jobId");
+        public Criteria andClusterIdNotBetween(Integer value1, Integer value2) {
+            addCriterion("cluster_id not between", value1, value2, "clusterId");
             return (Criteria) this;
         }
 
@@ -542,6 +542,76 @@ public class ResJobDetailCriteria {
 
         public Criteria andTaskEndTimeNotBetween(Timestamp value1, Timestamp value2) {
             addCriterion("task_end_time not between", value1, value2, "taskEndTime");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookIsNull() {
+            addCriterion("task_playbook is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookIsNotNull() {
+            addCriterion("task_playbook is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookEqualTo(String value) {
+            addCriterion("task_playbook =", value, "taskPlaybook");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookNotEqualTo(String value) {
+            addCriterion("task_playbook <>", value, "taskPlaybook");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookGreaterThan(String value) {
+            addCriterion("task_playbook >", value, "taskPlaybook");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookGreaterThanOrEqualTo(String value) {
+            addCriterion("task_playbook >=", value, "taskPlaybook");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookLessThan(String value) {
+            addCriterion("task_playbook <", value, "taskPlaybook");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookLessThanOrEqualTo(String value) {
+            addCriterion("task_playbook <=", value, "taskPlaybook");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookLike(String value) {
+            addCriterion("task_playbook like", value, "taskPlaybook");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookNotLike(String value) {
+            addCriterion("task_playbook not like", value, "taskPlaybook");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookIn(List<String> values) {
+            addCriterion("task_playbook in", values, "taskPlaybook");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookNotIn(List<String> values) {
+            addCriterion("task_playbook not in", values, "taskPlaybook");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookBetween(String value1, String value2) {
+            addCriterion("task_playbook between", value1, value2, "taskPlaybook");
+            return (Criteria) this;
+        }
+
+        public Criteria andTaskPlaybookNotBetween(String value1, String value2) {
+            addCriterion("task_playbook not between", value1, value2, "taskPlaybook");
             return (Criteria) this;
         }
     }

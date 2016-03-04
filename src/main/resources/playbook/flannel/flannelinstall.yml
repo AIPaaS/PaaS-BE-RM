@@ -1,8 +1,7 @@
 ---
-- hosts: nodes
+- hosts: '{{ hosts }}'
   user: root
   vars:
-     flanneletcdkey: FLANNEL_ETCD_KEY="/coreos.com/network"
   tasks:
      - name: yum install flannel
        yum: name=flannel state=latest

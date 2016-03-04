@@ -143,4 +143,8 @@ public class TaskUtil {
      */
     return source.replaceAll("\r\n", "\n");
   }
+
+  public static String genEtcdParam(OpenResourceParamVo openParam, String zone) {
+    return "/" + openParam.getClusterId() + "/" + zone + "/config";
+  }
 }

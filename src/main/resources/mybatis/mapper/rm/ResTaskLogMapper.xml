@@ -3,7 +3,7 @@
 <mapper namespace="com.ai.paas.cpaas.rm.dao.interfaces.ResTaskLogMapper" >
   <resultMap id="BaseResultMap" type="com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog" >
     <id column="log_id" property="logId" jdbcType="BIGINT" />
-    <result column="job_id" property="jobId" jdbcType="INTEGER" />
+    <result column="cluster_id" property="clusterId" jdbcType="INTEGER" />
     <result column="task_id" property="taskId" jdbcType="INTEGER" />
     <result column="log_cnt" property="logCnt" jdbcType="VARCHAR" />
     <result column="log_time" property="logTime" jdbcType="TIMESTAMP" />
@@ -67,7 +67,7 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    log_id, job_id, task_id, log_cnt, log_time
+    log_id, cluster_id, task_id, log_cnt, log_time
   </sql>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLogCriteria" >
     select
@@ -103,9 +103,9 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog" >
-    insert into res_task_log (log_id, job_id, task_id, 
+    insert into res_task_log (log_id, cluster_id, task_id, 
       log_cnt, log_time)
-    values (#{logId,jdbcType=BIGINT}, #{jobId,jdbcType=INTEGER}, #{taskId,jdbcType=INTEGER}, 
+    values (#{logId,jdbcType=BIGINT}, #{clusterId,jdbcType=INTEGER}, #{taskId,jdbcType=INTEGER}, 
       #{logCnt,jdbcType=VARCHAR}, #{logTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog" >
@@ -114,8 +114,8 @@
       <if test="logId != null" >
         log_id,
       </if>
-      <if test="jobId != null" >
-        job_id,
+      <if test="clusterId != null" >
+        cluster_id,
       </if>
       <if test="taskId != null" >
         task_id,
@@ -131,8 +131,8 @@
       <if test="logId != null" >
         #{logId,jdbcType=BIGINT},
       </if>
-      <if test="jobId != null" >
-        #{jobId,jdbcType=INTEGER},
+      <if test="clusterId != null" >
+        #{clusterId,jdbcType=INTEGER},
       </if>
       <if test="taskId != null" >
         #{taskId,jdbcType=INTEGER},
@@ -157,8 +157,8 @@
       <if test="record.logId != null" >
         log_id = #{record.logId,jdbcType=BIGINT},
       </if>
-      <if test="record.jobId != null" >
-        job_id = #{record.jobId,jdbcType=INTEGER},
+      <if test="record.clusterId != null" >
+        cluster_id = #{record.clusterId,jdbcType=INTEGER},
       </if>
       <if test="record.taskId != null" >
         task_id = #{record.taskId,jdbcType=INTEGER},
@@ -177,7 +177,7 @@
   <update id="updateByExample" parameterType="map" >
     update res_task_log
     set log_id = #{record.logId,jdbcType=BIGINT},
-      job_id = #{record.jobId,jdbcType=INTEGER},
+      cluster_id = #{record.clusterId,jdbcType=INTEGER},
       task_id = #{record.taskId,jdbcType=INTEGER},
       log_cnt = #{record.logCnt,jdbcType=VARCHAR},
       log_time = #{record.logTime,jdbcType=TIMESTAMP}
@@ -188,8 +188,8 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog" >
     update res_task_log
     <set >
-      <if test="jobId != null" >
-        job_id = #{jobId,jdbcType=INTEGER},
+      <if test="clusterId != null" >
+        cluster_id = #{clusterId,jdbcType=INTEGER},
       </if>
       <if test="taskId != null" >
         task_id = #{taskId,jdbcType=INTEGER},
@@ -205,7 +205,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog" >
     update res_task_log
-    set job_id = #{jobId,jdbcType=INTEGER},
+    set cluster_id = #{clusterId,jdbcType=INTEGER},
       task_id = #{taskId,jdbcType=INTEGER},
       log_cnt = #{logCnt,jdbcType=VARCHAR},
       log_time = #{logTime,jdbcType=TIMESTAMP}

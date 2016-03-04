@@ -5,7 +5,7 @@ import java.sql.Timestamp;
 public class ResTaskLog {
     private Long logId;
 
-    private Integer jobId;
+    private Integer clusterId;
 
     private Integer taskId;
 
@@ -21,12 +21,12 @@ public class ResTaskLog {
         this.logId = logId;
     }
 
-    public Integer getJobId() {
-        return jobId;
+    public Integer getClusterId() {
+        return clusterId;
     }
 
-    public void setJobId(Integer jobId) {
-        this.jobId = jobId;
+    public void setClusterId(Integer clusterId) {
+        this.clusterId = clusterId;
     }
 
     public Integer getTaskId() {

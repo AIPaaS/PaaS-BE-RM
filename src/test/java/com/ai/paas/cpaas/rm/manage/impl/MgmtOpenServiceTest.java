@@ -10,6 +10,7 @@ import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import com.ai.paas.cpaas.rm.interfaces.IMgmtOpenService;
+import com.ai.paas.cpaas.rm.vo.Attributes;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.MesosSlave;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
@@ -25,7 +26,7 @@ public class MgmtOpenServiceTest {
   @Test
   public void openServiceTest() {
     OpenResourceParamVo paramVo = new OpenResourceParamVo();
-    paramVo.setClusterName("cluster-01");
+    paramVo.setClusterId("cluster-01");
     paramVo.setClusterName("south-center");
     paramVo.setDomain("asiainfo.com");
     paramVo.setExternalDomain("asia.com");
@@ -35,19 +36,21 @@ public class MgmtOpenServiceTest {
     master.setIp("10.1.241.127");
     master.setRoot("root");
     master.setPasswd("abc@123");
+    master.setZone("center");
 
     MesosInstance master1 = new MesosInstance();
     master1.setId(0);
     master1.setIp("10.1.241.128");
     master1.setRoot("root");
     master1.setPasswd("abc@123");
-
+    master1.setZone("center");
 
     MesosInstance master2 = new MesosInstance();
     master2.setId(0);
     master2.setIp("10.1.241.129");
     master2.setRoot("root");
     master2.setPasswd("abc@123");
+    master2.setZone("center");
 
     List<MesosInstance> masters = new ArrayList<MesosInstance>();
     masters.add(master);
@@ -59,7 +62,7 @@ public class MgmtOpenServiceTest {
     slave.setIp("10.1.241.130");
     slave.setRoot("root");
     slave.setPasswd("abc@123");
-    slave.setRole("web");
+    slave.setZone("web");
     slave
         .setAttributes("ds:sth;jf:nj;rack:2;ex:ex1;model:hp-150;cpu:xe3;mem:ddr3;disk:ssd;netband:1G;");
     slave.setCpuTotal(8);
@@ -68,6 +71,24 @@ public class MgmtOpenServiceTest {
     slave.setMemOffer(6144);
     List<MesosSlave> slaves = new ArrayList<MesosSlave>();
     slaves.add(slave);
+
+    Attributes attributes1 = new Attributes();
+    attributes1.setZone("web");
+    attributes1.setNetwork("172.18.0.0/16");
+
+    Attributes attributes2 = new Attributes();
+    attributes2.setZone("db");
+    attributes2.setNetwork("172.19.0.0/16");
+
+    Attributes attributes3 = new Attributes();
+    attributes3.setZone("center");
+    attributes3.setNetwork("172.20.0.0/16");
+
+    List<Attributes> attributesList = new ArrayList<Attributes>();
+    attributesList.add(attributes1);
+    attributesList.add(attributes2);
+    attributesList.add(attributes3);
+    paramVo.setAttributesList(attributesList);
 
     paramVo.setMesosMaster(masters);
     paramVo.setMesosSlave(slaves);

@@ -14,6 +14,18 @@ public class OpenResourceParamVo implements Serializable {
   private String imagePath;
   private Boolean useAgent;
 
+  public String getClusterId() {
+    return clusterId;
+  }
+
+  public void setClusterId(String clusterId) {
+    this.clusterId = clusterId;
+  }
+
+
+
+  private String clusterId;
+
   public String getImagePath() {
     return imagePath;
   }
@@ -34,6 +46,7 @@ public class OpenResourceParamVo implements Serializable {
 
   private List<MesosInstance> mesosMaster;
   private List<MesosSlave> mesosSlave;
+  private List<Attributes> attributesList;
 
   public String getClusterName() {
     return clusterName;
@@ -93,6 +106,16 @@ public class OpenResourceParamVo implements Serializable {
 
   public static long getSerialversionuid() {
     return serialVersionUID;
+  }
+
+
+
+  public List<Attributes> getAttributesList() {
+    return attributesList;
+  }
+
+  public void setAttributesList(List<Attributes> attributesList) {
+    this.attributesList = attributesList;
   }
 
 

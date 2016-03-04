@@ -68,26 +68,33 @@ public class MgmtOpenService implements IMgmtOpenService {
   public String openService(String param) {
     Gson gson = new Gson();
     OpenResultParamVo openResultParam = new OpenResultParamVo();
+    ResReqInfoMapper mapper = ServiceUtil.getMapper(ResReqInfoMapper.class);
+    ResReqInfo resReqInfo = new ResReqInfo();
     try {
       if (StringUtil.isEmpty(param)) {
-        throw new PaasException(ExceptionCodeConstants.DubboServiceCode.PARAM_IS_NULL, "the parameter for appllying database is null");
+        throw new PaasException(ExceptionCodeConstants.DubboServiceCode.PARAM_IS_NULL,
+            "the parameter for appllying database is null");
       }
-      ResReqInfoMapper mapper = ServiceUtil.getMapper(ResReqInfoMapper.class);
-      ResReqInfo resReqInfo = new ResReqInfo();
-      resReqInfo.setJobId(TaskUtil.nextValue());
+      resReqInfo.setClusterId(TaskUtil.nextValue());
       resReqInfo.setReqType(1);
       resReqInfo.setReqCnt(param);
       resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));
       ExecuteBatchJob executeBatchJob = new ExecuteBatchJob();
       executeBatchJob.executeOpenService(param);
-      mapper.insert(resReqInfo);
+      openResultParam.setResultCode(ExceptionCodeConstants.DubboServiceCode.SUCCESS_CODE);
+      openResultParam.setResultMsg(ExceptionCodeConstants.DubboServiceCode.SUCCESS_MESSAGE);
+      resReqInfo.setReqState(new Integer(0));
     } catch (Exception e) {
       logger.error(e);
       openResultParam.setResultCode(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE);
       openResultParam.setResultMsg(e.toString());
+      resReqInfo.setReqState(new Integer(1));
+      mapper.insert(resReqInfo);
+    } finally {
+      resReqInfo.setReqResp(gson.toJson(openResultParam));
+      resReqInfo.setRespTime(new Timestamp(System.currentTimeMillis()));
+      mapper.insert(resReqInfo);
     }
-    openResultParam.setResultCode(ExceptionCodeConstants.DubboServiceCode.SUCCESS_CODE);
-    openResultParam.setResultMsg(ExceptionCodeConstants.DubboServiceCode.SUCCESS_MESSAGE);
     return gson.toJson(openResultParam);
   }
 
