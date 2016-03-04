@@ -10,8 +10,9 @@ import com.ai.paas.cpaas.rm.util.GenUserUtil;
 public class GenMaUser implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
-    GenUserUtil.genUser(chunkContext, "genMarathonUser", "rcmarathon", "master");
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
+    GenUserUtil.genUser(chunkContext, "genMarathonUser", "rcmarathon", "master", 17);
     return RepeatStatus.FINISHED;
   }
 

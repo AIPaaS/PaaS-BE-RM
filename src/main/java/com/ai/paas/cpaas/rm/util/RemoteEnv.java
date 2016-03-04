@@ -29,12 +29,12 @@ public class RemoteEnv implements ExecuteEnv {
   private static Logger logger = Logger.getLogger(RemoteEnv.class);
 
   @Override
-  public void uploadFile(String filename, String content) throws ClientProtocolException,
-      IOException, PaasException {
+  public void uploadFile(String filename, String content, String aid)
+      throws ClientProtocolException, IOException, PaasException {
     String filepath = TaskUtil.getSystemProperty("filepath");
     // 传输执行文件
-    String url = TaskUtil.getSystemProperty("proxy.upload");
-    StringEntity paramEntity = RemoteEnv.genFileParam(content, filename, filepath);
+    String url = TaskUtil.getSystemProperty("upload");
+    StringEntity paramEntity = RemoteEnv.genFileParam(content, filename, filepath, aid);
     RemoteEnv.sendRequest(url, paramEntity);
   }
 
@@ -113,24 +113,24 @@ public class RemoteEnv implements ExecuteEnv {
   }
 
   @Override
-  public String executeFile(String filename, String content) throws ClientProtocolException,
-      IOException, PaasException {
+  public String executeFile(String filename, String content, String aid)
+      throws ClientProtocolException, IOException, PaasException {
     String filepath = TaskUtil.getSystemProperty("filepath");
     // 传输执行文件
-    this.uploadFile(filename, content);
+    this.uploadFile(filename, content, aid);
 
     // 更改文件权限
-    this.executeCommand("chmod u+x " + filepath + "/" + filename);
+    this.executeCommand("chmod u+x " + filepath + "/" + filename, aid);
 
     // 执行文件
-    String result = this.executeCommand("bash " + filepath + "/" + filename);
+    String result = this.executeCommand("bash " + filepath + "/" + filename, aid);
     return result;
   }
 
-  public static StringEntity genFileParam(String content, String filename, String path)
+  public static StringEntity genFileParam(String content, String filename, String path, String aid)
       throws UnsupportedEncodingException {
     JsonObject object = new JsonObject();
-    object.addProperty("aid", "dev");
+    object.addProperty("aid", aid);
     object.addProperty("content", content);
     object.addProperty("fileName", filename);;
     object.addProperty("path", path);
@@ -138,19 +138,20 @@ public class RemoteEnv implements ExecuteEnv {
     return entity;
   }
 
-  public static StringEntity genCommandParam(String command) throws UnsupportedEncodingException {
+  public static StringEntity genCommandParam(String command, String aid)
+      throws UnsupportedEncodingException {
     JsonObject object = new JsonObject();
-    object.addProperty("aid", "dev");
+    object.addProperty("aid", aid);
     object.addProperty("command", command);
     StringEntity entity = new StringEntity(object.toString(), "application/json", "UTF-8");
     return entity;
   }
 
   @Override
-  public String executeCommand(String content) throws ClientProtocolException, IOException,
-      PaasException {
-    String url = TaskUtil.getSystemProperty("proxy.exec");
-    StringEntity paramEntity = RemoteEnv.genCommandParam(content);
+  public String executeCommand(String content, String aid) throws ClientProtocolException,
+      IOException, PaasException {
+    String url = TaskUtil.getSystemProperty("exec");
+    StringEntity paramEntity = RemoteEnv.genCommandParam(content, aid);
     String result = RemoteEnv.sendRequest(url, paramEntity);
     System.out.println("command content:" + content);
     logger.debug("command content:" + content);

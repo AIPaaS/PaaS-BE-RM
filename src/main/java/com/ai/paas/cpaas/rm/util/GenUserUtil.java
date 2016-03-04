@@ -2,6 +2,7 @@ package com.ai.paas.cpaas.rm.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,14 +15,15 @@ import com.ai.paas.ipaas.PaasException;
 
 public class GenUserUtil {
 
-  public static void genUser(ChunkContext chunkContext, String fileName, String user, String hosts)
-      throws ClientProtocolException, IOException, PaasException {
+  public static void genUser(ChunkContext chunkContext, String fileName, String user, String hosts,
+      int typeId) throws ClientProtocolException, IOException, PaasException {
 
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     InputStream in = GenUserUtil.class.getResourceAsStream("/playbook/adduser.yml");
     String content = TaskUtil.getFile(in);
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("adduser.yml", content, useAgent);
+    String aid = openParam.getAid();
+    TaskUtil.uploadFile("adduser.yml", content, useAgent, aid);
 
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
@@ -49,6 +51,13 @@ public class GenUserUtil {
             mesosInstance.getRoot(), userVars);
     shellContext.append(genUserCommand.toString());
     shellContext.append("\n");
-    TaskUtil.executeFile(fileName, shellContext.toString(), useAgent);
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+
+    String result = TaskUtil.executeFile(fileName, shellContext.toString(), useAgent, aid);
+
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+            typeId);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
   }
 }

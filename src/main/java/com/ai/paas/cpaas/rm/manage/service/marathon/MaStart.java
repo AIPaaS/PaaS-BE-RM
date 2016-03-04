@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.manage.service.marathon;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,9 @@ public class MaStart implements Tasklet {
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/marathon/startmarathon.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    String aid = openParam.getAid();
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("startmarathon.yml", content, useAgent);
+    TaskUtil.uploadFile("startmarathon.yml", content, useAgent, aid);
 
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
@@ -36,7 +38,7 @@ public class MaStart implements Tasklet {
       List<String> startVars = new ArrayList<String>();
       startVars.add("ansible_ssh_pass=" + password);
       startVars.add("ansible_become_pass=" + password);
-      startVars.add("hosts=mesos-master" + (i + 1));
+      startVars.add("hosts=" + TaskUtil.genMasterName(i + 1));
       startVars.add("hostname=" + masterInstance.getIp());
       AnsibleCommand masterStart =
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/startmarathon.yml",
@@ -44,7 +46,12 @@ public class MaStart implements Tasklet {
       shellContext.append(masterStart.toString());
       shellContext.append("\n");
     }
-    TaskUtil.executeFile("marathonStart", shellContext.toString(), useAgent);
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+    String result = TaskUtil.executeFile("marathonStart", shellContext.toString(), useAgent, aid);
+    // 插入日志和任务记录
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 20);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 

@@ -13,7 +13,7 @@ public class MaServiceVerify implements Tasklet {
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
     VerifyWebService.checkwebService(chunkContext, "8080", "marathonServiceVerify.yml",
-        "/playbook/marathon/marathonServiceVerify.yml");
+        "/playbook/marathon/marathonServiceVerify.yml", 21);
     return RepeatStatus.FINISHED;
   }
 

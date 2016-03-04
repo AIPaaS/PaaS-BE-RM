@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.manage.service.zookeeper;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +25,9 @@ public class ZookeeperVerify implements Tasklet {
         OpenPortUtil.class.getResourceAsStream("/playbook/zookeeper/zookeeperverify.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    String aid = openParam.getAid();
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("zookeeperverify.yml", content, useAgent);
+    TaskUtil.uploadFile("zookeeperverify.yml", content, useAgent, aid);
 
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     List<String> vars = new ArrayList<String>();
@@ -45,8 +47,13 @@ public class ZookeeperVerify implements Tasklet {
     AnsibleCommand command =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/zookeeperverify.yml", "root",
             vars);
-    TaskUtil.executeFile("zookeeperverify", command.toString(), useAgent);
-    // TaskUtil.executeCommand(command.toString(), useAgent);
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+
+    String result = TaskUtil.executeFile("zookeeperverify", command.toString(), useAgent, aid);
+    // 插入日志和任务记录
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(), 8);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 }

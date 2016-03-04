@@ -2,6 +2,7 @@ package com.ai.paas.cpaas.rm.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -15,12 +16,13 @@ import com.ai.paas.ipaas.PaasException;
 public class VerifyWebService {
 
   public static void checkwebService(ChunkContext chunkContext, String port, String filename,
-      String path) throws ClientProtocolException, IOException, PaasException {
+      String path, int typeId) throws ClientProtocolException, IOException, PaasException {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    String aid = openParam.getAid();
     InputStream in = OpenPortUtil.class.getResourceAsStream(path);
     String content = TaskUtil.getFile(in);
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile(filename, content, useAgent);
+    TaskUtil.uploadFile(filename, content, useAgent, aid);
 
 
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
@@ -40,8 +42,14 @@ public class VerifyWebService {
     vars.add("inventory_hosts=" + inventory_hosts.toString());
     AnsibleCommand command =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/" + filename, "root", vars);
-    TaskUtil.executeFile(filename + ".sh", command.toString(), useAgent);
-    // TaskUtil.executeCommand(command.toString(), useAgent);
+
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+    String result = TaskUtil.executeFile(filename + ".sh", command.toString(), useAgent, aid);
+
+    // 插入日志和任务记录
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(), typeId);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
   }
 
 }

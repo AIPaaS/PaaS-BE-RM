@@ -13,7 +13,7 @@ public class MeServiceVerify implements Tasklet {
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
     VerifyWebService.checkwebService(chunkContext, "5050", "mesosServiceVerify.yml",
-        "/playbook/mesos/mesosServiceVerify.yml");
+        "/playbook/mesos/mesosServiceVerify.yml", 16);
     return RepeatStatus.FINISHED;
   }
 

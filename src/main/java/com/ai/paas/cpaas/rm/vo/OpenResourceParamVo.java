@@ -13,6 +13,7 @@ public class OpenResourceParamVo implements Serializable {
   private String loadVirtualIP;
   private String imagePath;
   private Boolean useAgent;
+  private String aid;
 
   public String getClusterId() {
     return clusterId;
@@ -116,6 +117,16 @@ public class OpenResourceParamVo implements Serializable {
 
   public void setAttributesList(List<Attributes> attributesList) {
     this.attributesList = attributesList;
+  }
+
+
+
+  public String getAid() {
+    return aid;
+  }
+
+  public void setAid(String aid) {
+    this.aid = aid;
   }
 
 

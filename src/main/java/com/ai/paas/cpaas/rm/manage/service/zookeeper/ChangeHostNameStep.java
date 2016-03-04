@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.manage.service.zookeeper;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +25,9 @@ public class ChangeHostNameStep implements Tasklet {
     InputStream in = ChangeHostNameStep.class.getResourceAsStream("/playbook/hostnamectl.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    String aid = openParam.getAid();
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("hostnamectl.yml", content, useAgent);
+    TaskUtil.uploadFile("hostnamectl.yml", content, useAgent, aid);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     List<MesosSlave> mesosSlave = openParam.getMesosSlave();
     StringBuffer shellContext = TaskUtil.createBashFile();
@@ -45,8 +47,14 @@ public class ChangeHostNameStep implements Tasklet {
               .getExecutionContext().get(ip);
       this.genCommand(instance, shellContext, name);
     }
+
+    Timestamp start = new Timestamp(System.currentTimeMillis());
     // 将shellContext传到服务端，并执行
-    TaskUtil.executeFile("changehostnames", shellContext.toString(), useAgent);
+    String result = TaskUtil.executeFile("changehostnames", shellContext.toString(), useAgent, aid);
+
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 2);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 

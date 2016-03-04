@@ -10,10 +10,11 @@ import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 public class OpenEtcdPort implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
     String user = "rcflannel";
     String portParam = "ports=[2379,2380]";
-    return OpenPortUtil.openPort(chunkContext, portParam, user);
+    return OpenPortUtil.openPort(chunkContext, portParam, user, 23);
   }
 
 }

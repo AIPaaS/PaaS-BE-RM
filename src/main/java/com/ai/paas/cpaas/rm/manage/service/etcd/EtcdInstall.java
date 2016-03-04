@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.manage.service.etcd;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,9 @@ public class EtcdInstall implements Tasklet {
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/etcd/etcdinstall.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    String aid = openParam.getAid();
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("etcdinstall.yml", content, useAgent);
+    TaskUtil.uploadFile("etcdinstall.yml", content, useAgent, aid);
     // 构建执行文件
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
@@ -47,7 +49,7 @@ public class EtcdInstall implements Tasklet {
       String url = "http://" + mesosMaster.get(i).getIp();
 
       List<String> vars = new ArrayList<String>();
-      vars.add("hosts=mesos-master" + (i + 1));
+      vars.add("hosts=" + TaskUtil.genMasterName(i + 1));
       vars.add("ansible_ssh_pass=" + passwd);
       vars.add("ansible_become_pass=" + passwd);
       vars.add("initial_cluster='" + initial_cluster + "'");
@@ -63,7 +65,12 @@ public class EtcdInstall implements Tasklet {
       shellContext.append(command.toString());
       shellContext.append("\n");
     }
-    TaskUtil.executeFile("etcdInstall", shellContext.toString(), useAgent);
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+    String result = TaskUtil.executeFile("etcdInstall", shellContext.toString(), useAgent, aid);
+    // 插入日志和任务记录
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 24);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 

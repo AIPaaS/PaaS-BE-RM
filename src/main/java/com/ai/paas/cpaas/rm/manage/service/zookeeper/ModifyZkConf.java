@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.manage.service.zookeeper;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,7 +26,8 @@ public class ModifyZkConf implements Tasklet {
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("zookeeperinstall.yml", content, useAgent);
+    String aid = openParam.getAid();
+    TaskUtil.uploadFile("zookeeperinstall.yml", content, useAgent, aid);
 
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance instance = mesosMaster.get(0);
@@ -44,8 +46,13 @@ public class ModifyZkConf implements Tasklet {
     AnsibleCommand zookeeperinstall =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/zookeeperinstall.yml",
             "root", configvars);
-    TaskUtil.executeFile("zookeeperinstall", zookeeperinstall.toString(), useAgent);
-    // TaskUtil.executeCommand(zookeeperinstall.toString(), useAgent);
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+    String result =
+        TaskUtil.executeFile("zookeeperinstall", zookeeperinstall.toString(), useAgent, aid);
+    int taskId =
+        TaskUtil
+            .insertResJobDetail(start, openParam.getClusterId(), zookeeperinstall.toString(), 6);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 

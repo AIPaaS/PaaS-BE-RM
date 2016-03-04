@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.manage.service.zookeeper;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,9 @@ public class ConfigHostsStep implements Tasklet {
     InputStream in = ConfigHostsStep.class.getResourceAsStream("/playbook/confighosts.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    String aid = openParam.getAid();
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("confighosts.yml", content, useAgent);
+    TaskUtil.uploadFile("confighosts.yml", content, useAgent, aid);
 
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     List<MesosSlave> mesosSlave = openParam.getMesosSlave();
@@ -58,7 +60,14 @@ public class ConfigHostsStep implements Tasklet {
             vars);
     StringBuffer executeFile = TaskUtil.createBashFile();
     executeFile.append(command.toString());
-    TaskUtil.executeFile("confighosts", executeFile.toString(), useAgent);
+
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+
+    String result = TaskUtil.executeFile("confighosts", executeFile.toString(), useAgent, aid);
+
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 3);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 

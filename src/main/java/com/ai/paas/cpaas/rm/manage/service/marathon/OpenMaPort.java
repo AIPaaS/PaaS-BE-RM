@@ -10,10 +10,11 @@ import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 public class OpenMaPort implements Tasklet {
 
   @Override
-  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext) throws Exception {
+  public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
+      throws Exception {
     String portParam = "ports=[8080]";
     String user = "rcmarathon";
-    return OpenPortUtil.openPort(chunkContext, portParam, user);
+    return OpenPortUtil.openPort(chunkContext, portParam, user, 18);
   }
 
 }

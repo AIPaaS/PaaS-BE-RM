@@ -1,9 +1,6 @@
 ---
-
 - hosts: nodes
-  connection: local
-  gather_facts: false
-  
+  user: root
   tasks:
     - command: docker run hello-world
       register: status

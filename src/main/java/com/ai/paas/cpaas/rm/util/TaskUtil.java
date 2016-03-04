@@ -4,18 +4,28 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
-import java.util.Properties;
+import java.sql.Timestamp;
+import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import org.apache.http.client.ClientProtocolException;
-import org.apache.http.entity.StringEntity;
 import org.springframework.batch.core.scope.context.ChunkContext;
 
+import com.ai.paas.cpaas.rm.dao.interfaces.ResClusterInfoMapper;
+import com.ai.paas.cpaas.rm.dao.interfaces.ResInstancePropsMapper;
+import com.ai.paas.cpaas.rm.dao.interfaces.ResJobDetailMapper;
+import com.ai.paas.cpaas.rm.dao.interfaces.ResTaskLogMapper;
+import com.ai.paas.cpaas.rm.dao.interfaces.SysCodesMapper;
+import com.ai.paas.cpaas.rm.dao.mapper.bo.ResClusterInfo;
+import com.ai.paas.cpaas.rm.dao.mapper.bo.ResInstanceProps;
+import com.ai.paas.cpaas.rm.dao.mapper.bo.ResJobDetail;
+import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog;
+import com.ai.paas.cpaas.rm.dao.mapper.bo.SysCodes;
+import com.ai.paas.cpaas.rm.dao.mapper.bo.SysCodesCriteria;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.ipaas.PaasException;
+import com.ai.paas.ipaas.ServiceUtil;
 import com.google.gson.Gson;
-import com.google.gson.JsonObject;
 
 public class TaskUtil {
 
@@ -47,61 +57,42 @@ public class TaskUtil {
     return new SessionIdentifierGenerator().nextSessionId();
   }
 
-  public static void uploadFile(String filename, String content, Boolean useAgent)
+  public static void uploadFile(String filename, String content, Boolean useAgent, String aid)
       throws ClientProtocolException, IOException, PaasException {
     ExecuteEnv executeEnv = TaskUtil.genEnv(useAgent);
-    executeEnv.uploadFile(filename, content);
+    executeEnv.uploadFile(filename, content, aid);
   }
 
-  public static void executeFile(String filename, String content, Boolean useAgent)
+  public static String executeFile(String filename, String content, Boolean useAgent, String aid)
       throws ClientProtocolException, IOException, PaasException {
     ExecuteEnv executeEnv = TaskUtil.genEnv(useAgent);
-    executeEnv.executeFile(filename, content);
+    return executeEnv.executeFile(filename, content, aid);
   }
 
-  public static void executeCommand(String command, Boolean useAgent)
+  public static void executeCommand(String command, Boolean useAgent, String aid)
       throws ClientProtocolException, IOException, PaasException {
     ExecuteEnv executeEnv = TaskUtil.genEnv(useAgent);
-    executeEnv.executeCommand(command);
+    executeEnv.executeCommand(command, aid);
   }
 
   public static ExecuteEnv genEnv(Boolean useAgent) {
     ExecuteEnv executeEnv = null;
     if (useAgent) {
       executeEnv = new RemoteEnv();
-    } else {
-      executeEnv = new LocalEnv();
     }
     return executeEnv;
-  }
-
-  public static StringEntity genFileParam(String content, String filename, String path)
-      throws UnsupportedEncodingException {
-    JsonObject object = new JsonObject();
-    object.addProperty("aid", "dev");
-    object.addProperty("content", content);
-    object.addProperty("fileName", filename);;
-    object.addProperty("path", path);
-    StringEntity entity = new StringEntity(object.toString(), "application/json", "UTF-8");
-    return entity;
-  }
-
-  public static StringEntity genCommandParam(String command) throws UnsupportedEncodingException {
-    JsonObject object = new JsonObject();
-    object.addProperty("aid", "dev");
-    object.addProperty("command", command);
-    StringEntity entity = new StringEntity(object.toString(), "application/json", "UTF-8");
-    return entity;
   }
 
 
 
   public static String genMasterName(int i) {
-    return "mesos-master" + i;
+    // return "mesos-master" + i;
+    return "master" + i;
   }
 
   public static String genSlaveName(int i) {
-    return "mesos-slave" + i;
+    // return "mesos-slave" + i;
+    return "slave" + i;
   }
 
   public static String getFile(InputStream in) throws IOException {
@@ -124,15 +115,20 @@ public class TaskUtil {
   }
 
   public static String getSystemProperty(String param) {
-    Properties prop = new Properties();
-    String property = new String();
-    try {
-      prop.load(TaskUtil.class.getClassLoader().getResourceAsStream("batch/config.properties"));
-      property = prop.getProperty(param);
-    } catch (IOException ex) {
-      ex.printStackTrace();
-    }
-    return property;
+    /*
+     * Properties prop = new Properties(); String property = new String(); try {
+     * prop.load(TaskUtil.class.getClassLoader().getResourceAsStream("batch/config.properties"));
+     * property = prop.getProperty(param); } catch (IOException ex) { ex.printStackTrace(); }
+     */
+    SysCodesCriteria instance = new SysCodesCriteria();
+    SysCodesCriteria.Criteria criteria = instance.createCriteria();
+    criteria.andCodeKeyEqualTo(param);
+    criteria.andSysCodeEqualTo("PROXY");
+    // instance.setSysCode("PROXY");
+    // instance.setCodeKey(param);
+    SysCodesMapper mapper = ServiceUtil.getMapper(SysCodesMapper.class);
+    List<SysCodes> list = mapper.selectByExample(instance);
+    return list.get(0).getCodeValue();
   }
 
   // Ìæ»»windows»»ÐÐ·û
@@ -147,4 +143,45 @@ public class TaskUtil {
   public static String genEtcdParam(OpenResourceParamVo openParam, String zone) {
     return "/" + openParam.getClusterId() + "/" + zone + "/config";
   }
+
+  public static int insertResJobDetail(Timestamp start, String clusterId, String shellContext,
+      int typeId) {
+    ResJobDetail resJobDetail = new ResJobDetail();
+    ResJobDetailMapper mapper = ServiceUtil.getMapper(ResJobDetailMapper.class);
+    resJobDetail.setClusterId(new Integer(clusterId));
+    resJobDetail.setTaskPlaybook(shellContext);
+    resJobDetail.setTaskState(2);
+    resJobDetail.setTaskStartTime(start);
+    resJobDetail.setTaskEndTime(new Timestamp(System.currentTimeMillis()));
+    resJobDetail.setTypeId(typeId);
+    mapper.insert(resJobDetail);
+    int taskId = resJobDetail.getTaskId();
+    return resJobDetail.getTaskId();
+  }
+
+  public static void updateResClusterInfo(ResClusterInfo instance) {
+    ResClusterInfoMapper mapper = ServiceUtil.getMapper(ResClusterInfoMapper.class);
+    mapper.updateByPrimaryKey(instance);
+  }
+
+  public static void insertResInstanceProps(String keyCode, String keyValue, String clusterId) {
+    ResInstanceProps instance = new ResInstanceProps();
+    instance.setState(0);
+    // instance.setKeyCode(keyCode);
+    instance.setKeyValue(keyValue);
+    ResInstancePropsMapper mapper = ServiceUtil.getMapper(ResInstancePropsMapper.class);
+    mapper.insert(instance);
+  }
+
+  public static void insertResTaskLog(String clusterId, int taskId, String result) {
+    ResTaskLog resTaskLog = new ResTaskLog();
+    resTaskLog.setClusterId(new Integer(clusterId));
+    resTaskLog.setTaskId(taskId);
+    resTaskLog.setLogCnt(result);
+    ResTaskLogMapper mapper = ServiceUtil.getMapper(ResTaskLogMapper.class);
+    resTaskLog.setLogTime(new Timestamp(System.currentTimeMillis()));
+    mapper.insert(resTaskLog);
+  }
+
+
 }

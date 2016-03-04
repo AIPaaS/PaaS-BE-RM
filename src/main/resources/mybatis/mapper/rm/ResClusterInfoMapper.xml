@@ -106,6 +106,9 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResClusterInfo" >
+    <selectKey resultType="java.lang.Integer" keyProperty="clusterId" order="AFTER" >
+		SELECT @@IDENTITY
+	</selectKey>
     insert into res_cluster_info (cluster_id, cluster_name, marathon_addr, 
       consul_addr, chronos_addr, mesos_domain, 
       external_domain)

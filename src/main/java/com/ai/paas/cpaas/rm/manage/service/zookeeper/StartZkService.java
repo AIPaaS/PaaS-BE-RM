@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.manage.service.zookeeper;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +25,9 @@ public class StartZkService implements Tasklet {
         OpenPortUtil.class.getResourceAsStream("/playbook/zookeeper/zookeeperstart.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    String aid = openParam.getAid();
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("zookeeperstart.yml", content, useAgent);
+    TaskUtil.uploadFile("zookeeperstart.yml", content, useAgent, aid);
 
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
@@ -37,14 +39,22 @@ public class StartZkService implements Tasklet {
       startvars.add("ansible_ssh_pass=" + password);
       startvars.add("ansible_become_pass=" + password);
       startvars.add("myid=" + (i + 1));
-      startvars.add("hosts=mesos-master" + (i + 1));
+      startvars.add("hosts=" + TaskUtil.genMasterName(i + 1));
       AnsibleCommand startzkCommand =
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/zookeeperstart.yml",
               "root", startvars);
       shellContext.append(startzkCommand.toString());
       shellContext.append("\n");
     }
-    TaskUtil.executeFile("StartZkServiceStep", shellContext.toString(), useAgent);
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+
+    String result =
+        TaskUtil.executeFile("StartZkServiceStep", shellContext.toString(), useAgent, aid);
+
+    // 插入日志和任务记录
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 7);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 

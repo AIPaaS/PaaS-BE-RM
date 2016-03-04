@@ -1,5 +1,6 @@
 package com.ai.paas.cpaas.rm.manage.service.zookeeper;
 
+import java.sql.Timestamp;
 import java.util.List;
 
 import org.springframework.batch.core.StepContribution;
@@ -18,6 +19,7 @@ public class AnsibleHostsConfig implements Tasklet {
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    String aid = openParam.getAid();
     // 构建执行文件
     StringBuffer shellContext = TaskUtil.createBashFile();
     shellContext.append("mv /etc/ansible/hosts /etc/ansible/hosts.bak");
@@ -73,10 +75,19 @@ public class AnsibleHostsConfig implements Tasklet {
       shellContext.append(mesosSlave.get(i).getIp());
       shellContext.append("\n");
     }
-    // TODO
     shellContext.append("EOL");
     shellContext.append("\n");
-    TaskUtil.executeFile("configAnsibleHosts", shellContext.toString(), openParam.getUseAgent());
+
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+
+    String result =
+        TaskUtil.executeFile("configAnsibleHosts", shellContext.toString(),
+            openParam.getUseAgent(), aid);
+
+    // 插入日志和任务记录
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 1);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
 
     return RepeatStatus.FINISHED;
   }

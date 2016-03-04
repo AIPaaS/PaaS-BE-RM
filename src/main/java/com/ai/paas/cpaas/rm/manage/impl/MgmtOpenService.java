@@ -79,6 +79,7 @@ public class MgmtOpenService implements IMgmtOpenService {
       resReqInfo.setReqType(1);
       resReqInfo.setReqCnt(param);
       resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));
+
       ExecuteBatchJob executeBatchJob = new ExecuteBatchJob();
       executeBatchJob.executeOpenService(param);
       openResultParam.setResultCode(ExceptionCodeConstants.DubboServiceCode.SUCCESS_CODE);

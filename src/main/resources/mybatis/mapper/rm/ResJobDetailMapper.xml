@@ -107,6 +107,9 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResJobDetail" >
+    <selectKey resultType="java.lang.Integer" keyProperty="taskId" order="AFTER" >
+		SELECT @@IDENTITY
+	</selectKey>
     insert into res_job_detail (task_id, cluster_id, type_id, 
       task_state, task_order, task_start_time, 
       task_end_time, task_playbook)

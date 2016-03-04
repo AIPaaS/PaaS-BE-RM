@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.manage.service.mesos;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +25,9 @@ public class MesosSlaveStep implements Tasklet {
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/mesos/meslaveinstall.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    String aid = openParam.getAid();
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("meslaveinstall.yml", content, useAgent);
+    TaskUtil.uploadFile("meslaveinstall.yml", content, useAgent, aid);
 
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosSlave> slavenodes = openParam.getMesosSlave();
@@ -60,7 +62,14 @@ public class MesosSlaveStep implements Tasklet {
               "rcmesos", vars);
       shellContext.append(command.toString());
     }
-    TaskUtil.executeFile("mesosSlaveStep", shellContext.toString(), useAgent);
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+
+    String result = TaskUtil.executeFile("mesosSlaveStep", shellContext.toString(), useAgent, aid);
+
+    // 插入日志和任务记录
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 15);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 

@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.manage.service.etcd;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,14 +25,13 @@ public class ConfigFlannelParam implements Tasklet {
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/etcd/flannelConfig.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    String aid = openParam.getAid();
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("flannelConfig.yml", content, useAgent);
+    TaskUtil.uploadFile("flannelConfig.yml", content, useAgent, aid);
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance masternode = mesosMaster.get(0);
     String url = "http://" + masternode.getIp() + ":2379";
-    // String password =(String)
-    // chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext().get("password");
     String password = masternode.getPasswd();
 
     List<Attributes> attributesList = openParam.getAttributesList();
@@ -48,7 +48,12 @@ public class ConfigFlannelParam implements Tasklet {
               vars);
       shellContext.append(command.toString()).append("\n");
     }
-    TaskUtil.executeFile("flannelConfig", shellContext.toString(), useAgent);
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+    String result = TaskUtil.executeFile("flannelConfig", shellContext.toString(), useAgent, aid);
+    // 插入日志和任务记录
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 26);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 

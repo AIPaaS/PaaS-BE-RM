@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.manage.service.docker;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -21,10 +22,11 @@ public class DockerVerify implements Tasklet {
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    String aid = openParam.getAid();
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/docker/dockerVerify.yml");
     String content = TaskUtil.getFile(in);
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("dockerVerify.yml", content, useAgent);
+    TaskUtil.uploadFile("dockerVerify.yml", content, useAgent, aid);
 
 
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
@@ -36,7 +38,13 @@ public class DockerVerify implements Tasklet {
     AnsibleCommand command =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/dockerVerify.yml", "root",
             vars);
-    TaskUtil.executeFile("dockerVerify.sh", command.toString(), useAgent);
+
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+    String result = TaskUtil.executeFile("dockerVerify.sh", command.toString(), useAgent, aid);
+    // 插入日志和任务记录
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(), 10);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 

@@ -44,6 +44,9 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 		<flow id="installFlannel" parent="flannel"/>
 	</job>
 	<flow id="flannel">
+		<step id="flannelportStep" next="flannelInstallStep">
+				<tasklet ref="openflannelPort"/>
+		</step>
 		<step id="flannelInstallStep">
 				<tasklet ref="flannelInstall"/>
 		</step>

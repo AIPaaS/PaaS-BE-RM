@@ -2,6 +2,7 @@ package com.ai.paas.cpaas.rm.util;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,14 +15,15 @@ import com.ai.paas.ipaas.PaasException;
 
 public class OpenPortUtil {
 
-  public static RepeatStatus openPort(ChunkContext chunkContext, String portParam, String user)
-      throws ClientProtocolException, IOException, PaasException {
+  public static RepeatStatus openPort(ChunkContext chunkContext, String portParam, String user,
+      int typeId) throws ClientProtocolException, IOException, PaasException {
     // ÉÏ´«openport.yml
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/openport.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("openport.yml", content, useAgent);
+    String aid = openParam.getAid();
+    TaskUtil.uploadFile("openport.yml", content, useAgent, aid);
     String password =
         (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
             .getExecutionContext().get("password");
@@ -39,9 +41,17 @@ public class OpenPortUtil {
     portVars.add(portParam);
     AnsibleCommand openPortCommand =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/openport.yml", user, portVars);
-    // TODO
-    // TaskUtil.executeCommand(openPortCommand.toString(), useAgent);
-    TaskUtil.executeFile("openportUtil", openPortCommand.toString(), openParam.getUseAgent());
+
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+
+    String result =
+        TaskUtil.executeFile("openportUtil", openPortCommand.toString(), openParam.getUseAgent(),
+            aid);
+
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), openPortCommand.toString(),
+            typeId);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 }

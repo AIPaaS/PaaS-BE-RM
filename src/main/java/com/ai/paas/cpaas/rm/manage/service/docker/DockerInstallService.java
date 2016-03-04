@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.manage.service.docker;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,7 +25,8 @@ public class DockerInstallService implements Tasklet {
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("dockerinstall.yml", content, useAgent);
+    String aid = openParam.getAid();
+    TaskUtil.uploadFile("dockerinstall.yml", content, useAgent, aid);
 
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance instance = mesosMaster.get(0);
@@ -35,8 +37,12 @@ public class DockerInstallService implements Tasklet {
     AnsibleCommand dockerinstall =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/dockerinstall.yml",
             instance.getRoot(), configvars);
-    // TaskUtil.executeCommand(dockerinstall.toString(), useAgent);
-    TaskUtil.executeFile("dockerinstall", dockerinstall.toString(), useAgent);
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+    String result = TaskUtil.executeFile("dockerinstall", dockerinstall.toString(), useAgent, aid);
+    // 插入日志和任务记录
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), dockerinstall.toString(), 9);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 

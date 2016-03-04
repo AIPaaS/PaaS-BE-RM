@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.manage.service.etcd;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,8 +24,9 @@ public class EtcdStart implements Tasklet {
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/etcd/etcdstart.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    String aid = openParam.getAid();
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("etcdstart.yml", content, useAgent);
+    TaskUtil.uploadFile("etcdstart.yml", content, useAgent, aid);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance masternode = mesosMaster.get(0);
     String url = "http://" + masternode.getIp() + ":2379";
@@ -38,8 +40,12 @@ public class EtcdStart implements Tasklet {
     AnsibleCommand command =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/etcdstart.yml", "rcflannel",
             vars);
-    // TaskUtil.executeCommand(command.toString(), useAgent);
-    TaskUtil.executeFile("etcdStart", command.toString(), useAgent);
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+    String result = TaskUtil.executeFile("etcdStart", command.toString(), useAgent, aid);
+    // 插入日志和任务记录
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(), 25);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 

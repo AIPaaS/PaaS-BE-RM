@@ -26,30 +26,31 @@ public class MgmtOpenServiceTest {
   @Test
   public void openServiceTest() {
     OpenResourceParamVo paramVo = new OpenResourceParamVo();
-    paramVo.setClusterId("cluster-01");
-    paramVo.setClusterName("south-center");
+    paramVo.setClusterId("7");
+    paramVo.setClusterName("pheonixcenter");
     paramVo.setDomain("asiainfo.com");
     paramVo.setExternalDomain("asia.com");
     paramVo.setLoadVirtualIP("10.1.1.10");
+    paramVo.setAid("dev");
     MesosInstance master = new MesosInstance();
     master.setId(0);
     master.setIp("10.1.241.127");
     master.setRoot("root");
-    master.setPasswd("abc@123");
+    master.setPasswd("Mfjjbsq7!@#");
     master.setZone("center");
 
     MesosInstance master1 = new MesosInstance();
     master1.setId(0);
     master1.setIp("10.1.241.128");
     master1.setRoot("root");
-    master1.setPasswd("abc@123");
+    master1.setPasswd("Mfjjbsq7!@#");
     master1.setZone("center");
 
     MesosInstance master2 = new MesosInstance();
     master2.setId(0);
     master2.setIp("10.1.241.129");
     master2.setRoot("root");
-    master2.setPasswd("abc@123");
+    master2.setPasswd("Mfjjbsq7!@#");
     master2.setZone("center");
 
     List<MesosInstance> masters = new ArrayList<MesosInstance>();
@@ -61,7 +62,7 @@ public class MgmtOpenServiceTest {
     slave.setId(0);
     slave.setIp("10.1.241.130");
     slave.setRoot("root");
-    slave.setPasswd("abc@123");
+    slave.setPasswd("Mfjjbsq7!@#");
     slave.setZone("web");
     slave
         .setAttributes("ds:sth;jf:nj;rack:2;ex:ex1;model:hp-150;cpu:xe3;mem:ddr3;disk:ssd;netband:1G;");

@@ -103,6 +103,9 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog" >
+  <selectKey resultType="java.lang.Long" keyProperty="logId" order="AFTER" >
+		SELECT @@IDENTITY
+	</selectKey>
     insert into res_task_log (log_id, cluster_id, task_id, 
       log_cnt, log_time)
     values (#{logId,jdbcType=BIGINT}, #{clusterId,jdbcType=INTEGER}, #{taskId,jdbcType=INTEGER}, 

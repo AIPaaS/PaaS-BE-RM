@@ -10,13 +10,13 @@ public interface ExecuteEnv {
 
 
 
-  public String executeFile(String filename, String content) throws ClientProtocolException,
-      IOException, PaasException;
+  public String executeFile(String filename, String content, String aid)
+      throws ClientProtocolException, IOException, PaasException;
 
-  public void uploadFile(String filename, String content) throws ClientProtocolException,
-      IOException, PaasException;
+  public void uploadFile(String filename, String content, String aid)
+      throws ClientProtocolException, IOException, PaasException;
 
-  public String executeCommand(String content) throws ClientProtocolException, IOException,
-      PaasException;
+  public String executeCommand(String content, String aid) throws ClientProtocolException,
+      IOException, PaasException;
 
 }

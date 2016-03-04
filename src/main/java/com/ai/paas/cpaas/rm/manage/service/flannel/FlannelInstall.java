@@ -1,6 +1,7 @@
 package com.ai.paas.cpaas.rm.manage.service.flannel;
 
 import java.io.InputStream;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,8 +25,9 @@ public class FlannelInstall implements Tasklet {
         FlannelInstall.class.getResourceAsStream("/playbook/flannel/flannelinstall.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    String aid = openParam.getAid();
     Boolean useAgent = openParam.getUseAgent();
-    TaskUtil.uploadFile("flannelinstall.yml", content, useAgent);
+    TaskUtil.uploadFile("flannelinstall.yml", content, useAgent, aid);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     List<MesosSlave> slaveList = openParam.getMesosSlave();
     StringBuffer shellContext = TaskUtil.createBashFile();
@@ -53,7 +55,14 @@ public class FlannelInstall implements Tasklet {
       this.genCommand(mesosMaster.get(i), openParam, shellContext, flannelEtcd.toString(),
           execstart.toString(), password, i, "master");
     }
-    TaskUtil.executeFile("flannelinstall", shellContext.toString(), useAgent);
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+
+    String result = TaskUtil.executeFile("flannelinstall", shellContext.toString(), useAgent, aid);
+
+    // 插入日志和任务记录
+    int taskId =
+        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 28);
+    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     return RepeatStatus.FINISHED;
   }
 

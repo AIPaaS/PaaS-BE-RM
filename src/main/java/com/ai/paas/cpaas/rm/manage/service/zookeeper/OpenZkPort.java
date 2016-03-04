@@ -14,7 +14,7 @@ public class OpenZkPort implements Tasklet {
       throws Exception {
     String user = "rczkp01";
     String portParam = "ports=[2888,3888,2181]";
-    return OpenPortUtil.openPort(chunkContext, portParam, user);
+    return OpenPortUtil.openPort(chunkContext, portParam, user, 5);
   }
 
 }
