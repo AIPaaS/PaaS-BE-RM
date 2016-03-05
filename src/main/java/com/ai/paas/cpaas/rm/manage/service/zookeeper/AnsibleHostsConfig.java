@@ -8,16 +8,19 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
+import com.ai.paas.cpaas.rm.util.ExceptionCodeConstants;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.MesosSlave;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
+import com.ai.paas.ipaas.PaasException;
+import com.esotericsoftware.minlog.Log;
 
 public class AnsibleHostsConfig implements Tasklet {
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
-      throws Exception {
+      throws PaasException {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     String aid = openParam.getAid();
     // create execute file
@@ -80,15 +83,22 @@ public class AnsibleHostsConfig implements Tasklet {
 
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
-    String result =
-        TaskUtil.executeFile("configAnsibleHosts", shellContext.toString(),
-            openParam.getUseAgent(), aid);
-
-    // insert log and task record
-    int taskId =
-        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 1);
-    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
-
+    String result = new String();
+    try {
+      result =
+          TaskUtil.executeFile("configAnsibleHosts", shellContext.toString(),
+              openParam.getUseAgent(), aid);
+    } catch (Exception e) {
+      Log.error(e.toString());
+      result = e.toString();
+      throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+          e.toString());
+    } finally {
+      // insert log and task record
+      int taskId =
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 1);
+      TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
+    }
     return RepeatStatus.FINISHED;
   }
 }

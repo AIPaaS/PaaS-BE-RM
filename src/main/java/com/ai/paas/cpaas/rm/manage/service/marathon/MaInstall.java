@@ -13,11 +13,14 @@ import org.springframework.batch.repeat.RepeatStatus;
 import com.ai.paas.cpaas.rm.dao.interfaces.ResClusterInfoMapper;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResClusterInfo;
 import com.ai.paas.cpaas.rm.util.AnsibleCommand;
+import com.ai.paas.cpaas.rm.util.ExceptionCodeConstants;
 import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
+import com.ai.paas.ipaas.PaasException;
 import com.ai.paas.ipaas.ServiceUtil;
+import com.esotericsoftware.minlog.Log;
 
 public class MaInstall implements Tasklet {
 
@@ -60,13 +63,22 @@ public class MaInstall implements Tasklet {
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/marathoninstall.yml",
             "rcmarathon", installvars);
     Timestamp start = new Timestamp(System.currentTimeMillis());
-    String result =
-        TaskUtil.executeFile("marathoninstall", installCommand.toString(), useAgent, aid);
-    // insert log and task record
-    int taskId =
-        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), installCommand.toString(), 19);
-    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
 
+    String result = new String();
+    try {
+      result = TaskUtil.executeFile("marathoninstall", installCommand.toString(), useAgent, aid);
+    } catch (Exception e) {
+      Log.error(e.toString());
+      result = e.toString();
+      throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+          e.toString());
+    } finally {
+      // insert log and task record
+      int taskId =
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), installCommand.toString(),
+              19);
+      TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
+    }
 
     // insert record in cluster info
     ResClusterInfoMapper resClusterInfoMapper = ServiceUtil.getMapper(ResClusterInfoMapper.class);

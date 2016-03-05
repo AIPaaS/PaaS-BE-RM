@@ -11,11 +11,14 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import com.ai.paas.cpaas.rm.util.AnsibleCommand;
+import com.ai.paas.cpaas.rm.util.ExceptionCodeConstants;
 import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.Attributes;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
+import com.ai.paas.ipaas.PaasException;
+import com.esotericsoftware.minlog.Log;
 
 public class ConfigFlannelParam implements Tasklet {
 
@@ -49,11 +52,22 @@ public class ConfigFlannelParam implements Tasklet {
       shellContext.append(command.toString()).append("\n");
     }
     Timestamp start = new Timestamp(System.currentTimeMillis());
-    String result = TaskUtil.executeFile("flannelConfig", shellContext.toString(), useAgent, aid);
-    // insert log and task record
-    int taskId =
-        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 26);
-    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
+
+    String result = new String();
+    try {
+      result = TaskUtil.executeFile("flannelConfig", shellContext.toString(), useAgent, aid);
+    } catch (Exception e) {
+      Log.error(e.toString());
+      result = e.toString();
+      throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+          e.toString());
+    } finally {
+      // insert log and task record
+      int taskId =
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 26);
+      TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
+    }
+
     return RepeatStatus.FINISHED;
   }
 

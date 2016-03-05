@@ -13,6 +13,7 @@ import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.ipaas.PaasException;
 import com.ai.paas.ipaas.util.CiperUtil;
+import com.esotericsoftware.minlog.Log;
 
 public class GenUserUtil {
 
@@ -54,16 +55,26 @@ public class GenUserUtil {
     shellContext.append("\n");
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
-    String result = TaskUtil.executeFile(fileName, shellContext.toString(), useAgent, aid);
+    String result = new String();
+    try {
+      result = TaskUtil.executeFile(fileName, shellContext.toString(), useAgent, aid);
+    } catch (Exception e) {
+      Log.error(e.toString());
+      result = e.toString();
+      throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+          e.toString());
+    } finally {
+      // insert user and password in the res_instance_props
+      TaskUtil.insertResInstanceProps(openParam.getClusterId(), user,
+          CiperUtil.encrypt(TaskUtil.SECURITY_KEY, password));
 
-    // insert user and password in the res_instance_props
-    TaskUtil.insertResInstanceProps(openParam.getClusterId(), user,
-        CiperUtil.encrypt(TaskUtil.SECURITY_KEY, password));
+      // insert log and task record
+      int taskId =
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+              typeId);
+      TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
+    }
 
-    // insert log and task record
-    int taskId =
-        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
-            typeId);
-    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
+
   }
 }

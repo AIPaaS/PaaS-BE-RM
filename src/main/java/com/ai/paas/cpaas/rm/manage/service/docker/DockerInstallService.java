@@ -11,10 +11,13 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import com.ai.paas.cpaas.rm.util.AnsibleCommand;
+import com.ai.paas.cpaas.rm.util.ExceptionCodeConstants;
 import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
+import com.ai.paas.ipaas.PaasException;
+import com.esotericsoftware.minlog.Log;
 
 public class DockerInstallService implements Tasklet {
 
@@ -38,11 +41,23 @@ public class DockerInstallService implements Tasklet {
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/dockerinstall.yml",
             instance.getRoot(), configvars);
     Timestamp start = new Timestamp(System.currentTimeMillis());
-    String result = TaskUtil.executeFile("dockerinstall", dockerinstall.toString(), useAgent, aid);
-    // insert log and task record
-    int taskId =
-        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), dockerinstall.toString(), 9);
-    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
+
+    String result = new String();
+    try {
+      result = TaskUtil.executeFile("dockerinstall", dockerinstall.toString(), useAgent, aid);
+    } catch (Exception e) {
+      Log.error(e.toString());
+      result = e.toString();
+      throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+          e.toString());
+    } finally {
+      // insert log and task record
+      int taskId =
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), dockerinstall.toString(), 9);
+      TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
+
+    }
+
     return RepeatStatus.FINISHED;
   }
 

@@ -12,6 +12,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.ipaas.PaasException;
+import com.esotericsoftware.minlog.Log;
 
 public class VerifyWebService {
 
@@ -44,12 +45,22 @@ public class VerifyWebService {
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/" + filename, "root", vars);
 
     Timestamp start = new Timestamp(System.currentTimeMillis());
-    String result = TaskUtil.executeFile(filename + ".sh", command.toString(), useAgent, aid);
 
-    // insert log and task record
-    int taskId =
-        TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(), typeId);
-    TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
+    String result = new String();
+    try {
+      result = TaskUtil.executeFile(filename + ".sh", command.toString(), useAgent, aid);
+    } catch (Exception e) {
+      Log.error(e.toString());
+      result = e.toString();
+      throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+          e.toString());
+    } finally {
+      // insert log and task record
+      int taskId =
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(), typeId);
+      TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
+
+    }
   }
 
 }
