@@ -48,7 +48,7 @@ public class MaStart implements Tasklet {
     }
     Timestamp start = new Timestamp(System.currentTimeMillis());
     String result = TaskUtil.executeFile("marathonStart", shellContext.toString(), useAgent, aid);
-    // 插入日志和任务记录
+    // insert log and task record
     int taskId =
         TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 20);
     TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);

@@ -32,6 +32,20 @@ public class TaskUtil {
   // public static String filepath = "/root/test";
   private static final AtomicInteger counter = new AtomicInteger();
 
+  public static String SECURITY_KEY = "byjsy7!@#bjwqt7!";
+
+  public static int AVAILABLE = 0;
+
+  public static int DISABLED = 1;
+
+  public static int NOTSTART = 0;
+
+  public static int EXECUTING = 1;
+
+  public static int FINISHED = 2;
+
+  public static int FAILED = 3;
+
   public static int nextValue() {
     return counter.getAndIncrement();
   }
@@ -52,7 +66,7 @@ public class TaskUtil {
     return shellContext;
   }
 
-  // ÃÜÂëÉú³É´ý¸Ä
+  // gen password
   public static String generatePasswd() {
     return new SessionIdentifierGenerator().nextSessionId();
   }
@@ -131,7 +145,6 @@ public class TaskUtil {
     return list.get(0).getCodeValue();
   }
 
-  // Ìæ»»windows»»ÐÐ·û
   public static String replaceIllegalCharacter(String source) {
     if (source == null) return source;
     /*
@@ -148,15 +161,15 @@ public class TaskUtil {
       int typeId) {
     ResJobDetail resJobDetail = new ResJobDetail();
     ResJobDetailMapper mapper = ServiceUtil.getMapper(ResJobDetailMapper.class);
-    resJobDetail.setClusterId(new Integer(clusterId));
+    resJobDetail.setClusterId(clusterId);
     resJobDetail.setTaskPlaybook(shellContext);
-    resJobDetail.setTaskState(2);
+    resJobDetail.setTaskState(TaskUtil.FINISHED);
     resJobDetail.setTaskStartTime(start);
     resJobDetail.setTaskEndTime(new Timestamp(System.currentTimeMillis()));
     resJobDetail.setTypeId(typeId);
     mapper.insert(resJobDetail);
     int taskId = resJobDetail.getTaskId();
-    return resJobDetail.getTaskId();
+    return taskId;
   }
 
   public static void updateResClusterInfo(ResClusterInfo instance) {
@@ -164,11 +177,12 @@ public class TaskUtil {
     mapper.updateByPrimaryKey(instance);
   }
 
-  public static void insertResInstanceProps(String keyCode, String keyValue, String clusterId) {
+  public static void insertResInstanceProps(String clusterId, String keyCode, String keyValue) {
     ResInstanceProps instance = new ResInstanceProps();
-    instance.setState(0);
-    // instance.setKeyCode(keyCode);
+    instance.setState(TaskUtil.AVAILABLE);
+    instance.setKeyCode(keyCode);
     instance.setKeyValue(keyValue);
+    instance.setClusterId(clusterId);
     ResInstancePropsMapper mapper = ServiceUtil.getMapper(ResInstancePropsMapper.class);
     mapper.insert(instance);
   }

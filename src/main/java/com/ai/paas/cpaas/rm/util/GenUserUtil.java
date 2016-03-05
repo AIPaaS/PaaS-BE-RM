@@ -12,6 +12,7 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.ipaas.PaasException;
+import com.ai.paas.ipaas.util.CiperUtil;
 
 public class GenUserUtil {
 
@@ -27,7 +28,7 @@ public class GenUserUtil {
 
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
-    // 创建用户
+    // create user
     MesosInstance mesosInstance = mesosMaster.get(0);
     List<String> userVars = new ArrayList<String>();
     String passwd = mesosInstance.getPasswd();
@@ -36,9 +37,9 @@ public class GenUserUtil {
     userVars.add("username=" + user);
     userVars.add("hosts=" + hosts);
     userVars.add("line='" + user + "    ALL=(ALL)      ALL'");
-    // 获取密码
+    // gen password
     String password = TaskUtil.generatePasswd();
-    // 将生成密码存入上下文中
+    // store the password in context
     chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext()
         .put("password", password);
     shellContext
@@ -55,6 +56,11 @@ public class GenUserUtil {
 
     String result = TaskUtil.executeFile(fileName, shellContext.toString(), useAgent, aid);
 
+    // insert user and password in the res_instance_props
+    TaskUtil.insertResInstanceProps(openParam.getClusterId(), user,
+        CiperUtil.encrypt(TaskUtil.SECURITY_KEY, password));
+
+    // insert log and task record
     int taskId =
         TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
             typeId);

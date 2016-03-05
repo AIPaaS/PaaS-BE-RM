@@ -20,7 +20,7 @@ public class AnsibleHostsConfig implements Tasklet {
       throws Exception {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     String aid = openParam.getAid();
-    // 构建执行文件
+    // create execute file
     StringBuffer shellContext = TaskUtil.createBashFile();
     shellContext.append("mv /etc/ansible/hosts /etc/ansible/hosts.bak");
     shellContext.append("\n");
@@ -84,7 +84,7 @@ public class AnsibleHostsConfig implements Tasklet {
         TaskUtil.executeFile("configAnsibleHosts", shellContext.toString(),
             openParam.getUseAgent(), aid);
 
-    // 插入日志和任务记录
+    // insert log and task record
     int taskId =
         TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 1);
     TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);

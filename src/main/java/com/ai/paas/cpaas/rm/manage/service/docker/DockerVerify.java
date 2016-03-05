@@ -41,7 +41,7 @@ public class DockerVerify implements Tasklet {
 
     Timestamp start = new Timestamp(System.currentTimeMillis());
     String result = TaskUtil.executeFile("dockerVerify.sh", command.toString(), useAgent, aid);
-    // 插入日志和任务记录
+    // insert log and task record
     int taskId =
         TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(), 10);
     TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);

@@ -32,7 +32,7 @@ public class RemoteEnv implements ExecuteEnv {
   public void uploadFile(String filename, String content, String aid)
       throws ClientProtocolException, IOException, PaasException {
     String filepath = TaskUtil.getSystemProperty("filepath");
-    // 传输执行文件
+    // upload execute shell
     String url = TaskUtil.getSystemProperty("upload");
     StringEntity paramEntity = RemoteEnv.genFileParam(content, filename, filepath, aid);
     RemoteEnv.sendRequest(url, paramEntity);
@@ -65,19 +65,17 @@ public class RemoteEnv implements ExecuteEnv {
       JsonObject o = parser.parse(excResult).getAsJsonObject();
       String stderr = o.get("stderr").getAsString();
       String stdout = o.get("stdout").getAsString();
-      // 在ansible执行命令中，resultcode无法作为唯一判定结果，需要对stdout进行分析，
+      // judge the result with stderr and stdout
       if (!resultVo.getCode().equals(ExceptionCodeConstants.TransServiceCode.SUCCESS_CODE)) {
         System.out.println(stderr);
         logger.error(stderr);
         throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
             resultVo.getMsg());
       }
-      // 对stdout进行分析，
+      // analyze stdout，
       if (stdout.contains("unreachable")) {
         String pattern = "unreachable=[1-9]";
-        // 创建 Pattern 对象
         Pattern r = Pattern.compile(pattern);
-        // 现在创建 matcher 对象
         Matcher m = r.matcher(stdout);
         if (m.find()) {
           System.out.println(stdout);
@@ -88,9 +86,7 @@ public class RemoteEnv implements ExecuteEnv {
       }
       if (stdout.contains("failed")) {
         String pattern = "failed=[1-9]";
-        // 创建 Pattern 对象
         Pattern r = Pattern.compile(pattern);
-        // 现在创建 matcher 对象
         Matcher m = r.matcher(stdout);
         if (m.find()) {
           System.out.println(stdout);
@@ -116,13 +112,13 @@ public class RemoteEnv implements ExecuteEnv {
   public String executeFile(String filename, String content, String aid)
       throws ClientProtocolException, IOException, PaasException {
     String filepath = TaskUtil.getSystemProperty("filepath");
-    // 传输执行文件
+    // upload execute file
     this.uploadFile(filename, content, aid);
 
-    // 更改文件权限
+    // change the permission of file
     this.executeCommand("chmod u+x " + filepath + "/" + filename, aid);
 
-    // 执行文件
+    // execute shell file
     String result = this.executeCommand("bash " + filepath + "/" + filename, aid);
     return result;
   }

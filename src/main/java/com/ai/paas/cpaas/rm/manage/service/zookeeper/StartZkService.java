@@ -33,7 +33,7 @@ public class StartZkService implements Tasklet {
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance instance = mesosMaster.get(0);
     String password = instance.getPasswd();
-    // 启动zookeeper服务
+    // start zookeeper service
     for (int i = 0; i < mesosMaster.size(); i++) {
       List<String> startvars = new ArrayList<String>();
       startvars.add("ansible_ssh_pass=" + password);
@@ -51,7 +51,7 @@ public class StartZkService implements Tasklet {
     String result =
         TaskUtil.executeFile("StartZkServiceStep", shellContext.toString(), useAgent, aid);
 
-    // 插入日志和任务记录
+    // insert log and task record
     int taskId =
         TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 7);
     TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);

@@ -40,7 +40,7 @@ public class FlannelInstall implements Tasklet {
       flannelEtcd.append(mesosMaster.get(i).getIp()).append(":2379");
     }
     String password = masternode.getPasswd();
-    // 需要在参数中指定docker的启动位置，并且添加etcd master的ip地址
+    // It is necessary assign the location of docker startup,and append the addr of etcd master
     StringBuffer execstart = new StringBuffer("execstart='ExecStart=/usr/bin/docker daemon -g  ");
     execstart.append(openParam.getImagePath()).append("  -H fd:// --cluster-store=etcd://");
     execstart.append(masternode.getIp());
@@ -59,7 +59,7 @@ public class FlannelInstall implements Tasklet {
 
     String result = TaskUtil.executeFile("flannelinstall", shellContext.toString(), useAgent, aid);
 
-    // 插入日志和任务记录
+    // insert log and task record
     int taskId =
         TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 28);
     TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);

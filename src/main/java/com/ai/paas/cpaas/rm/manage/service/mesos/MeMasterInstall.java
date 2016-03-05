@@ -30,9 +30,9 @@ public class MeMasterInstall implements Tasklet {
 
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
-    // 创建mesos用户
+    // create the user of mesos
     MesosInstance mesosInstance = mesosMaster.get(0);
-    // mesos master 安装
+    // install mesos-master
     List<String> installVars = new ArrayList<String>();
     String password =
         (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
@@ -58,7 +58,7 @@ public class MeMasterInstall implements Tasklet {
     Timestamp start = new Timestamp(System.currentTimeMillis());
     String result =
         TaskUtil.executeFile("mesosMasterInstall", shellContext.toString(), useAgent, aid);
-    // 插入日志和任务记录
+    // insert log and task record
     int taskId =
         TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 12);
     TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);

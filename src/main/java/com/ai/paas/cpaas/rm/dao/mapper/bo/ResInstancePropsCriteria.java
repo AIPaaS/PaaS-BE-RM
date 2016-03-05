@@ -184,6 +184,76 @@ public class ResInstancePropsCriteria {
             return (Criteria) this;
         }
 
+        public Criteria andKeyCodeIsNull() {
+            addCriterion("key_code is null");
+            return (Criteria) this;
+        }
+
+        public Criteria andKeyCodeIsNotNull() {
+            addCriterion("key_code is not null");
+            return (Criteria) this;
+        }
+
+        public Criteria andKeyCodeEqualTo(String value) {
+            addCriterion("key_code =", value, "keyCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andKeyCodeNotEqualTo(String value) {
+            addCriterion("key_code <>", value, "keyCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andKeyCodeGreaterThan(String value) {
+            addCriterion("key_code >", value, "keyCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andKeyCodeGreaterThanOrEqualTo(String value) {
+            addCriterion("key_code >=", value, "keyCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andKeyCodeLessThan(String value) {
+            addCriterion("key_code <", value, "keyCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andKeyCodeLessThanOrEqualTo(String value) {
+            addCriterion("key_code <=", value, "keyCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andKeyCodeLike(String value) {
+            addCriterion("key_code like", value, "keyCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andKeyCodeNotLike(String value) {
+            addCriterion("key_code not like", value, "keyCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andKeyCodeIn(List<String> values) {
+            addCriterion("key_code in", values, "keyCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andKeyCodeNotIn(List<String> values) {
+            addCriterion("key_code not in", values, "keyCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andKeyCodeBetween(String value1, String value2) {
+            addCriterion("key_code between", value1, value2, "keyCode");
+            return (Criteria) this;
+        }
+
+        public Criteria andKeyCodeNotBetween(String value1, String value2) {
+            addCriterion("key_code not between", value1, value2, "keyCode");
+            return (Criteria) this;
+        }
+
         public Criteria andKeyValueIsNull() {
             addCriterion("key_value is null");
             return (Criteria) this;

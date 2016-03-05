@@ -39,7 +39,7 @@ public class DockerInstallService implements Tasklet {
             instance.getRoot(), configvars);
     Timestamp start = new Timestamp(System.currentTimeMillis());
     String result = TaskUtil.executeFile("dockerinstall", dockerinstall.toString(), useAgent, aid);
-    // 插入日志和任务记录
+    // insert log and task record
     int taskId =
         TaskUtil.insertResJobDetail(start, openParam.getClusterId(), dockerinstall.toString(), 9);
     TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);

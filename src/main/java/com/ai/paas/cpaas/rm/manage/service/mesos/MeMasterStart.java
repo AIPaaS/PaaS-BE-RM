@@ -29,10 +29,10 @@ public class MeMasterStart implements Tasklet {
     TaskUtil.uploadFile("memasterstart.yml", content, useAgent, aid);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     StringBuffer shellContext = TaskUtil.createBashFile();
-    // 添加hostname文件，并启动mesos master
+    // create the file of hostname，and start mesos-master
     for (int i = 0; i < mesosMaster.size(); i++) {
       MesosInstance masterInstance = mesosMaster.get(i);
-      // 需要在/etc/mesos-master目录下创建文件，普通用户没有写入权限，此处用root用户
+      // create file in /etc/mesos-master with the user of root
       String root = masterInstance.getRoot();
       String passwd = masterInstance.getPasswd();
       List<String> startVars = new ArrayList<String>();
@@ -49,7 +49,7 @@ public class MeMasterStart implements Tasklet {
     Timestamp start = new Timestamp(System.currentTimeMillis());
     String result =
         TaskUtil.executeFile("mesosMasterStart", shellContext.toString(), useAgent, aid);
-    // 插入日志和任务记录
+    // insert log and task record
     int taskId =
         TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 14);
     TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);

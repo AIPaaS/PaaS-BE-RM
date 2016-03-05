@@ -3,13 +3,13 @@ package com.ai.paas.cpaas.rm.dao.mapper.bo;
 public class ResInstanceProps {
     private Integer keyId;
 
+    private String keyCode;
+
     private String keyValue;
 
     private String clusterId;
 
     private Integer state;
-
-    private Byte[] keyCode;
 
     public Integer getKeyId() {
         return keyId;
@@ -17,6 +17,14 @@ public class ResInstanceProps {
 
     public void setKeyId(Integer keyId) {
         this.keyId = keyId;
+    }
+
+    public String getKeyCode() {
+        return keyCode;
+    }
+
+    public void setKeyCode(String keyCode) {
+        this.keyCode = keyCode == null ? null : keyCode.trim();
     }
 
     public String getKeyValue() {
@@ -41,13 +49,5 @@ public class ResInstanceProps {
 
     public void setState(Integer state) {
         this.state = state;
-    }
-
-    public Byte[] getKeyCode() {
-        return keyCode;
-    }
-
-    public void setKeyCode(Byte[] keyCode) {
-        this.keyCode = keyCode;
     }
 }

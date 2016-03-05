@@ -3,7 +3,7 @@
 <mapper namespace="com.ai.paas.cpaas.rm.dao.interfaces.ResJobDetailMapper" >
   <resultMap id="BaseResultMap" type="com.ai.paas.cpaas.rm.dao.mapper.bo.ResJobDetail" >
     <id column="task_id" property="taskId" jdbcType="INTEGER" />
-    <result column="cluster_id" property="clusterId" jdbcType="INTEGER" />
+    <result column="cluster_id" property="clusterId" jdbcType="VARCHAR" />
     <result column="type_id" property="typeId" jdbcType="INTEGER" />
     <result column="task_state" property="taskState" jdbcType="INTEGER" />
     <result column="task_order" property="taskOrder" jdbcType="INTEGER" />
@@ -107,13 +107,13 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResJobDetail" >
-    <selectKey resultType="java.lang.Integer" keyProperty="taskId" order="AFTER" >
+  <selectKey resultType="java.lang.Integer" keyProperty="taskId" order="AFTER" >
 		SELECT @@IDENTITY
 	</selectKey>
     insert into res_job_detail (task_id, cluster_id, type_id, 
       task_state, task_order, task_start_time, 
       task_end_time, task_playbook)
-    values (#{taskId,jdbcType=INTEGER}, #{clusterId,jdbcType=INTEGER}, #{typeId,jdbcType=INTEGER}, 
+    values (#{taskId,jdbcType=INTEGER}, #{clusterId,jdbcType=VARCHAR}, #{typeId,jdbcType=INTEGER}, 
       #{taskState,jdbcType=INTEGER}, #{taskOrder,jdbcType=INTEGER}, #{taskStartTime,jdbcType=TIMESTAMP}, 
       #{taskEndTime,jdbcType=TIMESTAMP}, #{taskPlaybook,jdbcType=VARCHAR})
   </insert>
@@ -150,7 +150,7 @@
         #{taskId,jdbcType=INTEGER},
       </if>
       <if test="clusterId != null" >
-        #{clusterId,jdbcType=INTEGER},
+        #{clusterId,jdbcType=VARCHAR},
       </if>
       <if test="typeId != null" >
         #{typeId,jdbcType=INTEGER},
@@ -185,7 +185,7 @@
         task_id = #{record.taskId,jdbcType=INTEGER},
       </if>
       <if test="record.clusterId != null" >
-        cluster_id = #{record.clusterId,jdbcType=INTEGER},
+        cluster_id = #{record.clusterId,jdbcType=VARCHAR},
       </if>
       <if test="record.typeId != null" >
         type_id = #{record.typeId,jdbcType=INTEGER},
@@ -213,7 +213,7 @@
   <update id="updateByExample" parameterType="map" >
     update res_job_detail
     set task_id = #{record.taskId,jdbcType=INTEGER},
-      cluster_id = #{record.clusterId,jdbcType=INTEGER},
+      cluster_id = #{record.clusterId,jdbcType=VARCHAR},
       type_id = #{record.typeId,jdbcType=INTEGER},
       task_state = #{record.taskState,jdbcType=INTEGER},
       task_order = #{record.taskOrder,jdbcType=INTEGER},
@@ -228,7 +228,7 @@
     update res_job_detail
     <set >
       <if test="clusterId != null" >
-        cluster_id = #{clusterId,jdbcType=INTEGER},
+        cluster_id = #{clusterId,jdbcType=VARCHAR},
       </if>
       <if test="typeId != null" >
         type_id = #{typeId,jdbcType=INTEGER},
@@ -253,7 +253,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResJobDetail" >
     update res_job_detail
-    set cluster_id = #{clusterId,jdbcType=INTEGER},
+    set cluster_id = #{clusterId,jdbcType=VARCHAR},
       type_id = #{typeId,jdbcType=INTEGER},
       task_state = #{taskState,jdbcType=INTEGER},
       task_order = #{taskOrder,jdbcType=INTEGER},

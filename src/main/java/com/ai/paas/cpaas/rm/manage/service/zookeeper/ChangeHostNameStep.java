@@ -21,7 +21,7 @@ public class ChangeHostNameStep implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
-    // 上传hostnamectl.yml
+    // upload hostnamectl.yml
     InputStream in = ChangeHostNameStep.class.getResourceAsStream("/playbook/hostnamectl.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
@@ -49,7 +49,7 @@ public class ChangeHostNameStep implements Tasklet {
     }
 
     Timestamp start = new Timestamp(System.currentTimeMillis());
-    // 将shellContext传到服务端，并执行
+    // upload shellContext and execute it
     String result = TaskUtil.executeFile("changehostnames", shellContext.toString(), useAgent, aid);
 
     int taskId =

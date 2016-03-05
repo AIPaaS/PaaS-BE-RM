@@ -66,7 +66,7 @@ public class MesosSlaveStep implements Tasklet {
 
     String result = TaskUtil.executeFile("mesosSlaveStep", shellContext.toString(), useAgent, aid);
 
-    // 插入日志和任务记录
+    // insert log and task record
     int taskId =
         TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 15);
     TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);

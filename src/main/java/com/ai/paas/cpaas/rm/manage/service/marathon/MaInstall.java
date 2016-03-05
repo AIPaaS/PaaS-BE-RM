@@ -50,7 +50,7 @@ public class MaInstall implements Tasklet {
     master.append("master=zk://");
     master.append(zkMessage.toString());
     master.append("/mesos");
-    // 安装marathon
+    // install marathon
     List<String> installvars = new ArrayList<String>();
     installvars.add(zk.toString());
     installvars.add(master.toString());
@@ -62,13 +62,13 @@ public class MaInstall implements Tasklet {
     Timestamp start = new Timestamp(System.currentTimeMillis());
     String result =
         TaskUtil.executeFile("marathoninstall", installCommand.toString(), useAgent, aid);
-    // 插入日志和任务记录
+    // insert log and task record
     int taskId =
         TaskUtil.insertResJobDetail(start, openParam.getClusterId(), installCommand.toString(), 19);
     TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
 
 
-    // 向集群信息表中插入数据
+    // insert record in cluster info
     ResClusterInfoMapper resClusterInfoMapper = ServiceUtil.getMapper(ResClusterInfoMapper.class);
     ResClusterInfo resClusterInfo = new ResClusterInfo();
     resClusterInfo.setClusterId(openParam.getClusterId());
@@ -77,7 +77,7 @@ public class MaInstall implements Tasklet {
     resClusterInfo.setMesosDomain(master.toString());
     resClusterInfo.setMarathonAddr(zk.toString());
     // TODO
-    // chronos为安装，暂时不插入
+    // lack of chronos
     // resClusterInfoMapper.insert(resClusterInfo);
 
     return RepeatStatus.FINISHED;

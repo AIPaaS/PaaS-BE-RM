@@ -17,7 +17,7 @@ public class OpenPortUtil {
 
   public static RepeatStatus openPort(ChunkContext chunkContext, String portParam, String user,
       int typeId) throws ClientProtocolException, IOException, PaasException {
-    // 上传openport.yml
+    // upload openport.yml
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/openport.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
@@ -27,10 +27,9 @@ public class OpenPortUtil {
     String password =
         (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
             .getExecutionContext().get("password");
-    // 开放指定端口
+    // open the port
     List<String> portVars = new ArrayList<String>();
 
-    // 对rczkp01做特殊处理
     if (user.equals("rczkp01")) {
       user = "root";
       password = openParam.getMesosMaster().get(0).getPasswd();

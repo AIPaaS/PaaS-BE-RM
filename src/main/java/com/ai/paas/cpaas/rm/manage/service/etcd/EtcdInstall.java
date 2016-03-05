@@ -27,7 +27,7 @@ public class EtcdInstall implements Tasklet {
     String aid = openParam.getAid();
     Boolean useAgent = openParam.getUseAgent();
     TaskUtil.uploadFile("etcdinstall.yml", content, useAgent, aid);
-    // 构建执行文件
+    // build execute file
     StringBuffer shellContext = TaskUtil.createBashFile();
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     MesosInstance masternode = mesosMaster.get(0);
@@ -35,7 +35,7 @@ public class EtcdInstall implements Tasklet {
         (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
             .getExecutionContext().get("password");
 
-    // 拼接initial_cluster参数
+    // initial_cluster param
     StringBuffer initial_cluster = new StringBuffer("ETCD_INITIAL_CLUSTER=");
     initial_cluster.append("etcd-01=http://" + masternode.getIp()).append(":2380");
     for (int i = 1; i < mesosMaster.size(); i++) {
@@ -67,7 +67,7 @@ public class EtcdInstall implements Tasklet {
     }
     Timestamp start = new Timestamp(System.currentTimeMillis());
     String result = TaskUtil.executeFile("etcdInstall", shellContext.toString(), useAgent, aid);
-    // 插入日志和任务记录
+    // insert log and task record
     int taskId =
         TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 24);
     TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);

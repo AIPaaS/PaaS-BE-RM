@@ -3,12 +3,10 @@
 <mapper namespace="com.ai.paas.cpaas.rm.dao.interfaces.ResInstancePropsMapper" >
   <resultMap id="BaseResultMap" type="com.ai.paas.cpaas.rm.dao.mapper.bo.ResInstanceProps" >
     <id column="key_id" property="keyId" jdbcType="INTEGER" />
+    <result column="key_code" property="keyCode" jdbcType="VARCHAR" />
     <result column="key_value" property="keyValue" jdbcType="VARCHAR" />
     <result column="cluster_id" property="clusterId" jdbcType="VARCHAR" />
     <result column="state" property="state" jdbcType="INTEGER" />
-  </resultMap>
-  <resultMap id="ResultMapWithBLOBs" type="com.ai.paas.cpaas.rm.dao.mapper.bo.ResInstanceProps" extends="BaseResultMap" >
-    <result column="key_code" property="keyCode" jdbcType="VARBINARY" />
   </resultMap>
   <sql id="Example_Where_Clause" >
     <where >
@@ -69,27 +67,8 @@
     </where>
   </sql>
   <sql id="Base_Column_List" >
-    key_id, key_value, cluster_id, state
+    key_id, key_code, key_value, cluster_id, state
   </sql>
-  <sql id="Blob_Column_List" >
-    key_code
-  </sql>
-  <select id="selectByExampleWithBLOBs" resultMap="ResultMapWithBLOBs" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResInstancePropsCriteria" >
-    select
-    <if test="distinct" >
-      distinct
-    </if>
-    <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
-    from res_instance_props
-    <if test="_parameter != null" >
-      <include refid="Example_Where_Clause" />
-    </if>
-    <if test="orderByClause != null" >
-      order by ${orderByClause}
-    </if>
-  </select>
   <select id="selectByExample" resultMap="BaseResultMap" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResInstancePropsCriteria" >
     select
     <if test="distinct" >
@@ -107,11 +86,9 @@
       limit #{limitStart} , #{limitEnd}
     </if>
   </select>
-  <select id="selectByPrimaryKey" resultMap="ResultMapWithBLOBs" parameterType="Integer" >
+  <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="Integer" >
     select 
     <include refid="Base_Column_List" />
-    ,
-    <include refid="Blob_Column_List" />
     from res_instance_props
     where key_id = #{keyId,jdbcType=INTEGER}
   </select>
@@ -126,16 +103,19 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResInstanceProps" >
-    insert into res_instance_props (key_id, key_value, cluster_id, 
-      state, key_code)
-    values (#{keyId,jdbcType=INTEGER}, #{keyValue,jdbcType=VARCHAR}, #{clusterId,jdbcType=VARCHAR}, 
-      #{state,jdbcType=INTEGER}, #{keyCode,jdbcType=VARBINARY})
+    insert into res_instance_props (key_id, key_code, key_value, 
+      cluster_id, state)
+    values (#{keyId,jdbcType=INTEGER}, #{keyCode,jdbcType=VARCHAR}, #{keyValue,jdbcType=VARCHAR}, 
+      #{clusterId,jdbcType=VARCHAR}, #{state,jdbcType=INTEGER})
   </insert>
   <insert id="insertSelective" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResInstanceProps" >
     insert into res_instance_props
     <trim prefix="(" suffix=")" suffixOverrides="," >
       <if test="keyId != null" >
         key_id,
+      </if>
+      <if test="keyCode != null" >
+        key_code,
       </if>
       <if test="keyValue != null" >
         key_value,
@@ -146,13 +126,13 @@
       <if test="state != null" >
         state,
       </if>
-      <if test="keyCode != null" >
-        key_code,
-      </if>
     </trim>
     <trim prefix="values (" suffix=")" suffixOverrides="," >
       <if test="keyId != null" >
         #{keyId,jdbcType=INTEGER},
+      </if>
+      <if test="keyCode != null" >
+        #{keyCode,jdbcType=VARCHAR},
       </if>
       <if test="keyValue != null" >
         #{keyValue,jdbcType=VARCHAR},
@@ -162,9 +142,6 @@
       </if>
       <if test="state != null" >
         #{state,jdbcType=INTEGER},
-      </if>
-      <if test="keyCode != null" >
-        #{keyCode,jdbcType=VARBINARY},
       </if>
     </trim>
   </insert>
@@ -180,6 +157,9 @@
       <if test="record.keyId != null" >
         key_id = #{record.keyId,jdbcType=INTEGER},
       </if>
+      <if test="record.keyCode != null" >
+        key_code = #{record.keyCode,jdbcType=VARCHAR},
+      </if>
       <if test="record.keyValue != null" >
         key_value = #{record.keyValue,jdbcType=VARCHAR},
       </if>
@@ -189,21 +169,7 @@
       <if test="record.state != null" >
         state = #{record.state,jdbcType=INTEGER},
       </if>
-      <if test="record.keyCode != null" >
-        key_code = #{record.keyCode,jdbcType=VARBINARY},
-      </if>
     </set>
-    <if test="_parameter != null" >
-      <include refid="Update_By_Example_Where_Clause" />
-    </if>
-  </update>
-  <update id="updateByExampleWithBLOBs" parameterType="map" >
-    update res_instance_props
-    set key_id = #{record.keyId,jdbcType=INTEGER},
-      key_value = #{record.keyValue,jdbcType=VARCHAR},
-      cluster_id = #{record.clusterId,jdbcType=VARCHAR},
-      state = #{record.state,jdbcType=INTEGER},
-      key_code = #{record.keyCode,jdbcType=VARBINARY}
     <if test="_parameter != null" >
       <include refid="Update_By_Example_Where_Clause" />
     </if>
@@ -211,6 +177,7 @@
   <update id="updateByExample" parameterType="map" >
     update res_instance_props
     set key_id = #{record.keyId,jdbcType=INTEGER},
+      key_code = #{record.keyCode,jdbcType=VARCHAR},
       key_value = #{record.keyValue,jdbcType=VARCHAR},
       cluster_id = #{record.clusterId,jdbcType=VARCHAR},
       state = #{record.state,jdbcType=INTEGER}
@@ -221,6 +188,9 @@
   <update id="updateByPrimaryKeySelective" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResInstanceProps" >
     update res_instance_props
     <set >
+      <if test="keyCode != null" >
+        key_code = #{keyCode,jdbcType=VARCHAR},
+      </if>
       <if test="keyValue != null" >
         key_value = #{keyValue,jdbcType=VARCHAR},
       </if>
@@ -230,23 +200,13 @@
       <if test="state != null" >
         state = #{state,jdbcType=INTEGER},
       </if>
-      <if test="keyCode != null" >
-        key_code = #{keyCode,jdbcType=VARBINARY},
-      </if>
     </set>
-    where key_id = #{keyId,jdbcType=INTEGER}
-  </update>
-  <update id="updateByPrimaryKeyWithBLOBs" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResInstanceProps" >
-    update res_instance_props
-    set key_value = #{keyValue,jdbcType=VARCHAR},
-      cluster_id = #{clusterId,jdbcType=VARCHAR},
-      state = #{state,jdbcType=INTEGER},
-      key_code = #{keyCode,jdbcType=VARBINARY}
     where key_id = #{keyId,jdbcType=INTEGER}
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResInstanceProps" >
     update res_instance_props
-    set key_value = #{keyValue,jdbcType=VARCHAR},
+    set key_code = #{keyCode,jdbcType=VARCHAR},
+      key_value = #{keyValue,jdbcType=VARCHAR},
       cluster_id = #{clusterId,jdbcType=VARCHAR},
       state = #{state,jdbcType=INTEGER}
     where key_id = #{keyId,jdbcType=INTEGER}
