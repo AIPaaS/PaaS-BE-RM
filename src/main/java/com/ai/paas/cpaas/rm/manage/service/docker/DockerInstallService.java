@@ -37,6 +37,7 @@ public class DockerInstallService implements Tasklet {
     List<String> configvars = new ArrayList<String>();
     configvars.add("ansible_ssh_pass=" + password);
     configvars.add("ansible_become_pass=" + password);
+    configvars.add("startup=" + openParam.getImagePath());
     AnsibleCommand dockerinstall =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/dockerinstall.yml",
             instance.getRoot(), configvars);

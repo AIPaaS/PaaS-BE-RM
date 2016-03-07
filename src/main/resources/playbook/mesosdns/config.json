@@ -1,0 +1,11 @@
+{
+  "refreshSeconds": 60,
+  "ttl": 60,
+  "domain": "ai",
+  "port": 53,
+  "httpon":true,
+  "dnson":true,
+  "httpport":8123,
+  "timeout": 5,
+  "IPSources":["netinfo","host"]
+}
