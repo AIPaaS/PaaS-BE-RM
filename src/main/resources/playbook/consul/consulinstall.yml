@@ -2,8 +2,12 @@
 - hosts: master
   user: rcconsul
   vars:
-      ansible_become_pass: root
-      subscriber: http_callback
+        datacenter: ai-internel
+        domain: aio
+        client_addr: /root/consul/dist
+        log_level: INFO
+        node_name: master-123
+        client_addr: master
   tasks:
       - name: yum install consul
         yum: name=consul state=latest
@@ -11,15 +15,8 @@
       - name: create dir /etc/consul.d
         file: path=/etc/consul.d state=directory mode=0755
         sudo: yes
-      - name: echo event_subscriber
-        shell: echo "{{subscriber}}" > event_subscriber
-        args:
-             chdir: /etc/consul.d
-        sudo: yes
-      - name: echo master
-        shell: echo "{{master}}" > master
-        args:
-             chdir: /etc/consul.d
+      - name: new config file
+        template: src=./00-defaults.json.j2 dest=/etc/consul.d/consul.json
         sudo: yes
       - name: open 8600 port
         firewalld: port={{ item }}/tcp permanent=true state=enabled

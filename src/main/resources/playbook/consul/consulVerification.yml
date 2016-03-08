@@ -1,7 +1,7 @@
 ---
 
 - name: Verification
-  hosts: localhost
+  hosts: master
   connection: local
   gather_facts: no
   sudo: no
@@ -20,7 +20,7 @@
       
     - name: Test for Consul Web UI
       get_url: 
-        url="http://{{ansible_default_ipv4.address}}:8500/ui/" 
+        url="http://{{ansible_default_ipv4.address}}:8600/ui/" 
         dest=/tmp/consul-webui
         force=yes
       register: webui_status
