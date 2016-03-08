@@ -1,4 +1,4 @@
-package com.ai.paas.cpaas.rm.manage.service.mesosdns;
+package com.ai.paas.cpaas.rm.manage.service.haproxy;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
@@ -19,7 +19,7 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.ipaas.PaasException;
 import com.esotericsoftware.minlog.Log;
 
-public class MesosDnsInstall implements Tasklet {
+public class HaproxyInstall implements Tasklet {
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
@@ -27,59 +27,29 @@ public class MesosDnsInstall implements Tasklet {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     Boolean useAgent = openParam.getUseAgent();
     String aid = openParam.getAid();
-    String[] filenames = {"config.json", "mesos-dns.service", "mesosdnsinstall.yml"};
+    String[] filenames = {"haproxyinstall.yml", "keepalived.conf"};
     for (String filename : filenames) {
-      InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/mesosdns/" + filename);
+      InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/keepalived/" + filename);
       String content = TaskUtil.getFile(in);
       TaskUtil.uploadFile(filename, content, useAgent, aid);
     }
-
-    StringBuffer zk = new StringBuffer();
-    StringBuffer masters = new StringBuffer();
-
-    zk.append("zk='\"zk://");
-    masters.append("master='[");
     List<MesosInstance> masterList = openParam.getMesosMaster();
-
     MesosInstance masterInstance = masterList.get(0);
     String password = masterInstance.getPasswd();
-    zk.append(this.genZkInfo(masterInstance.getIp()));
-    masters.append("\\\\").append("\\\"").append(this.genMesosInfo(masterInstance.getIp()))
-        .append("\\\\").append("\\\"");
-    for (int i = 1; i < masterList.size(); i++) {
-      zk.append(",");
-      zk.append(this.genZkInfo(masterList.get(i).getIp()));
-      masters.append(",");
-      masters.append("\\\\").append("\\\"").append(this.genMesosInfo(masterList.get(i).getIp()))
-          .append("\\\\").append("\\\"");
-    }
-    zk.append("/mesos\"'");
-    masters.append("]'");
+
     // 获取文件存储路径
     String path = TaskUtil.getSystemProperty("filepath");
-    String config = path + "/config.json";
-    String mesosservice = path + "/mesos-dns.service";
-    // 获取mesosdns下载位置
-    String mesosPath = TaskUtil.getSystemProperty("mesosdns");
-    String nameserver = TaskUtil.getSystemProperty("nameserver");
     List<String> configvars = new ArrayList<String>();
     configvars.add("ansible_ssh_pass=" + password);
     configvars.add("ansible_become_pass=" + password);
-    configvars.add(zk.toString());
-    configvars.add(masters.toString());
-    configvars.add("config=" + config);
-    configvars.add("mesosservice=" + mesosservice);
-    configvars.add("filepath=" + mesosPath);
-    configvars.add("resolvers='[" + nameserver + "]'");
-    configvars.add("domain='\\\\\\\"" + openParam.getDomain() + "\\\\\\\"'");
     AnsibleCommand command =
-        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/mesosdnsinstall.yml", "root",
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/haproxyinstall.yml", "root",
             configvars);
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
     String result = new String();
     try {
-      result = TaskUtil.executeFile("mesosdnsinstall", command.toString(), useAgent, aid);
+      result = TaskUtil.executeFile("haproxyinstall", command.toString(), useAgent, aid);
     } catch (Exception e) {
       Log.error(e.toString());
       result = e.toString();
@@ -94,11 +64,4 @@ public class MesosDnsInstall implements Tasklet {
     return RepeatStatus.FINISHED;
   }
 
-  public String genZkInfo(String url) {
-    return url + ":2181";
-  }
-
-  public String genMesosInfo(String url) {
-    return url + ":5050";
-  }
 }

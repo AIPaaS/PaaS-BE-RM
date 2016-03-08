@@ -14,6 +14,7 @@ import com.ai.paas.cpaas.rm.vo.Attributes;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.MesosSlave;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
+import com.ai.paas.cpaas.rm.vo.WebHaproxy;
 import com.google.gson.Gson;
 
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -94,6 +95,19 @@ public class MgmtOpenServiceTest {
     paramVo.setMesosSlave(slaves);
     paramVo.setUseAgent(Boolean.TRUE);
     paramVo.setImagePath("/aifs01/docker");
+
+    WebHaproxy proxy = new WebHaproxy();
+    proxy.setLoadOnly(Boolean.TRUE);
+    proxy.setVirtualIp("172.168.11.1");
+
+    List<MesosInstance> agents = new ArrayList<MesosInstance>();
+    agents.add(master);
+    agents.add(master1);
+
+    proxy.setHosts(agents);
+
+    paramVo.setWebHaproxy(proxy);
+
     Gson gson = new Gson();
     String param = gson.toJson(paramVo);
     service.openService(param);

@@ -3,7 +3,7 @@
 <mapper namespace="com.ai.paas.cpaas.rm.dao.interfaces.ResReqInfoMapper" >
   <resultMap id="BaseResultMap" type="com.ai.paas.cpaas.rm.dao.mapper.bo.ResReqInfo" >
     <id column="req_id" property="reqId" jdbcType="INTEGER" />
-    <result column="cluster_id" property="clusterId" jdbcType="INTEGER" />
+    <result column="cluster_id" property="clusterId" jdbcType="VARCHAR" />
     <result column="req_type" property="reqType" jdbcType="INTEGER" />
     <result column="req_cnt" property="reqCnt" jdbcType="VARCHAR" />
     <result column="req_resp" property="reqResp" jdbcType="VARCHAR" />
@@ -106,14 +106,14 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResReqInfo" >
-  <selectKey resultType="java.lang.Integer" keyProperty="reqId" order="AFTER" >
+  <selectKey resultType="java.lang.String" keyProperty="reqId" order="AFTER" >
 		SELECT @@IDENTITY
-	</selectKey>
+  </selectKey>
   
     insert into res_req_info (req_id, cluster_id, req_type, 
       req_cnt, req_resp, req_time, 
       resp_time, req_state)
-    values (#{reqId,jdbcType=INTEGER}, #{clusterId,jdbcType=INTEGER}, #{reqType,jdbcType=INTEGER}, 
+    values (#{reqId,jdbcType=INTEGER}, #{clusterId,jdbcType=VARCHAR}, #{reqType,jdbcType=INTEGER}, 
       #{reqCnt,jdbcType=VARCHAR}, #{reqResp,jdbcType=VARCHAR}, #{reqTime,jdbcType=TIMESTAMP}, 
       #{respTime,jdbcType=TIMESTAMP}, #{reqState,jdbcType=INTEGER})
   </insert>
@@ -150,7 +150,7 @@
         #{reqId,jdbcType=INTEGER},
       </if>
       <if test="clusterId != null" >
-        #{clusterId,jdbcType=INTEGER},
+        #{clusterId,jdbcType=VARCHAR},
       </if>
       <if test="reqType != null" >
         #{reqType,jdbcType=INTEGER},
@@ -185,7 +185,7 @@
         req_id = #{record.reqId,jdbcType=INTEGER},
       </if>
       <if test="record.clusterId != null" >
-        cluster_id = #{record.clusterId,jdbcType=INTEGER},
+        cluster_id = #{record.clusterId,jdbcType=VARCHAR},
       </if>
       <if test="record.reqType != null" >
         req_type = #{record.reqType,jdbcType=INTEGER},
@@ -213,7 +213,7 @@
   <update id="updateByExample" parameterType="map" >
     update res_req_info
     set req_id = #{record.reqId,jdbcType=INTEGER},
-      cluster_id = #{record.clusterId,jdbcType=INTEGER},
+      cluster_id = #{record.clusterId,jdbcType=VARCHAR},
       req_type = #{record.reqType,jdbcType=INTEGER},
       req_cnt = #{record.reqCnt,jdbcType=VARCHAR},
       req_resp = #{record.reqResp,jdbcType=VARCHAR},
@@ -228,7 +228,7 @@
     update res_req_info
     <set >
       <if test="clusterId != null" >
-        cluster_id = #{clusterId,jdbcType=INTEGER},
+        cluster_id = #{clusterId,jdbcType=VARCHAR},
       </if>
       <if test="reqType != null" >
         req_type = #{reqType,jdbcType=INTEGER},
@@ -253,7 +253,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResReqInfo" >
     update res_req_info
-    set cluster_id = #{clusterId,jdbcType=INTEGER},
+    set cluster_id = #{clusterId,jdbcType=VARCHAR},
       req_type = #{reqType,jdbcType=INTEGER},
       req_cnt = #{reqCnt,jdbcType=VARCHAR},
       req_resp = #{reqResp,jdbcType=VARCHAR},

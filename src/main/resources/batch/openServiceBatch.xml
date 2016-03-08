@@ -35,13 +35,15 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="configFlannelParam" class="com.ai.paas.cpaas.rm.manage.service.etcd.ConfigFlannelParam"/>
 	<beans:bean id="flannelInstall" class="com.ai.paas.cpaas.rm.manage.service.flannel.FlannelInstall"/>
 	<beans:bean id="openflannelPort" class="com.ai.paas.cpaas.rm.manage.service.flannel.OpenFlannelPort"/>
+	<beans:bean id="mesosDnsInstall" class="com.ai.paas.cpaas.rm.manage.service.mesosdns.MesosDnsInstall"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
 	    <flow id="installzookeeper" parent="zookeeper" next="installDocker"/>
 		<flow id="installDocker" parent="docker" next="installMesos"/>
 		<flow id="installMesos" parent="mesos" next="installMarathon"/>
 		<flow id="installMarathon" parent="marathon" next="installEtcd"/>
 		<flow id="installEtcd" parent="etcd" next="installFlannel"/>
-		<flow id="installFlannel" parent="flannel"/>
+		<flow id="installFlannel" parent="flannel" next="installMesosDns"/>
+		<flow id="installMesosDns" parent="mesosDns"/>
 	</job>
 	<flow id="flannel">
 		<step id="flannelportStep" next="flannelInstallStep">
@@ -137,6 +139,11 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 		</step>
 		<step id="verifyMarathon">
 			<tasklet ref="maServiceVerify"/>
+		</step>
+	</flow>
+	<flow id="mesosDns">
+		<step id="installMesosDnsStep">
+			<tasklet ref="mesosDnsInstall"/>
 		</step>
 	</flow>
 </beans:beans>

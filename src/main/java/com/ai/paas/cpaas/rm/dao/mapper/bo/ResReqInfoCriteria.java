@@ -195,52 +195,62 @@ public class ResReqInfoCriteria {
             return (Criteria) this;
         }
 
-        public Criteria andClusterIdEqualTo(Integer value) {
+        public Criteria andClusterIdEqualTo(String value) {
             addCriterion("cluster_id =", value, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andClusterIdNotEqualTo(Integer value) {
+        public Criteria andClusterIdNotEqualTo(String value) {
             addCriterion("cluster_id <>", value, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andClusterIdGreaterThan(Integer value) {
+        public Criteria andClusterIdGreaterThan(String value) {
             addCriterion("cluster_id >", value, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andClusterIdGreaterThanOrEqualTo(Integer value) {
+        public Criteria andClusterIdGreaterThanOrEqualTo(String value) {
             addCriterion("cluster_id >=", value, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andClusterIdLessThan(Integer value) {
+        public Criteria andClusterIdLessThan(String value) {
             addCriterion("cluster_id <", value, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andClusterIdLessThanOrEqualTo(Integer value) {
+        public Criteria andClusterIdLessThanOrEqualTo(String value) {
             addCriterion("cluster_id <=", value, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andClusterIdIn(List<Integer> values) {
+        public Criteria andClusterIdLike(String value) {
+            addCriterion("cluster_id like", value, "clusterId");
+            return (Criteria) this;
+        }
+
+        public Criteria andClusterIdNotLike(String value) {
+            addCriterion("cluster_id not like", value, "clusterId");
+            return (Criteria) this;
+        }
+
+        public Criteria andClusterIdIn(List<String> values) {
             addCriterion("cluster_id in", values, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andClusterIdNotIn(List<Integer> values) {
+        public Criteria andClusterIdNotIn(List<String> values) {
             addCriterion("cluster_id not in", values, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andClusterIdBetween(Integer value1, Integer value2) {
+        public Criteria andClusterIdBetween(String value1, String value2) {
             addCriterion("cluster_id between", value1, value2, "clusterId");
             return (Criteria) this;
         }
 
-        public Criteria andClusterIdNotBetween(Integer value1, Integer value2) {
+        public Criteria andClusterIdNotBetween(String value1, String value2) {
             addCriterion("cluster_id not between", value1, value2, "clusterId");
             return (Criteria) this;
         }

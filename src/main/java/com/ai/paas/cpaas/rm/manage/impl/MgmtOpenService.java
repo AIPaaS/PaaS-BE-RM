@@ -11,7 +11,7 @@ import com.ai.paas.cpaas.rm.dao.mapper.bo.ResReqInfo;
 import com.ai.paas.cpaas.rm.interfaces.IMgmtOpenService;
 import com.ai.paas.cpaas.rm.manage.service.ExecuteBatchJob;
 import com.ai.paas.cpaas.rm.util.ExceptionCodeConstants;
-import com.ai.paas.cpaas.rm.util.TaskUtil;
+import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.cpaas.rm.vo.OpenResultParamVo;
 import com.ai.paas.ipaas.PaasException;
 import com.ai.paas.ipaas.ServiceUtil;
@@ -75,7 +75,8 @@ public class MgmtOpenService implements IMgmtOpenService {
         throw new PaasException(ExceptionCodeConstants.DubboServiceCode.PARAM_IS_NULL,
             "the parameter for appllying database is null");
       }
-      resReqInfo.setClusterId(TaskUtil.nextValue());
+      OpenResourceParamVo openParam = gson.fromJson(param, OpenResourceParamVo.class);
+      resReqInfo.setClusterId(openParam.getClusterId());
       resReqInfo.setReqType(1);
       resReqInfo.setReqCnt(param);
       resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));

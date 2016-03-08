@@ -1,8 +1,7 @@
 {
   "refreshSeconds": 60,
   "ttl": 60,
-  "domain": "ai",
-  "port": 53,
+  "port": 54,
   "httpon":true,
   "dnson":true,
   "httpport":8123,

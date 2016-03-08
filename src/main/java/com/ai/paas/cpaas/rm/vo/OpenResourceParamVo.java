@@ -14,6 +14,15 @@ public class OpenResourceParamVo implements Serializable {
   private String imagePath;
   private Boolean useAgent;
   private String aid;
+  private WebHaproxy webHaproxy;
+
+  public WebHaproxy getWebHaproxy() {
+    return webHaproxy;
+  }
+
+  public void setWebHaproxy(WebHaproxy webHaproxy) {
+    this.webHaproxy = webHaproxy;
+  }
 
   public String getClusterId() {
     return clusterId;
