@@ -32,7 +32,7 @@ public class MeMasterStart implements Tasklet {
     TaskUtil.uploadFile("memasterstart.yml", content, useAgent, aid);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     StringBuffer shellContext = TaskUtil.createBashFile();
-    // create the file of hostname£¬and start mesos-master
+    // create the file of hostnameï¿½ï¿½and start mesos-master
     for (int i = 0; i < mesosMaster.size(); i++) {
       MesosInstance masterInstance = mesosMaster.get(i);
       // create file in /etc/mesos-master with the user of root
@@ -62,7 +62,8 @@ public class MeMasterStart implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 14);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+              TaskUtil.getTypeId("meMasterStart"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
 

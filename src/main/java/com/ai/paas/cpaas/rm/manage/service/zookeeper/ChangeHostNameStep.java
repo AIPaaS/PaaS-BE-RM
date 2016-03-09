@@ -75,7 +75,8 @@ public class ChangeHostNameStep implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 2);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+              TaskUtil.getTypeId("changeHostNameStep"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
 

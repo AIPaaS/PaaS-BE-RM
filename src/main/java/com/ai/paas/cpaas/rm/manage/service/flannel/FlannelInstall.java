@@ -71,7 +71,8 @@ public class FlannelInstall implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 28);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+              TaskUtil.getTypeId("flannelInstall"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
 

@@ -55,7 +55,8 @@ public class DockerVerify implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(), 10);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(),
+              TaskUtil.getTypeId("dockerVerify"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
 
     }

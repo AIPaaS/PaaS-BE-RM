@@ -6,6 +6,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import com.ai.paas.cpaas.rm.util.OpenPortUtil;
+import com.ai.paas.cpaas.rm.util.TaskUtil;
 
 public class OpenZkPort implements Tasklet {
 
@@ -14,7 +15,8 @@ public class OpenZkPort implements Tasklet {
       throws Exception {
     String user = "rczkp01";
     String portParam = "ports=[2888,3888,2181]";
-    return OpenPortUtil.openPort(chunkContext, portParam, user, 5);
+    return OpenPortUtil.openPort(chunkContext, portParam, user,
+        TaskUtil.getTypeId("openZkPortStep"));
   }
 
 }

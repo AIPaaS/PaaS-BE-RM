@@ -88,7 +88,8 @@ public class MesosDnsInstall implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(), 9);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(),
+              TaskUtil.getTypeId("mesosDnsInstall"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
     return RepeatStatus.FINISHED;

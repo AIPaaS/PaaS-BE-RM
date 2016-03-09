@@ -45,7 +45,15 @@ public class HaproxyInstall implements Tasklet {
       List<String> configvars = new ArrayList<String>();
       configvars.add("ansible_ssh_pass=" + password);
       configvars.add("ansible_become_pass=" + password);
-      configvars.add("hosts=" + TaskUtil.genAgentName(i + 1));
+      // TODO
+      // 测试需要，测试完需要删除
+      if (i == 0) {
+        configvars.add("hosts=master1");
+      } else {
+        configvars.add("hosts=master2");
+      }
+      // TODO
+      // configvars.add("hosts=" + TaskUtil.genAgentName(i + 1));
       configvars.add("ip=" + virtualIp);
       configvars.add("configfile=" + path + "/keepalived.conf");
       if (i == 0) {
@@ -59,10 +67,10 @@ public class HaproxyInstall implements Tasklet {
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/haproxyinstall.yml",
               "root", configvars);
       shellContext.append(command.toString());
+      shellContext.append("\n");
     }
 
     Timestamp start = new Timestamp(System.currentTimeMillis());
-
     String result = new String();
     try {
       result = TaskUtil.executeFile("haproxyinstall", shellContext.toString(), useAgent, aid);
@@ -74,7 +82,8 @@ public class HaproxyInstall implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 9);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+              TaskUtil.getTypeId("haproxyInstall"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
     return RepeatStatus.FINISHED;

@@ -76,7 +76,7 @@ public class MaInstall implements Tasklet {
       // insert log and task record
       int taskId =
           TaskUtil.insertResJobDetail(start, openParam.getClusterId(), installCommand.toString(),
-              19);
+              TaskUtil.getTypeId("maInstall"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
 

@@ -70,6 +70,7 @@ public class AnsibleHostsConfig implements Tasklet {
       shellContext.append("\n");
     }
 
+
     for (int i = 0; i < agents.size(); i++) {
       String agentName = TaskUtil.genAgentName(i + 1);
       String ip = agents.get(i).getIp();
@@ -81,6 +82,7 @@ public class AnsibleHostsConfig implements Tasklet {
           .put(ip, agentName);
 
     }
+
 
     shellContext.append("[nodes]");
     shellContext.append("\n");
@@ -110,7 +112,8 @@ public class AnsibleHostsConfig implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 1);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+              TaskUtil.getTypeId("ansibleHostsConfig"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
     return RepeatStatus.FINISHED;

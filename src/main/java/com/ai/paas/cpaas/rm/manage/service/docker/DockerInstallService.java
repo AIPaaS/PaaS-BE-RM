@@ -54,7 +54,8 @@ public class DockerInstallService implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), dockerinstall.toString(), 9);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), dockerinstall.toString(),
+              TaskUtil.getTypeId("dockerInstallService"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
 
     }

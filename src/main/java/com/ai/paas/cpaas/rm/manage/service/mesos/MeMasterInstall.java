@@ -71,7 +71,8 @@ public class MeMasterInstall implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 12);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+              TaskUtil.getTypeId("meMasterInstall"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
 
     }

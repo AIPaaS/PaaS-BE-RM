@@ -6,13 +6,15 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import com.ai.paas.cpaas.rm.util.GenUserUtil;
+import com.ai.paas.cpaas.rm.util.TaskUtil;
 
 public class GenZkUser implements Tasklet {
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
-    GenUserUtil.genUser(chunkContext, "genZkUser", "rczkp01", "master", 4);
+    GenUserUtil.genUser(chunkContext, "genZkUser", "rczkp01", "master",
+        TaskUtil.getTypeId("genZkUserStep"));
     return RepeatStatus.FINISHED;
   }
 
