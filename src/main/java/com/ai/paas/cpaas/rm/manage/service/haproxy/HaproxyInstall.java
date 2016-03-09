@@ -46,14 +46,11 @@ public class HaproxyInstall implements Tasklet {
       configvars.add("ansible_ssh_pass=" + password);
       configvars.add("ansible_become_pass=" + password);
       // TODO
-      // 测试需要，测试完需要删除
-      if (i == 0) {
-        configvars.add("hosts=master1");
-      } else {
-        configvars.add("hosts=master2");
-      }
-      // TODO
-      // configvars.add("hosts=" + TaskUtil.genAgentName(i + 1));
+      /*
+       * // 测试需要，测试完需要删除 if (i == 0) { configvars.add("hosts=master1"); } else {
+       * configvars.add("hosts=master2"); } // TODO
+       */
+      configvars.add("hosts=" + TaskUtil.genAgentName(i + 1));
       configvars.add("ip=" + virtualIp);
       configvars.add("configfile=" + path + "/keepalived.conf");
       if (i == 0) {
@@ -85,6 +82,10 @@ public class HaproxyInstall implements Tasklet {
           TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
               TaskUtil.getTypeId("haproxyInstall"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
+
+      // insert keepalived virtual ip
+      TaskUtil.insertResInstanceProps(openParam.getClusterId(), "keepalived_vip", openParam
+          .getWebHaproxy().getVirtualIp());
     }
     return RepeatStatus.FINISHED;
   }

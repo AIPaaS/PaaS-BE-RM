@@ -83,6 +83,13 @@ public class AnsibleHostsConfig implements Tasklet {
 
     }
 
+    shellContext.append("[agent]");
+    shellContext.append("\n");
+    for (int i = 0; i < agents.size(); i++) {
+      shellContext.append(agents.get(i).getIp());
+      shellContext.append("\n");
+    }
+
 
     shellContext.append("[nodes]");
     shellContext.append("\n");

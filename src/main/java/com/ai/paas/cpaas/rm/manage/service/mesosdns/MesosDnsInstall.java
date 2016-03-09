@@ -36,6 +36,7 @@ public class MesosDnsInstall implements Tasklet {
 
     StringBuffer zk = new StringBuffer();
     StringBuffer masters = new StringBuffer();
+    StringBuffer mesosDns = new StringBuffer();
 
     zk.append("zk='\"zk://");
     masters.append("master='[");
@@ -46,12 +47,16 @@ public class MesosDnsInstall implements Tasklet {
     zk.append(this.genZkInfo(masterInstance.getIp()));
     masters.append("\\\\").append("\\\"").append(this.genMesosInfo(masterInstance.getIp()))
         .append("\\\\").append("\\\"");
+    mesosDns.append(this.genMesosDNSInfo(masterInstance.getIp()));
     for (int i = 1; i < masterList.size(); i++) {
       zk.append(",");
       zk.append(this.genZkInfo(masterList.get(i).getIp()));
       masters.append(",");
       masters.append("\\\\").append("\\\"").append(this.genMesosInfo(masterList.get(i).getIp()))
           .append("\\\\").append("\\\"");
+
+      mesosDns.append(",");
+      mesosDns.append(this.genMesosDNSInfo(masterList.get(i).getIp()));
     }
     zk.append("/mesos\"'");
     masters.append("]'");
@@ -91,6 +96,9 @@ public class MesosDnsInstall implements Tasklet {
           TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(),
               TaskUtil.getTypeId("mesosDnsInstall"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
+
+      // insert mesosDns info
+      TaskUtil.insertResInstanceProps(openParam.getClusterId(), "mesosDNS", mesosDns.toString());
     }
     return RepeatStatus.FINISHED;
   }
@@ -101,5 +109,9 @@ public class MesosDnsInstall implements Tasklet {
 
   public String genMesosInfo(String url) {
     return url + ":5050";
+  }
+
+  public String genMesosDNSInfo(String url) {
+    return "http://" + url + ":8123";
   }
 }

@@ -103,18 +103,20 @@ public class TaskUtil {
 
 
   public static String genMasterName(int i) {
-    // return "mesos-master" + i;
+
     return "master" + i;
   }
 
   public static String genSlaveName(int i) {
-    // return "mesos-slave" + i;
+
     return "slave" + i;
   }
 
   public static String genAgentName(int i) {
-    // return "mesos-slave" + i;
-    return "agent" + i;
+    // TODO
+    // return "agent" + i;
+    // 测试
+    return "master" + i;
   }
 
   public static String getFile(InputStream in) throws IOException {
