@@ -1,0 +1,8 @@
+---
+- hosts: master
+  user: rcconsul
+  vars:
+  tasks:
+     - name: start consul
+       command: consul agent -config-file /etc/consul.d/consul.json
+       sudo: yes
