@@ -2,12 +2,11 @@
 - hosts: master
   user: rcconsul
   vars:
-        datacenter: ai-internel
-        domain: aio
+        datacenter: "{{ datacenter }}"
+        domain: "{{ domain }}"
+        node_name: "{{ node_name }}"
         client_addr: /root/consul/dist
         log_level: INFO
-        node_name: master-123
-        client_addr: master
   tasks:
       - name: yum install consul
         yum: name=consul state=latest
@@ -17,12 +16,4 @@
         sudo: yes
       - name: new config file
         template: src=./00-defaults.json.j2 dest=/etc/consul.d/consul.json
-        sudo: yes
-      - name: open 8600 port
-        firewalld: port={{ item }}/tcp permanent=true state=enabled
-        with_items:
-                - 8600
-        sudo: yes
-      - name: reload firewall-cmd
-        command: firewall-cmd --reload
         sudo: yes
