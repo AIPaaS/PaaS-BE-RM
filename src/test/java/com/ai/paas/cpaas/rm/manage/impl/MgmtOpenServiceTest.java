@@ -90,7 +90,6 @@ public class MgmtOpenServiceTest {
     attributesList.add(attributes2);
     attributesList.add(attributes3);
     paramVo.setAttributesList(attributesList);
-
     paramVo.setMesosMaster(masters);
     paramVo.setMesosSlave(slaves);
     paramVo.setUseAgent(Boolean.TRUE);
