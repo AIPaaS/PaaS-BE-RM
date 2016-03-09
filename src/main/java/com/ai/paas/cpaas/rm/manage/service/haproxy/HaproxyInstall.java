@@ -33,23 +33,39 @@ public class HaproxyInstall implements Tasklet {
       String content = TaskUtil.getFile(in);
       TaskUtil.uploadFile(filename, content, useAgent, aid);
     }
-    List<MesosInstance> masterList = openParam.getMesosMaster();
-    MesosInstance masterInstance = masterList.get(0);
-    String password = masterInstance.getPasswd();
 
+    List<MesosInstance> agents = openParam.getWebHaproxy().getHosts();
+    String password = agents.get(0).getPasswd();
+    String virtualIp = openParam.getWebHaproxy().getVirtualIp();
+
+    StringBuffer shellContext = TaskUtil.createBashFile();
     // 获取文件存储路径
     String path = TaskUtil.getSystemProperty("filepath");
-    List<String> configvars = new ArrayList<String>();
-    configvars.add("ansible_ssh_pass=" + password);
-    configvars.add("ansible_become_pass=" + password);
-    AnsibleCommand command =
-        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/haproxyinstall.yml", "root",
-            configvars);
+    for (int i = 0; i < agents.size(); i++) {
+      List<String> configvars = new ArrayList<String>();
+      configvars.add("ansible_ssh_pass=" + password);
+      configvars.add("ansible_become_pass=" + password);
+      configvars.add("hosts=" + TaskUtil.genAgentName(i + 1));
+      configvars.add("ip=" + virtualIp);
+      configvars.add("configfile=" + path + "/keepalived.conf");
+      if (i == 0) {
+        configvars.add("role=MASTER");
+        configvars.add("priority=101");
+      } else {
+        configvars.add("role=BACKUP");
+        configvars.add("priority=100");
+      }
+      AnsibleCommand command =
+          new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/haproxyinstall.yml",
+              "root", configvars);
+      shellContext.append(command.toString());
+    }
+
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
     String result = new String();
     try {
-      result = TaskUtil.executeFile("haproxyinstall", command.toString(), useAgent, aid);
+      result = TaskUtil.executeFile("haproxyinstall", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
       Log.error(e.toString());
       result = e.toString();
@@ -58,7 +74,7 @@ public class HaproxyInstall implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(), 9);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 9);
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
     return RepeatStatus.FINISHED;

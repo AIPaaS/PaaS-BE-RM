@@ -37,11 +37,14 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="openflannelPort" class="com.ai.paas.cpaas.rm.manage.service.flannel.OpenFlannelPort"/>
 	<beans:bean id="mesosDnsInstall" class="com.ai.paas.cpaas.rm.manage.service.mesosdns.MesosDnsInstall"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
-		<flow id="installMesosDns" parent="mesosDns"/>
+		<flow id="installzookeeper" parent="zookeeper"/>
 	</job>
-	<flow id="mesosDns">
-		<step id="installMesosDnsStep">
-			<tasklet ref="mesosDnsInstall"/>
+	<flow id="zookeeper">
+    	<step id="configAnsibleHosts" next="configHostname">
+	    	<tasklet ref="ansibleHostsConfig"/>
+		</step>
+		<step id="configHostname">
+				<tasklet ref="changeHostNameStep"/>
 		</step>
 	</flow>
 </beans:beans>

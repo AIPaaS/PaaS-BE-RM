@@ -32,6 +32,7 @@ public class AnsibleHostsConfig implements Tasklet {
 
     List<MesosInstance> mesosmaster = openParam.getMesosMaster();
     List<MesosSlave> mesosSlave = openParam.getMesosSlave();
+    List<MesosInstance> agents = openParam.getWebHaproxy().getHosts();
     for (int i = 0; i < mesosmaster.size(); i++) {
       String masterName = TaskUtil.genMasterName(i + 1);
       String ip = mesosmaster.get(i).getIp();
@@ -68,6 +69,19 @@ public class AnsibleHostsConfig implements Tasklet {
       shellContext.append(mesosSlave.get(i).getIp());
       shellContext.append("\n");
     }
+
+    for (int i = 0; i < agents.size(); i++) {
+      String agentName = TaskUtil.genAgentName(i + 1);
+      String ip = agents.get(i).getIp();
+      shellContext.append("[" + agentName + "]");
+      shellContext.append("\n");
+      shellContext.append(ip);
+      shellContext.append("\n");
+      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext()
+          .put(ip, agentName);
+
+    }
+
     shellContext.append("[nodes]");
     shellContext.append("\n");
     for (int i = 0; i < mesosmaster.size(); i++) {

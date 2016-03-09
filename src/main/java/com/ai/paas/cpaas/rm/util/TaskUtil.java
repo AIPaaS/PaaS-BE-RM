@@ -109,6 +109,11 @@ public class TaskUtil {
     return "slave" + i;
   }
 
+  public static String genAgentName(int i) {
+    // return "mesos-slave" + i;
+    return "agent" + i;
+  }
+
   public static String getFile(InputStream in) throws IOException {
     // InputStream in = TaskUtil.class.getResourceAsStream("/batch/river.yml");
     // InputStream in = TaskUtil.class.getResourceAsStream(path);

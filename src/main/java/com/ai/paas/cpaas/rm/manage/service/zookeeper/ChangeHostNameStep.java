@@ -33,6 +33,8 @@ public class ChangeHostNameStep implements Tasklet {
     TaskUtil.uploadFile("hostnamectl.yml", content, useAgent, aid);
     List<MesosInstance> mesosMaster = openParam.getMesosMaster();
     List<MesosSlave> mesosSlave = openParam.getMesosSlave();
+    List<MesosInstance> agents = openParam.getWebHaproxy().getHosts();
+
     StringBuffer shellContext = TaskUtil.createBashFile();
     for (int i = 0; i < mesosMaster.size(); i++) {
       MesosInstance instance = mesosMaster.get(i);
@@ -51,6 +53,14 @@ public class ChangeHostNameStep implements Tasklet {
       this.genCommand(instance, shellContext, name);
     }
 
+    for (int i = 0; i < agents.size(); i++) {
+      MesosInstance instance = agents.get(i);
+      String ip = instance.getIp();
+      String name =
+          (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
+              .getExecutionContext().get(ip);
+      this.genCommand(instance, shellContext, name);
+    }
     Timestamp start = new Timestamp(System.currentTimeMillis());
     // upload shellContext and execute it
 

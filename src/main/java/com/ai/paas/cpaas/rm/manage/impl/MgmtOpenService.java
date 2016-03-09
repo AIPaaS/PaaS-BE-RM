@@ -76,6 +76,10 @@ public class MgmtOpenService implements IMgmtOpenService {
             "the parameter for appllying database is null");
       }
       OpenResourceParamVo openParam = gson.fromJson(param, OpenResourceParamVo.class);
+      if (!openParam.getUseAgent()) {
+        throw new PaasException(ExceptionCodeConstants.TransServiceCode.ERROR_CODE,
+            "it should be true for useAgent");
+      }
       resReqInfo.setClusterId(openParam.getClusterId());
       resReqInfo.setReqType(1);
       resReqInfo.setReqCnt(param);
