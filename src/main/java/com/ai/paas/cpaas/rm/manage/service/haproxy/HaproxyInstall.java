@@ -27,7 +27,8 @@ public class HaproxyInstall implements Tasklet {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     Boolean useAgent = openParam.getUseAgent();
     String aid = openParam.getAid();
-    String[] filenames = {"haproxyinstall.yml", "keepalived.conf"};
+    String[] filenames =
+        {"haproxyinstall.yml", "keepalived.conf", "check_haproxy.sh", "haproxy.cfg"};
     for (String filename : filenames) {
       InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/keepalived/" + filename);
       String content = TaskUtil.getFile(in);
@@ -45,14 +46,15 @@ public class HaproxyInstall implements Tasklet {
       List<String> configvars = new ArrayList<String>();
       configvars.add("ansible_ssh_pass=" + password);
       configvars.add("ansible_become_pass=" + password);
-      // TODO
       /*
-       * // 测试需要，测试完需要删除 if (i == 0) { configvars.add("hosts=master1"); } else {
-       * configvars.add("hosts=master2"); } // TODO
+       * // TODO if (i == 0) { configvars.add("hosts=master1"); } else {
+       * configvars.add("hosts=master2"); }
        */
       configvars.add("hosts=" + TaskUtil.genAgentName(i + 1));
       configvars.add("ip=" + virtualIp);
       configvars.add("configfile=" + path + "/keepalived.conf");
+      configvars.add("checkshell=" + path + "/check_haproxy.sh");
+      configvars.add("haconfig=" + path + "/haproxy.cfg");
       if (i == 0) {
         configvars.add("role=MASTER");
         configvars.add("priority=101");

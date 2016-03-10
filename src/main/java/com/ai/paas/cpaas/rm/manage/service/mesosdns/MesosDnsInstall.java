@@ -66,7 +66,7 @@ public class MesosDnsInstall implements Tasklet {
     String mesosservice = path + "/mesos-dns.service";
     // 获取mesosdns下载位置
     String mesosPath = TaskUtil.getSystemProperty("mesosdns");
-    String nameserver = TaskUtil.getSystemProperty("nameserver");
+    String nameserver = "\\\\\\\"" + openParam.getWebHaproxy().getVirtualIp() + "\\\\\\\"";
     List<String> configvars = new ArrayList<String>();
     configvars.add("ansible_ssh_pass=" + password);
     configvars.add("ansible_become_pass=" + password);
@@ -75,7 +75,7 @@ public class MesosDnsInstall implements Tasklet {
     configvars.add("config=" + config);
     configvars.add("mesosservice=" + mesosservice);
     configvars.add("filepath=" + mesosPath);
-    configvars.add("resolvers='[" + nameserver + "]'");
+    configvars.add("resolvers='" + nameserver + "'");
     configvars.add("domain='\\\\\\\"" + openParam.getDomain() + "\\\\\\\"'");
     AnsibleCommand command =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/mesosdnsinstall.yml", "root",

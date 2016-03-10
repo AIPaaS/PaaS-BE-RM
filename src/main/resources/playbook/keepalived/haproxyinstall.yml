@@ -14,6 +14,10 @@
        command: mv /etc/keepalived/keepalived.conf /etc/keepalived/keepalived.conf.bak
      - name: transfer keepalived.conf to the dest hosts
        copy: src={{ configfile }} dest=/etc/keepalived/keepalived.conf owner=root  mode=0755
+     - name: transfer check_haproxy.sh to the dest hosts
+       copy: src={{ checkshell }} dest=/etc/keepalived/check_haproxy.sh owner=root  mode=0755
+     - name: transfer check_haproxy.cfg to the dest hosts
+       copy: src={{ haconfig }} dest=/etc/haproxy/haproxy.cfg owner=root  mode=0755
      - name: insert state to the keepalived.conf
        lineinfile: dest={{ dest }} line="    state {{ role }}" state=present insertafter="interface?"
      - name: insert priority info

@@ -1,0 +1,8 @@
+---
+- hosts: '{{ hosts }}'
+  user: root
+  tasks:
+     - name: consul join 
+       command: consul join {{ item }}
+       with_items:
+          - "{{ nodes }}"

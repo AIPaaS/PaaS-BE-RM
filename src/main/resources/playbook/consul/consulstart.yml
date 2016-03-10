@@ -1,8 +1,15 @@
 ---
-- hosts: master
-  user: rcconsul
-  vars:
+- hosts: '{{ hosts }}'
+  user: root
   tasks:
+     - name: insert datacenter info
+       lineinfile: dest=/etc/consul/consul.json line="  \\\"datacenter\\\":\\\"{{ datacenter }}\\\"," state=present insertafter="[{]"
+     - name: insert node_name info
+       lineinfile: dest=/etc/consul/consul.json line="  \\\"node_name\\\":\\\"{{ node_name }}\\\"," state=present insertafter="[{]"
+     - name: insert client_addr
+       lineinfile: dest=/etc/consul/consul.json line="  \\\"client_addr\\\":\\\"{{ client_addr }}\\\"," state=present insertafter="[{]"
+     - name: insert domain info
+       lineinfile: dest=/etc/consul/consul.json line="  \\\"domain\\\":\\\"{{ domain }}\\\"," state=present insertafter="[{]"
      - name: start consul
-       command: consul agent -config-file /etc/consul.d/consul.json
+       command: consul agent -config-file /etc/consul/consul.json
        sudo: yes
