@@ -78,7 +78,8 @@ public class MesosSlaveStep implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 15);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+              TaskUtil.getTypeId("meSlaveStep"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
 
     }

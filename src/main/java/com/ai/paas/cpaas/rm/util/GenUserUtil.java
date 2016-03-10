@@ -19,6 +19,13 @@ public class GenUserUtil {
 
   public static void genUser(ChunkContext chunkContext, String fileName, String user, String hosts,
       int typeId) throws ClientProtocolException, IOException, PaasException {
+    String password = TaskUtil.generatePasswd();
+    GenUserUtil.genUser(chunkContext, fileName, user, hosts, typeId, password);
+
+  }
+
+  public static void genUser(ChunkContext chunkContext, String fileName, String user, String hosts,
+      int typeId, String password) throws ClientProtocolException, IOException, PaasException {
 
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     InputStream in = GenUserUtil.class.getResourceAsStream("/playbook/adduser.yml");
@@ -38,8 +45,6 @@ public class GenUserUtil {
     userVars.add("username=" + user);
     userVars.add("hosts=" + hosts);
     userVars.add("line='" + user + "    ALL=(ALL)      ALL'");
-    // gen password
-    String password = TaskUtil.generatePasswd();
     // store the password in context
     chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext()
         .put("password", password);
@@ -74,7 +79,5 @@ public class GenUserUtil {
               typeId);
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
-
-
   }
 }

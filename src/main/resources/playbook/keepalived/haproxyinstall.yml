@@ -15,7 +15,7 @@
      - name: transfer keepalived.conf to the dest hosts
        copy: src={{ configfile }} dest=/etc/keepalived/keepalived.conf owner=root  mode=0755
      - name: insert state to the keepalived.conf
-       lineinfile: dest={{ dest }} line="    state {{ role }}"," state=present insertafter="interface?"
+       lineinfile: dest={{ dest }} line="    state {{ role }}" state=present insertafter="interface?"
      - name: insert priority info
        lineinfile: dest={{ dest }} line="    priority {{ priority }}" state=present insertafter="virtual_router_id?"
      - name: insert virtual ip info
@@ -24,5 +24,5 @@
        service: name=haproxy state=restarted enabled=yes
        sudo: yes
      - name: restart keepalived service
-       service: name=keepalived state=restarted enable=yes
+       service: name=keepalived state=restarted enabled=yes
        sudo: yes

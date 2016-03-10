@@ -81,7 +81,8 @@ public class EtcdInstall implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 24);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+              TaskUtil.getTypeId("etcdInstall"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
 
     }

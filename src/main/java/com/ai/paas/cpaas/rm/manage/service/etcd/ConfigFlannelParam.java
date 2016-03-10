@@ -64,7 +64,8 @@ public class ConfigFlannelParam implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 26);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+              TaskUtil.getTypeId("configFlannelParam"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
 

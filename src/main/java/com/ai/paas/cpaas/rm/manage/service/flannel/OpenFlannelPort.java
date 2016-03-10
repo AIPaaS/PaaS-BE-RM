@@ -52,7 +52,8 @@ public class OpenFlannelPort implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(), 27);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(),
+              TaskUtil.getTypeId("openflannelPort"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
 
     }

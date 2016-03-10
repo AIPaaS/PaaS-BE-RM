@@ -6,6 +6,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import com.ai.paas.cpaas.rm.util.OpenPortUtil;
+import com.ai.paas.cpaas.rm.util.TaskUtil;
 
 public class OpenMaPort implements Tasklet {
 
@@ -14,7 +15,7 @@ public class OpenMaPort implements Tasklet {
       throws Exception {
     String portParam = "ports=[8080]";
     String user = "rcmarathon";
-    return OpenPortUtil.openPort(chunkContext, portParam, user, 18);
+    return OpenPortUtil.openPort(chunkContext, portParam, user, TaskUtil.getTypeId("openMaPort"));
   }
 
 }

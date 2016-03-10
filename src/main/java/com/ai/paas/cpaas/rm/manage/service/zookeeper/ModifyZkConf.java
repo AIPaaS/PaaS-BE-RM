@@ -63,7 +63,7 @@ public class ModifyZkConf implements Tasklet {
       // insert log and task record
       int taskId =
           TaskUtil.insertResJobDetail(start, openParam.getClusterId(), zookeeperinstall.toString(),
-              6);
+              TaskUtil.getTypeId("modifyZkConfStep"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
 

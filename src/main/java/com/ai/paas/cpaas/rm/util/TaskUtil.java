@@ -15,11 +15,14 @@ import com.ai.paas.cpaas.rm.dao.interfaces.ResClusterInfoMapper;
 import com.ai.paas.cpaas.rm.dao.interfaces.ResInstancePropsMapper;
 import com.ai.paas.cpaas.rm.dao.interfaces.ResJobDetailMapper;
 import com.ai.paas.cpaas.rm.dao.interfaces.ResTaskLogMapper;
+import com.ai.paas.cpaas.rm.dao.interfaces.ResTaskTypeMapper;
 import com.ai.paas.cpaas.rm.dao.interfaces.SysCodesMapper;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResClusterInfo;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResInstanceProps;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResJobDetail;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog;
+import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskType;
+import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskTypeCriteria;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.SysCodes;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.SysCodesCriteria;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
@@ -100,18 +103,20 @@ public class TaskUtil {
 
 
   public static String genMasterName(int i) {
-    // return "mesos-master" + i;
+
     return "master" + i;
   }
 
   public static String genSlaveName(int i) {
-    // return "mesos-slave" + i;
+
     return "slave" + i;
   }
 
   public static String genAgentName(int i) {
-    // return "mesos-slave" + i;
-    return "agent" + i;
+    // TODO
+    // return "agent" + i;
+    // 测试
+    return "master" + i;
   }
 
   public static String getFile(InputStream in) throws IOException {
@@ -134,20 +139,22 @@ public class TaskUtil {
   }
 
   public static String getSystemProperty(String param) {
-    /*
-     * Properties prop = new Properties(); String property = new String(); try {
-     * prop.load(TaskUtil.class.getClassLoader().getResourceAsStream("batch/config.properties"));
-     * property = prop.getProperty(param); } catch (IOException ex) { ex.printStackTrace(); }
-     */
     SysCodesCriteria instance = new SysCodesCriteria();
     SysCodesCriteria.Criteria criteria = instance.createCriteria();
     criteria.andCodeKeyEqualTo(param);
     criteria.andSysCodeEqualTo("PROXY");
-    // instance.setSysCode("PROXY");
-    // instance.setCodeKey(param);
     SysCodesMapper mapper = ServiceUtil.getMapper(SysCodesMapper.class);
     List<SysCodes> list = mapper.selectByExample(instance);
     return list.get(0).getCodeValue();
+  }
+
+  public static int getTypeId(String param) {
+    ResTaskTypeCriteria resCriteria = new ResTaskTypeCriteria();
+    ResTaskTypeCriteria.Criteria criteria = resCriteria.createCriteria();
+    criteria.andTypeNameEqualTo(param);
+    ResTaskTypeMapper mapper = ServiceUtil.getMapper(ResTaskTypeMapper.class);
+    List<ResTaskType> list = mapper.selectByExample(resCriteria);
+    return list.get(0).getTypeId();
   }
 
   public static String replaceIllegalCharacter(String source) {

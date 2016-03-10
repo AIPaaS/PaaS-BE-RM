@@ -35,16 +35,28 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="configFlannelParam" class="com.ai.paas.cpaas.rm.manage.service.etcd.ConfigFlannelParam"/>
 	<beans:bean id="flannelInstall" class="com.ai.paas.cpaas.rm.manage.service.flannel.FlannelInstall"/>
 	<beans:bean id="openflannelPort" class="com.ai.paas.cpaas.rm.manage.service.flannel.OpenFlannelPort"/>
-	<beans:bean id="mesosDnsInstall" class="com.ai.paas.cpaas.rm.manage.service.mesosdns.MesosDnsInstall"/>
+	<beans:bean id="mesosDnsInstall" class="com.ai.paas.cpaas.rm.manage.service.mesosdns.MesosDnsInstall"/>	
+	<beans:bean id="configDNS" class="com.ai.paas.cpaas.rm.manage.service.mesosdns.ConfigDNS"/>
+	<beans:bean id="haproxyInstall" class="com.ai.paas.cpaas.rm.manage.service.haproxy.HaproxyInstall"/>
+	<beans:bean id="genHaUser" class="com.ai.paas.cpaas.rm.manage.service.haproxy.GenHaUser"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
-		<flow id="installzookeeper" parent="zookeeper"/>
+		<flow id="installMesosDns" parent="mesosDns" next="installHaproxy" />
+		<flow id="installHaproxy" parent="haproxy" />
 	</job>
-	<flow id="zookeeper">
-    	<step id="configAnsibleHosts" next="configHostname">
-	    	<tasklet ref="ansibleHostsConfig"/>
+	<flow id="mesosDns">
+		<step id="installMesosDnsStep" next="configSlaveDns">
+			<tasklet ref="mesosDnsInstall"/>
 		</step>
-		<step id="configHostname">
-				<tasklet ref="changeHostNameStep"/>
+		<step id="configSlaveDns">
+			<tasklet ref="configDNS"/>
+		</step>
+	</flow>
+	<flow id="haproxy">
+		<step id="installHaproxyStep" next="genHaUserStep">
+			<tasklet ref="haproxyInstall"/>
+		</step>
+		<step id="genHaUserStep">
+			<tasklet ref="genHaUser"/>
 		</step>
 	</flow>
 </beans:beans>

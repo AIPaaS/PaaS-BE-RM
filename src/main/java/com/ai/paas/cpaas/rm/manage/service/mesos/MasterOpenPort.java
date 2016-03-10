@@ -6,6 +6,7 @@ import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
 import com.ai.paas.cpaas.rm.util.OpenPortUtil;
+import com.ai.paas.cpaas.rm.util.TaskUtil;
 
 
 public class MasterOpenPort implements Tasklet {
@@ -15,7 +16,8 @@ public class MasterOpenPort implements Tasklet {
       throws Exception {
     String user = "rcmesos";
     String portParam = "ports=[5050]";
-    return OpenPortUtil.openPort(chunkContext, portParam, user, 13);
+    return OpenPortUtil.openPort(chunkContext, portParam, user,
+        TaskUtil.getTypeId("meMasterOpenPort"));
   }
 
 }

@@ -77,7 +77,8 @@ public class ConfigHostsStep implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 3);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+              TaskUtil.getTypeId("configHostsStep"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
 

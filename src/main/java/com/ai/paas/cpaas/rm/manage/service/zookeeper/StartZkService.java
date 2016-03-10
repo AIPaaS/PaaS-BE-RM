@@ -63,7 +63,8 @@ public class StartZkService implements Tasklet {
       // insert log and task record
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(), 7);
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+              TaskUtil.getTypeId("startZkServiceStep"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
 
