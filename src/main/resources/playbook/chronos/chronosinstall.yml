@@ -1,0 +1,10 @@
+---
+- hosts: master
+  user: root
+  tasks:
+     - name: install chronos on masters
+       yum: name=chronos state=latest
+       sudo: yes
+     - name: restart chronos service
+       service: name=chronos state=restarted enabled=yes
+       sudo: yes

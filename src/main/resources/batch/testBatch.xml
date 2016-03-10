@@ -39,24 +39,25 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="configDNS" class="com.ai.paas.cpaas.rm.manage.service.mesosdns.ConfigDNS"/>
 	<beans:bean id="haproxyInstall" class="com.ai.paas.cpaas.rm.manage.service.haproxy.HaproxyInstall"/>
 	<beans:bean id="genHaUser" class="com.ai.paas.cpaas.rm.manage.service.haproxy.GenHaUser"/>
+	<beans:bean id="genChronosUser" class="com.ai.paas.cpaas.rm.manage.service.chronos.GenChronosUser"/>
+	<beans:bean id="chronosInstall" class="com.ai.paas.cpaas.rm.manage.service.chronos.ChronosInstall"/>
+	<beans:bean id="openChronosPort" class="com.ai.paas.cpaas.rm.manage.service.chronos.OpenChronosPort"/>
+	<beans:bean id="verifyChronos" class="com.ai.paas.cpaas.rm.manage.service.chronos.VerifyChronos"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
-		<flow id="installMesosDns" parent="mesosDns" next="installHaproxy" />
-		<flow id="installHaproxy" parent="haproxy" />
+		<flow id="installChronos" parent="chronos"/>
 	</job>
-	<flow id="mesosDns">
-		<step id="installMesosDnsStep" next="configSlaveDns">
-			<tasklet ref="mesosDnsInstall"/>
+	<flow id="chronos">
+		<step id="genChronosUserStep" next="openChronosPortStep">
+			<tasklet ref="genChronosUser"/>
 		</step>
-		<step id="configSlaveDns">
-			<tasklet ref="configDNS"/>
+		<step id="openChronosPortStep" next="chronosInstallStep">
+			<tasklet ref="openChronosPort"/>
 		</step>
-	</flow>
-	<flow id="haproxy">
-		<step id="installHaproxyStep" next="genHaUserStep">
-			<tasklet ref="haproxyInstall"/>
+		<step id="chronosInstallStep" next="verifyChronosStep">
+			<tasklet ref="chronosInstall"/>
 		</step>
-		<step id="genHaUserStep">
-			<tasklet ref="genHaUser"/>
+		<step id="verifyChronosStep">
+			<tasklet ref="verifyChronos"/>
 		</step>
 	</flow>
 </beans:beans>

@@ -39,6 +39,10 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="configDNS" class="com.ai.paas.cpaas.rm.manage.service.mesosdns.ConfigDNS"/>
 	<beans:bean id="haproxyInstall" class="com.ai.paas.cpaas.rm.manage.service.haproxy.HaproxyInstall"/>
 	<beans:bean id="genHaUser" class="com.ai.paas.cpaas.rm.manage.service.haproxy.GenHaUser"/>
+	<beans:bean id="genChronosUser" class="com.ai.paas.cpaas.rm.manage.service.chronos.GenChronosUser"/>
+	<beans:bean id="chronosInstall" class="com.ai.paas.cpaas.rm.manage.service.chronos.ChronosInstall"/>
+	<beans:bean id="openChronosPort" class="com.ai.paas.cpaas.rm.manage.service.chronos.OpenChronosPort"/>
+	<beans:bean id="verifyChronos" class="com.ai.paas.cpaas.rm.manage.service.chronos.VerifyChronos"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
 	    <flow id="installzookeeper" parent="zookeeper" next="installDocker"/>
 		<flow id="installDocker" parent="docker" next="installMesos"/>
@@ -47,7 +51,8 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 		<flow id="installEtcd" parent="etcd" next="installFlannel"/>
 		<flow id="installFlannel" parent="flannel" next="installMesosDns"/>
 		<flow id="installMesosDns" parent="mesosDns" next="installHaproxy" />
-		<flow id="installHaproxy" parent="haproxy" />
+		<flow id="installHaproxy" parent="haproxy" next="installChronos"/>
+		<flow id="installChronos" parent="chronos"/>
 	</job>
 	<flow id="flannel">
 		<step id="flannelportStep" next="flannelInstallStep">
@@ -159,6 +164,20 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 		</step>
 		<step id="genHaUserStep">
 			<tasklet ref="genHaUser"/>
+		</step>
+	</flow>
+	<flow id="chronos">
+		<step id="genChronosUserStep" next="openChronosPortStep">
+			<tasklet ref="genChronosUser"/>
+		</step>
+		<step id="openChronosPortStep" next="chronosInstallStep">
+			<tasklet ref="openChronosPort"/>
+		</step>
+		<step id="chronosInstallStep" next="verifyChronosStep">
+			<tasklet ref="chronosInstall"/>
+		</step>
+		<step id="verifyChronosStep">
+			<tasklet ref="verifyChronos"/>
 		</step>
 	</flow>
 </beans:beans>

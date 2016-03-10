@@ -113,10 +113,10 @@ public class TaskUtil {
   }
 
   public static String genAgentName(int i) {
-    // TODO
-    // return "agent" + i;
+
+    return "agent" + i;
     // 测试
-    return "master" + i;
+    // return "master" + i;
   }
 
   public static String getFile(InputStream in) throws IOException {

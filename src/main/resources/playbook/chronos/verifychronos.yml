@@ -1,0 +1,11 @@
+---
+- hosts: nodes
+  user: root
+  tasks:
+    - name: Wait for Chronos to be ready
+      wait_for:
+         host: "{{ chronos_bind_address }}"
+         port: "{{ chronos_port }}"
+         state: started
+      delay: 3
+      retries: 5
