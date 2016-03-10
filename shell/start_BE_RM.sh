@@ -1,7 +1,9 @@
 #!/bin/sh
 
-COMMON_LIB=$HOME/applications/PaaS-BE-RM
-COMMON_CONF=$HOME/applications/PaaS-BE-RM/config
+#COMMON_LIB=$HOME/applications/PaaS-BE-RM
+#COMMON_CONF=$HOME/applications/PaaS-BE-RM/config
+COMMON_LIB=$HOME
+COMMON_CONF=$HOME
 #echo -----------------------------------------COMMON_LIB $COMMON_LIB
 export COMMON_LIB
 
