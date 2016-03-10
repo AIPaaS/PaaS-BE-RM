@@ -102,9 +102,7 @@ public class MgmtOpenServiceTest {
     List<MesosInstance> agents = new ArrayList<MesosInstance>();
     agents.add(master);
     agents.add(master1);
-
     proxy.setHosts(agents);
-
     paramVo.setWebHaproxy(proxy);
 
     Gson gson = new Gson();
