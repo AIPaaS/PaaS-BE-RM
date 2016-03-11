@@ -2,14 +2,23 @@
 - hosts: '{{ hosts }}'
   user: root
   tasks:
+     - name: bind ip info
+       lineinfile: dest=/etc/systemd/system/consul.service  line="ExecStart=/bin/sh -c '/usr/local/bin/consul agent  -config-file=/etc/consul/consul.json -bind={{ ip }}'" state=present insertafter="Restart?"
+     - name: insert boostrap info
+       lineinfile: dest=/etc/consul/consul.json line="  \\\"bootstrap\\\":{{ bootstrap }}," state=present insertafter="log_level?"
      - name: insert datacenter info
-       lineinfile: dest=/etc/consul/consul.json line="  \\\"datacenter\\\":\\\"{{ datacenter }}\\\"," state=present insertafter="[{]"
+       lineinfile: dest=/etc/consul/consul.json line="  \\\"datacenter\\\":\\\"{{ datacenter }}\\\"," state=present insertafter="log_level?"
+     - name: insert startjoin info
+       lineinfile: dest=/etc/consul/consul.json line="  \\\"retry_join\\\":[{{ startjoin }}]," state=present insertafter="log_level?"
      - name: insert node_name info
-       lineinfile: dest=/etc/consul/consul.json line="  \\\"node_name\\\":\\\"{{ node_name }}\\\"," state=present insertafter="[{]"
+       lineinfile: dest=/etc/consul/consul.json line="  \\\"node_name\\\":\\\"{{ node_name }}\\\"," state=present insertafter="log_level?"
      - name: insert client_addr
-       lineinfile: dest=/etc/consul/consul.json line="  \\\"client_addr\\\":\\\"{{ client_addr }}\\\"," state=present insertafter="[{]"
+       lineinfile: dest=/etc/consul/consul.json line="  \\\"client_addr\\\":\\\"{{ client_addr }}\\\"," state=present insertafter="log_level?"
      - name: insert domain info
-       lineinfile: dest=/etc/consul/consul.json line="  \\\"domain\\\":\\\"{{ domain }}\\\"," state=present insertafter="[{]"
+       lineinfile: dest=/etc/consul/consul.json line="  \\\"domain\\\":\\\"{{ domain }}\\\"," state=present insertafter="log_level?"
+     - name: start consul
+       command: systemctl daemon-reload
+       sudo: yes
      - name: start consul
        service: name=consul state=restarted  enabled=yes
        sudo: yes

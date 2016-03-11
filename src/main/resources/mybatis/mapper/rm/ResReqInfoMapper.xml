@@ -106,7 +106,7 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResReqInfo" >
-  <selectKey resultType="java.lang.String" keyProperty="reqId" order="AFTER" >
+  <selectKey resultType="java.lang.Integer" keyProperty="reqId" order="AFTER" >
 		SELECT @@IDENTITY
   </selectKey>
   

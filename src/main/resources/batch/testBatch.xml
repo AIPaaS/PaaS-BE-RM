@@ -46,22 +46,14 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="genConUser" class="com.ai.paas.cpaas.rm.manage.service.consul.GenConUser"/>
 	<beans:bean id="openConsulPort" class="com.ai.paas.cpaas.rm.manage.service.consul.OpenConsulPort"/>
 	<beans:bean id="consulInstall" class="com.ai.paas.cpaas.rm.manage.service.consul.ConsulInstall"/>
-	<beans:bean id="consulStart" class="com.ai.paas.cpaas.rm.manage.service.consul.ConsulStart"/>
+	<beans:bean id="consulStart" class="com.ai.paas.cpaas.rm.manage.service.consul.ConsulStart"/>	
+	<beans:bean id="insertClusterInfo" class="com.ai.paas.cpaas.rm.manage.service.cluster.InsertClusterInfo"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
-		<flow id="installConsul" parent="consul"/>
+		<flow id="insertCluster" parent="cluster"/>
 	</job>
-	<flow id="consul">
-		<step id="genConUserStep" next="openConsulStep">
-			<tasklet ref="genConUser"/>
-		</step>
-		<step id="openConsulStep" next="consulInstallStep">
-			<tasklet ref="openConsulPort"/>
-		</step>
-		<step id="consulInstallStep" next="consulStartStep">
-			<tasklet ref="consulInstall"/>
-		</step>
-		<step id="consulStartStep">
-			<tasklet ref="consulStart"/>
+	<flow id="cluster">
+		<step id="clusterStep">
+			<tasklet ref="insertClusterInfo"/>
 		</step>
 	</flow>
 </beans:beans>

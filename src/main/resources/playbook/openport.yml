@@ -3,8 +3,13 @@
   user: root
   vars: 
   tasks:
-      - name: open port 
+      - name: open tcp port 
         firewalld: port={{ item }}/tcp permanent=true state=enabled
+        with_items:
+           - "{{ ports }}"
+        sudo: yes
+      - name: open udp port 
+        firewalld: port={{ item }}/udp permanent=true state=enabled
         with_items:
            - "{{ ports }}"
         sudo: yes

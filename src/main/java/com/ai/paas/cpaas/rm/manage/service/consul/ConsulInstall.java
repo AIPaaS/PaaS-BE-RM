@@ -73,7 +73,7 @@ public class ConsulInstall implements Tasklet {
     vars.add(consulCluster.toString());
     AnsibleCommand configCommand =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/configha.yml", "root",
-            configvars);
+            vars);
     shellContext.append(configCommand.toString()).append("\n");
 
     Timestamp start = new Timestamp(System.currentTimeMillis());
@@ -97,6 +97,6 @@ public class ConsulInstall implements Tasklet {
   }
 
   public String genConsulInfo(int i, String ip) {
-    return "server consul-" + (i + 1) + " " + ip + ":8600 check";
+    return "server master" + (i + 1) + " " + ip + ":8600 check";
   }
 }

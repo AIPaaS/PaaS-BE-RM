@@ -46,7 +46,8 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="genConUser" class="com.ai.paas.cpaas.rm.manage.service.consul.GenConUser"/>
 	<beans:bean id="openConsulPort" class="com.ai.paas.cpaas.rm.manage.service.consul.OpenConsulPort"/>
 	<beans:bean id="consulInstall" class="com.ai.paas.cpaas.rm.manage.service.consul.ConsulInstall"/>
-	<beans:bean id="consulStart" class="com.ai.paas.cpaas.rm.manage.service.consul.ConsulStart"/>
+	<beans:bean id="consulStart" class="com.ai.paas.cpaas.rm.manage.service.consul.ConsulStart"/>	
+	<beans:bean id="insertClusterInfo" class="com.ai.paas.cpaas.rm.manage.service.cluster.InsertClusterInfo"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
 	    <flow id="installzookeeper" parent="zookeeper" next="installDocker"/>
 		<flow id="installDocker" parent="docker" next="installMesos"/>
@@ -57,7 +58,8 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 		<flow id="installMesosDns" parent="mesosDns" next="installHaproxy" />
 		<flow id="installHaproxy" parent="haproxy" next="installChronos"/>
 		<flow id="installChronos" parent="chronos" next="installConsul"/>
-		<flow id="installConsul" parent="consul"/>
+		<flow id="installConsul" parent="consul" next="insertCluster"/>
+		<flow id="insertCluster" parent="cluster"/>
 	</job>
 	<flow id="flannel">
 		<step id="flannelportStep" next="flannelInstallStep">
@@ -197,6 +199,11 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 		</step>
 		<step id="consulStartStep">
 			<tasklet ref="consulStart"/>
+		</step>
+	</flow>
+	<flow id="cluster">
+		<step id="clusterStep">
+			<tasklet ref="insertClusterInfo"/>
 		</step>
 	</flow>
 </beans:beans>

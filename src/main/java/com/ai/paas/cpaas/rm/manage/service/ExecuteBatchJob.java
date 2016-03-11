@@ -18,8 +18,8 @@ public class ExecuteBatchJob {
 
   public void executeOpenService(String param) throws Exception {
     // TODO
-    // String[] springConfig = {"batch/openServiceBatch.xml"};
-    String[] springConfig = {"batch/testBatch.xml"};
+     String[] springConfig = {"batch/openServiceBatch.xml"};
+    //String[] springConfig = {"batch/testBatch.xml"};
     ApplicationContext context = new ClassPathXmlApplicationContext(springConfig);
     JobLauncher jobLauncher = (JobLauncher) context.getBean("jobLauncher");
     Job job = (Job) context.getBean("openService");

@@ -25,9 +25,10 @@ public class OpenPortUtil {
     Boolean useAgent = openParam.getUseAgent();
     String aid = openParam.getAid();
     TaskUtil.uploadFile("openport.yml", content, useAgent, aid);
-    String password =
+    /*String password =
         (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
-            .getExecutionContext().get("password");
+            .getExecutionContext().get("password");*/
+    String password=openParam.getMesosMaster().get(0).getPasswd();
     // open the port
     List<String> portVars = new ArrayList<String>();
 
@@ -40,7 +41,7 @@ public class OpenPortUtil {
     // portVars.add("ports=[5050,8080]");
     portVars.add(portParam);
     AnsibleCommand openPortCommand =
-        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/openport.yml", user, portVars);
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/openport.yml","root", portVars);
 
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
