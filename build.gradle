@@ -56,12 +56,6 @@ task cleanTempDir(type: Delete) {
 	delete fileTree(dir: "$buildDir", include: "$project.ext.projectName*")
 }
 
-task copy3rdJars(type: Copy) {
-	project.each { project ->
-		from project.configurations.runtime
-		destinationDir file("$buildDir/libs")
-	}
-}
 
 task copyConfig(type: Copy) {
 	project.each { project ->
@@ -86,13 +80,23 @@ task copyBin(type: Copy) {
 	}
 }
 
+task copy3rdJars(type: Copy) {
+	project.each { project ->
+		from project.configurations.runtime
+		destinationDir file("$buildDir/libs")
+	}
+}
 
 jar {
-	baseName projectName
-	version moduleVersion
-	manifest {
-		attributes 'packageName': projectName, 'Built-By': builtBy, 'create-date': new Date().format('yyyy-MM-dd HH:mm:ss')
-	}
+    baseName projectName
+    version moduleVersion
+    exclude "context"
+    exclude "mybatis"
+    exclude "**.xml"
+    exclude "**.properties"
+    manifest {
+        attributes 'packageName': projectName, 'Built-By': builtBy, 'create-date': new Date().format('yyyy-MM-dd HH:mm:ss')
+    }
 }
 
 build.dependsOn copy3rdJars,copyConfig,copyBin,cleanTempDir
