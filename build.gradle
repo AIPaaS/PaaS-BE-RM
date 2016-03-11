@@ -53,17 +53,46 @@ dependencies {
 
 
 task cleanTempDir(type: Delete) {
-    delete fileTree(dir: "$buildDir/libs", include: "$project.ext.projectName*")
+	delete fileTree(dir: "$buildDir", include: "$project.ext.projectName*")
 }
+
+task copy3rdJars(type: Copy) {
+	project.each { project ->
+		from project.configurations.runtime
+		destinationDir file("$buildDir/libs")
+	}
+}
+
+task copyConfig(type: Copy) {
+	project.each { project ->
+		from project.fileTree(
+				dir: 'src/main/resources',
+				include: {
+					'dubbo/registry/**'
+					'**.xml'
+					'**.properties'
+				}
+		)
+		destinationDir file("$buildDir/config")
+	}
+}
+
+task copyBin(type: Copy) {
+	project.each { project ->
+		from project.fileTree(
+				dir: 'shell',
+		)
+		destinationDir file("$buildDir/bin")
+	}
+}
+
 
 jar {
-    baseName projectName
-    version moduleVersion
-    manifest {
-        attributes 'packageName': projectName, 'Built-By': builtBy, 'create-date': new Date().format('yyyy-MM-dd HH:mm:ss')
-    }
+	baseName projectName
+	version moduleVersion
+	manifest {
+		attributes 'packageName': projectName, 'Built-By': builtBy, 'create-date': new Date().format('yyyy-MM-dd HH:mm:ss')
+	}
 }
 
-
-
-build.dependsOn cleanTempDir
+build.dependsOn copy3rdJars,copyConfig,copyBin,cleanTempDir
