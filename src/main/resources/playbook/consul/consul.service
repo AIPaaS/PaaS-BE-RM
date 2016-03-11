@@ -1,0 +1,14 @@
+[Unit]
+Description=Consul Agent
+Requires=network-online.target
+After=network-online.target
+
+[Service]
+Environment="GOMAXPROCS=`nproc`"
+Restart=on-failure
+ExecStart=/bin/sh -c '/usr/local/bin/consul agent  -config-file=/etc/consul/consul.json'
+ExecReload=/bin/kill -HUP $MAINPID
+KillSignal=SIGINT
+
+[Install]
+WantedBy=multi-user.target

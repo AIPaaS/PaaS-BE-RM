@@ -1,5 +1,5 @@
 ---
-- hosts: agents
+- hosts: agent
   user: root
   tasks:
      - name: restart haproxy

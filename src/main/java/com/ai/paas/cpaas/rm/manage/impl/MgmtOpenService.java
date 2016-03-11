@@ -3,7 +3,6 @@ package com.ai.paas.cpaas.rm.manage.impl;
 import java.sql.Timestamp;
 
 import org.apache.log4j.Logger;
-import org.hsqldb.lib.StringUtil;
 import org.springframework.stereotype.Service;
 
 import com.ai.paas.cpaas.rm.dao.interfaces.ResReqInfoMapper;
@@ -15,6 +14,7 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.cpaas.rm.vo.OpenResultParamVo;
 import com.ai.paas.ipaas.PaasException;
 import com.ai.paas.ipaas.ServiceUtil;
+import com.alibaba.dubbo.common.utils.StringUtils;
 import com.google.gson.Gson;
 
 @Service
@@ -71,7 +71,7 @@ public class MgmtOpenService implements IMgmtOpenService {
     ResReqInfoMapper mapper = ServiceUtil.getMapper(ResReqInfoMapper.class);
     ResReqInfo resReqInfo = new ResReqInfo();
     try {
-      if (StringUtil.isEmpty(param)) {
+      if (StringUtils.isEmpty(param)) {
         throw new PaasException(ExceptionCodeConstants.DubboServiceCode.PARAM_IS_NULL,
             "the parameter for appllying database is null");
       }

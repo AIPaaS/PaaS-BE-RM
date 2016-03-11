@@ -11,5 +11,5 @@
      - name: insert domain info
        lineinfile: dest=/etc/consul/consul.json line="  \\\"domain\\\":\\\"{{ domain }}\\\"," state=present insertafter="[{]"
      - name: start consul
-       command: consul agent -config-file /etc/consul/consul.json
+       service: name=consul state=restarted  enabled=yes
        sudo: yes

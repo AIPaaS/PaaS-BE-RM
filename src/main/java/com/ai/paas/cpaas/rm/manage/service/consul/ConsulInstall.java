@@ -16,6 +16,7 @@ import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
+import com.ai.paas.cpaas.rm.vo.WebHaproxy;
 import com.ai.paas.ipaas.PaasException;
 import com.esotericsoftware.minlog.Log;
 
@@ -27,19 +28,20 @@ public class ConsulInstall implements Tasklet {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     Boolean useAgent = openParam.getUseAgent();
     String aid = openParam.getAid();
-    String[] files = {"installConsul.yml", "consul.json"};
+    String[] files = {"installConsul.yml", "consul.json", "configha.yml", "consul.service"};
     for (String file : files) {
       InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/consul/" + file);
       String content = TaskUtil.getFile(in);
       TaskUtil.uploadFile(file, content, useAgent, aid);
     }
-
+    StringBuffer shellContext = TaskUtil.createBashFile();
 
     List<MesosInstance> list = openParam.getMesosMaster();
     MesosInstance master = openParam.getMesosMaster().get(0);
     String password = master.getPasswd();
     String consulPath = TaskUtil.getSystemProperty("consul");
     String configFile = TaskUtil.getSystemProperty("filepath") + "/consul.json";
+    String consulService = TaskUtil.getSystemProperty("filepath") + "/consul.service";
     StringBuffer consulCluster = new StringBuffer();
     consulCluster.append("lines=[").append("'").append(this.genConsulInfo(0, master.getIp()))
         .append("'");
@@ -55,16 +57,30 @@ public class ConsulInstall implements Tasklet {
     configvars.add("ansible_become_pass=" + password);
     configvars.add("url=" + consulPath);
     configvars.add("configfile=" + configFile);
-    configvars.add(consulCluster.toString());
+    configvars.add("consulService=" + consulService);
+    // configvars.add(consulCluster.toString());
 
-    AnsibleCommand command =
+    AnsibleCommand installcommand =
         new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/installConsul.yml", "root",
             configvars);
+    shellContext.append(installcommand.toString()).append("\n");
+
+    WebHaproxy webHaproxy = openParam.getWebHaproxy();
+    String agentPass = webHaproxy.getHosts().get(0).getPasswd();
+    List<String> vars = new ArrayList<String>();
+    vars.add("ansible_ssh_pass=" + agentPass);
+    vars.add("ansible_become_pass=" + agentPass);
+    vars.add(consulCluster.toString());
+    AnsibleCommand configCommand =
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/configha.yml", "root",
+            configvars);
+    shellContext.append(configCommand.toString()).append("\n");
+
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
     String result = new String();
     try {
-      result = TaskUtil.executeFile("installConsul", command.toString(), useAgent, aid);
+      result = TaskUtil.executeFile("installConsul", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
       Log.error(e.toString());
       result = e.toString();
@@ -73,7 +89,7 @@ public class ConsulInstall implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(),
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
               TaskUtil.getTypeId("consulInstall"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }

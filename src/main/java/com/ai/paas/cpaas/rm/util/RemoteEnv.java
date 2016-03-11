@@ -16,10 +16,10 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.log4j.Logger;
-import org.hsqldb.lib.StringUtil;
 
 import com.ai.paas.cpaas.rm.vo.TransResultVo;
 import com.ai.paas.ipaas.PaasException;
+import com.alibaba.dubbo.common.utils.StringUtils;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -72,7 +72,7 @@ public class RemoteEnv implements ExecuteEnv {
         throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
             resultVo.getMsg());
       }
-      // analyze stdout£¬
+      // analyze stdout
       if (stdout.contains("unreachable")) {
         String pattern = "unreachable=[1-9]";
         Pattern r = Pattern.compile(pattern);
@@ -95,7 +95,7 @@ public class RemoteEnv implements ExecuteEnv {
               resultVo.getMsg());
         }
       }
-      if (!StringUtil.isEmpty(stderr)) {
+      if (!StringUtils.isEmpty(stderr)) {
         System.out.println(stderr);
         logger.error(stderr);
         throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

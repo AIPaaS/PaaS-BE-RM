@@ -47,6 +47,7 @@ public class ConsulStart implements Tasklet {
       configvars.add("domain=" + openParam.getExternalDomain());
       configvars.add("client_addr=" + list.get(i).getIp());
       configvars.add("node_name=" + TaskUtil.genMasterName(i + 1));
+      configvars.add("hosts=" + TaskUtil.genMasterName(i + 1));
       AnsibleCommand command =
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/consulstart.yml", "root",
               configvars);
@@ -77,7 +78,7 @@ public class ConsulStart implements Tasklet {
 
     String result = new String();
     try {
-      result = TaskUtil.executeFile("installConsul", shellContext.toString(), useAgent, aid);
+      result = TaskUtil.executeFile("consulStart", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
       Log.error(e.toString());
       result = e.toString();

@@ -2,9 +2,9 @@
   "data_dir": "/opt/consul",
   "log_level": "INFO",
   "server": true,
-  "bootstrap_expect":2,
+  "bootstrap_expect":1,
   "ports":{
-        "dns”:8600
+	"dns":53
    },
   "ui_dir":"/root/consul/dist"
 }

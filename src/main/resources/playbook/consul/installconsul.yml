@@ -9,7 +9,5 @@
        sudo: yes
      - name: transfer consul.json to the master node
        copy: src={{ configfile }} dest=/etc/consul/consul.json owner=root  mode=0755
-     - name: insert consul node info 
-       lineinfile: dest=/etc/haproxy/haproxy.cfg line="{{ item }}" state=present
-       with_items:
-          - "{{ lines }}"
+     - name: transfer consul.service to the master node
+       copy: src={{ consulService }} dest=/etc/systemd/system/consul.service owner=root  mode=0755
