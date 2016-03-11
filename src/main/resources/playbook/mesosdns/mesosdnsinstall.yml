@@ -16,7 +16,7 @@
      - name: insert masters info
        lineinfile: dest=/etc/mesos-dns/config.json line="  \"masters\":{{ master }}," state=present  insertafter="[{]"
      - name: insert resolvers info
-       lineinfile: dest=/etc/mesos-dns/config.json line="  \"resolvers\":{{ resolvers }}," state=present insertafter="[{]" 
+       lineinfile: dest=/etc/mesos-dns/config.json line="  \"resolvers\":[{{ resolvers }}]," state=present insertafter="[{]" 
      - name: insert resolvers info
        lineinfile: dest=/etc/mesos-dns/config.json line="  \"domain\":{{ domain }}," state=present insertafter="[{]"
      - name: start mesos-dns service

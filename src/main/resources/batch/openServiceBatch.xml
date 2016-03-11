@@ -43,6 +43,10 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="chronosInstall" class="com.ai.paas.cpaas.rm.manage.service.chronos.ChronosInstall"/>
 	<beans:bean id="openChronosPort" class="com.ai.paas.cpaas.rm.manage.service.chronos.OpenChronosPort"/>
 	<beans:bean id="verifyChronos" class="com.ai.paas.cpaas.rm.manage.service.chronos.VerifyChronos"/>
+	<beans:bean id="genConUser" class="com.ai.paas.cpaas.rm.manage.service.consul.GenConUser"/>
+	<beans:bean id="openConsulPort" class="com.ai.paas.cpaas.rm.manage.service.consul.OpenConsulPort"/>
+	<beans:bean id="consulInstall" class="com.ai.paas.cpaas.rm.manage.service.consul.ConsulInstall"/>
+	<beans:bean id="consulStart" class="com.ai.paas.cpaas.rm.manage.service.consul.ConsulStart"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
 	    <flow id="installzookeeper" parent="zookeeper" next="installDocker"/>
 		<flow id="installDocker" parent="docker" next="installMesos"/>
@@ -52,7 +56,8 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 		<flow id="installFlannel" parent="flannel" next="installMesosDns"/>
 		<flow id="installMesosDns" parent="mesosDns" next="installHaproxy" />
 		<flow id="installHaproxy" parent="haproxy" next="installChronos"/>
-		<flow id="installChronos" parent="chronos"/>
+		<flow id="installChronos" parent="chronos" next="installConsul"/>
+		<flow id="installConsul" parent="consul"/>
 	</job>
 	<flow id="flannel">
 		<step id="flannelportStep" next="flannelInstallStep">
@@ -178,6 +183,20 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 		</step>
 		<step id="verifyChronosStep">
 			<tasklet ref="verifyChronos"/>
+		</step>
+	</flow>
+	<flow id="consul">
+		<step id="genConUserStep" next="openConsulStep">
+			<tasklet ref="genConUser"/>
+		</step>
+		<step id="openConsulStep" next="consulInstallStep">
+			<tasklet ref="openConsulPort"/>
+		</step>
+		<step id="consulInstallStep" next="consulStartStep">
+			<tasklet ref="consulInstall"/>
+		</step>
+		<step id="consulStartStep">
+			<tasklet ref="consulStart"/>
 		</step>
 	</flow>
 </beans:beans>

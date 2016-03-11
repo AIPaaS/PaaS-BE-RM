@@ -1,0 +1,15 @@
+---
+- hosts: master
+  user: root
+  tasks:
+     - name: fetch consul and unpack at /usr/local/bin/consul
+       get_url: url={{ url }} dest=/usr/local/bin/consul mode=0755
+     - name: create dir /etc/consul
+       file: path=/etc/consul state=directory mode=0755
+       sudo: yes
+     - name: transfer consul.json to the master node
+       copy: src={{ configfile }} dest=/etc/consul/consul.json owner=root  mode=0755
+     - name: insert consul node info 
+       lineinfile: dest=/etc/haproxy/haproxy.cfg line="{{ item }}" state=present
+       with_items:
+          - "{{ lines }}"

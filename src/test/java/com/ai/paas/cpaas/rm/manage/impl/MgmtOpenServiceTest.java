@@ -97,14 +97,12 @@ public class MgmtOpenServiceTest {
 
     WebHaproxy proxy = new WebHaproxy();
     proxy.setLoadOnly(Boolean.TRUE);
-    proxy.setVirtualIp("172.168.11.1");
+    proxy.setVirtualIp("10.1.241.14");
 
     List<MesosInstance> agents = new ArrayList<MesosInstance>();
     agents.add(master);
     agents.add(master1);
-
     proxy.setHosts(agents);
-
     paramVo.setWebHaproxy(proxy);
 
     Gson gson = new Gson();

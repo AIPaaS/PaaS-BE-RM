@@ -1,0 +1,10 @@
+---
+- hosts: agents
+  user: root
+  tasks:
+     - name: restart haproxy
+       service: name=haproxy state=restarted enabled=yes
+       sudo: yes
+     - name: restart keepalived
+       service: name=keepalived state=restarted enabled=yes
+       sudo: yes

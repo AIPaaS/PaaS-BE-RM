@@ -19,7 +19,7 @@ import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.ipaas.PaasException;
 import com.esotericsoftware.minlog.Log;
 
-public class ConsulInstall implements Tasklet {
+public class ConsulStart implements Tasklet {
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
@@ -27,44 +27,57 @@ public class ConsulInstall implements Tasklet {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     Boolean useAgent = openParam.getUseAgent();
     String aid = openParam.getAid();
-    String[] files = {"installConsul.yml", "consul.json"};
+    String[] files = {"consulstart.yml", "consuljoin.yml"};
     for (String file : files) {
       InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/consul/" + file);
       String content = TaskUtil.getFile(in);
       TaskUtil.uploadFile(file, content, useAgent, aid);
     }
-
+    StringBuffer shellContext = TaskUtil.createBashFile();
 
     List<MesosInstance> list = openParam.getMesosMaster();
-    MesosInstance master = openParam.getMesosMaster().get(0);
+    MesosInstance master = list.get(0);
     String password = master.getPasswd();
-    String consulPath = TaskUtil.getSystemProperty("consul");
-    String configFile = TaskUtil.getSystemProperty("filepath") + "/consul.json";
-    StringBuffer consulCluster = new StringBuffer();
-    consulCluster.append("lines=[").append("'").append(this.genConsulInfo(0, master.getIp()))
-        .append("'");
-    for (int i = 1; i < list.size(); i++) {
-      consulCluster.append(",");
-      MesosInstance instance = list.get(i);
-      consulCluster.append("'").append(this.genConsulInfo(i, instance.getIp())).append("'");
+
+    for (int i = 0; i < list.size(); i++) {
+      List<String> configvars = new ArrayList<String>();
+      configvars.add("ansible_ssh_pass=" + password);
+      configvars.add("ansible_become_pass=" + password);
+      configvars.add("datacenter=" + openParam.getDataCenter());
+      configvars.add("domain=" + openParam.getExternalDomain());
+      configvars.add("client_addr=" + list.get(i).getIp());
+      configvars.add("node_name=" + TaskUtil.genMasterName(i + 1));
+      AnsibleCommand command =
+          new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/consulstart.yml", "root",
+              configvars);
+      shellContext.append(command.toString());
+      shellContext.append("\n");
     }
-    consulCluster.append("]");
 
-    List<String> configvars = new ArrayList<String>();
-    configvars.add("ansible_ssh_pass=" + password);
-    configvars.add("ansible_become_pass=" + password);
-    configvars.add("url=" + consulPath);
-    configvars.add("configfile=" + configFile);
-    configvars.add(consulCluster.toString());
+    StringBuffer nodes = new StringBuffer();
+    nodes.append("nodes=[");
+    nodes.append("'").append(list.get(1).getIp()).append("'");
+    for (int i = 2; i < list.size(); i++) {
+      nodes.append(",");
+      nodes.append("'").append(list.get(i).getIp()).append("'");
+    }
+    nodes.append("]");
 
-    AnsibleCommand command =
-        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/installConsul.yml", "root",
-            configvars);
+    List<String> vars = new ArrayList<String>();
+    vars.add("ansible_ssh_pass=" + password);
+    vars.add("ansible_become_pass=" + password);
+    vars.add(nodes.toString());
+    vars.add("hosts=" + TaskUtil.genMasterName(1));
+    AnsibleCommand joinCommand =
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/consuljoin.yml", "root", vars);
+    shellContext.append(joinCommand.toString());
+    shellContext.append("\n");
+
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
     String result = new String();
     try {
-      result = TaskUtil.executeFile("installConsul", command.toString(), useAgent, aid);
+      result = TaskUtil.executeFile("installConsul", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
       Log.error(e.toString());
       result = e.toString();
@@ -73,14 +86,11 @@ public class ConsulInstall implements Tasklet {
     } finally {
       // insert log and task record
       int taskId =
-          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), command.toString(),
-              TaskUtil.getTypeId("consulInstall"));
+          TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
+              TaskUtil.getTypeId("consulStart"));
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
     return RepeatStatus.FINISHED;
   }
 
-  public String genConsulInfo(int i, String ip) {
-    return "server consul-" + (i + 1) + " " + ip + ":8600 check";
-  }
 }
