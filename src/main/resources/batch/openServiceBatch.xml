@@ -47,6 +47,7 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="openConsulPort" class="com.ai.paas.cpaas.rm.manage.service.consul.OpenConsulPort"/>
 	<beans:bean id="consulInstall" class="com.ai.paas.cpaas.rm.manage.service.consul.ConsulInstall"/>
 	<beans:bean id="consulStart" class="com.ai.paas.cpaas.rm.manage.service.consul.ConsulStart"/>	
+	<beans:bean id="restartKa" class="com.ai.paas.cpaas.rm.manage.service.consul.RestartKa"/>
 	<beans:bean id="insertClusterInfo" class="com.ai.paas.cpaas.rm.manage.service.cluster.InsertClusterInfo"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
 	    <flow id="installzookeeper" parent="zookeeper" next="installDocker"/>
@@ -197,8 +198,11 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 		<step id="consulInstallStep" next="consulStartStep">
 			<tasklet ref="consulInstall"/>
 		</step>
-		<step id="consulStartStep">
+		<step id="consulStartStep" next="restartKaStep">
 			<tasklet ref="consulStart"/>
+		</step>
+		<step id="restartKaStep">
+			<tasklet ref="restartKa"/>
 		</step>
 	</flow>
 	<flow id="cluster">
