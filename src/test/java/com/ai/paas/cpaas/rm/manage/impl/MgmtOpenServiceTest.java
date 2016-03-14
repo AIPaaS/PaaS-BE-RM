@@ -24,7 +24,6 @@ public class MgmtOpenServiceTest {
   @Autowired
   IMgmtOpenService service;
 
-
   public void testSelect() {
     String result = service.queryLog("7");
     System.out.println(result);
