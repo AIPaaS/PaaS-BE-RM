@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.apache.log4j.Logger;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobParameter;
@@ -12,14 +13,17 @@ import org.springframework.batch.core.launch.JobLauncher;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.support.ClassPathXmlApplicationContext;
 
+import com.ai.paas.cpaas.rm.util.ExceptionCodeConstants;
+import com.ai.paas.cpaas.rm.vo.OpenResultParamVo;
+
 public class ExecuteBatchJob {
 
   private static Logger logger = Logger.getLogger(ExecuteBatchJob.class);
 
-  public void executeOpenService(String param) throws Exception {
+  public void executeOpenService(String param, OpenResultParamVo openResultParam) throws Exception {
     // TODO
-    String[] springConfig = {"batch/openServiceBatch.xml"};
-    // String[] springConfig = {"batch/testBatch.xml"};
+    // String[] springConfig = {"batch/openServiceBatch.xml"};
+    String[] springConfig = {"batch/testBatch.xml"};
     ApplicationContext context = new ClassPathXmlApplicationContext(springConfig);
     JobLauncher jobLauncher = (JobLauncher) context.getBean("jobLauncher");
     Job job = (Job) context.getBean("openService");
@@ -30,6 +34,13 @@ public class ExecuteBatchJob {
     JobParameters jobParameters = new JobParameters(parameters);
     try {
       JobExecution execution = jobLauncher.run(job, jobParameters);
+      if (execution.getStatus().equals(BatchStatus.FAILED)) {
+        openResultParam.setResultCode(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE);
+        openResultParam.setResultMsg(execution.getStepExecutions().toString());
+      } else {
+        openResultParam.setResultCode(ExceptionCodeConstants.DubboServiceCode.SUCCESS_CODE);
+        openResultParam.setResultMsg(ExceptionCodeConstants.DubboServiceCode.SUCCESS_MESSAGE);
+      }
       logger.info("Exit Status : " + execution.getStatus());
     } catch (Exception e) {
       logger.error(e);

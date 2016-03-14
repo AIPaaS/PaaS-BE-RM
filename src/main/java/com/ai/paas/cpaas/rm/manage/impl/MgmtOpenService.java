@@ -100,16 +100,14 @@ public class MgmtOpenService implements IMgmtOpenService {
       resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));
 
       ExecuteBatchJob executeBatchJob = new ExecuteBatchJob();
-      executeBatchJob.executeOpenService(param);
-      openResultParam.setResultCode(ExceptionCodeConstants.DubboServiceCode.SUCCESS_CODE);
-      openResultParam.setResultMsg(ExceptionCodeConstants.DubboServiceCode.SUCCESS_MESSAGE);
+      executeBatchJob.executeOpenService(param, openResultParam);
+
 
 
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       System.out.println(e.getMessage());
-      openResultParam.setResultCode(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE);
-      openResultParam.setResultMsg(e.toString());
+
       status = TaskUtil.REQFAILED;
     }
     resReqInfo.setReqState(status);
