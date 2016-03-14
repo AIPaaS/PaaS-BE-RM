@@ -1,21 +1,12 @@
 #!/bin/sh
+cd `dirname $0`
+BIN_DIR=`pwd`
+cd ..
+DEPLOY_DIR=`pwd`
+CONF_DIR=$DEPLOY_DIR/config
 
-#COMMON_LIB=$HOME/applications/PaaS-BE-RM
-#COMMON_CONF=$HOME/applications/PaaS-BE-RM/config
-COMMON_LIB=$HOME
-COMMON_CONF=$HOME
-#echo -----------------------------------------COMMON_LIB $COMMON_LIB
-export COMMON_LIB
+LIB_DIR=$DEPLOY_DIR/libs
+LIB_JARS=$DEPLOY_DIR/libs/*
 
-for file in ${COMMON_LIB}/**/*.jar;
-do CP=${CP}:$file;
-done
-
-CP=${CP}:${COMMON_CONF}
-CLASSPATH="${CP}"
-export CLASSPATH
-#echo $CLASSPATH
-export JAVA_OPTIONS=" -Dfile.encoding=UTF-8 -Djava.net.preferIPv4Stack=true -Dsun.net.inetaddr.ttl=10"
-export MEM_ARGS="-Xms128m -Xmx512m"
-
-${JAVA_HOME}/bin/java ${MEM_ARGS}  ${JAVA_OPTIONS} com.ai.paas.ipaas.DubboServiceStart $1
+nohup ${JAVA_HOME}/bin/java -classpath $CONF_DIR:$LIB_JARS:$DEPLOY_DIR/classes/main com.ai.paas.ipaas.DubboServiceS
+tart $1 &
