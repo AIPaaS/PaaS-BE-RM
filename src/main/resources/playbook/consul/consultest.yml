@@ -1,0 +1,11 @@
+---
+- hosts: master
+  user: root
+  tasks:
+     - name: test for endpoints
+       get_url: 
+          url="http://10.1.241.127:8500/v1/catalog/nodes"
+          dest=/tmp/consul-nodes 
+          force=yes
+       register: status
+       failed_when: "'OK' not in status.msg"

@@ -65,18 +65,20 @@ public class ChangeHostNameStep implements Tasklet {
     // upload shellContext and execute it
 
     String result = new String();
+    int status = TaskUtil.FINISHED;
     try {
       result = TaskUtil.executeFile("changehostnames", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
       Log.error(e.toString());
       result = e.toString();
+      status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
           e.toString());
     } finally {
       // insert log and task record
       int taskId =
           TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
-              TaskUtil.getTypeId("changeHostNameStep"));
+              TaskUtil.getTypeId("changeHostNameStep"), status);
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
 

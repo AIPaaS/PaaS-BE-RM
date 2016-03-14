@@ -22,6 +22,7 @@ import com.ai.paas.cpaas.rm.dao.mapper.bo.ResClusterInfoCriteria;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResInstanceProps;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResJobDetail;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog;
+import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLogCriteria;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskType;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskTypeCriteria;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.SysCodes;
@@ -49,6 +50,12 @@ public class TaskUtil {
   public static int FINISHED = 2;
 
   public static int FAILED = 3;
+
+  public static int REQSUCCESS = 0;
+
+  public static int REQFAILED = 1;
+
+  public static int REQINSERT = 1;
 
   public static int nextValue() {
     return counter.getAndIncrement();
@@ -158,21 +165,20 @@ public class TaskUtil {
     return list.get(0).getTypeId();
   }
 
-  public static Boolean clusterExist(String param)
-  {
-	  ResClusterInfoCriteria rescriteria=new ResClusterInfoCriteria();
-	  ResClusterInfoCriteria.Criteria criteria=rescriteria.createCriteria();
-	  criteria.andClusterIdEqualTo(param);
-	  ResClusterInfoMapper mapper=ServiceUtil.getMapper(ResClusterInfoMapper.class);
-	  List<ResClusterInfo> list=mapper.selectByExample(rescriteria);
-	  Boolean status=false;
-	  if(list!=null&&list.size()!=0)
-	  {
-		  status=true;
-	  }
-	  return status;
-	  
+  public static Boolean clusterExist(String param) {
+    ResClusterInfoCriteria rescriteria = new ResClusterInfoCriteria();
+    ResClusterInfoCriteria.Criteria criteria = rescriteria.createCriteria();
+    criteria.andClusterIdEqualTo(param);
+    ResClusterInfoMapper mapper = ServiceUtil.getMapper(ResClusterInfoMapper.class);
+    List<ResClusterInfo> list = mapper.selectByExample(rescriteria);
+    Boolean status = false;
+    if (list != null && list.size() != 0) {
+      status = true;
+    }
+    return status;
+
   }
+
   public static String replaceIllegalCharacter(String source) {
     if (source == null) return source;
     /*
@@ -186,12 +192,12 @@ public class TaskUtil {
   }
 
   public static int insertResJobDetail(Timestamp start, String clusterId, String shellContext,
-      int typeId) {
+      int typeId, int status) {
     ResJobDetail resJobDetail = new ResJobDetail();
     ResJobDetailMapper mapper = ServiceUtil.getMapper(ResJobDetailMapper.class);
     resJobDetail.setClusterId(clusterId);
     resJobDetail.setTaskPlaybook(shellContext);
-    resJobDetail.setTaskState(TaskUtil.FINISHED);
+    resJobDetail.setTaskState(status);
     resJobDetail.setTaskStartTime(start);
     resJobDetail.setTaskEndTime(new Timestamp(System.currentTimeMillis()));
     resJobDetail.setTypeId(typeId);
@@ -217,7 +223,7 @@ public class TaskUtil {
 
   public static void insertResTaskLog(String clusterId, int taskId, String result) {
     ResTaskLog resTaskLog = new ResTaskLog();
-    resTaskLog.setClusterId(new Integer(clusterId));
+    resTaskLog.setClusterId(clusterId);
     resTaskLog.setTaskId(taskId);
     resTaskLog.setLogCnt(result);
     ResTaskLogMapper mapper = ServiceUtil.getMapper(ResTaskLogMapper.class);
@@ -225,5 +231,42 @@ public class TaskUtil {
     mapper.insert(resTaskLog);
   }
 
+  public static ResJobDetail getResJobDetail(int taskId) {
+    ResJobDetailMapper mapper = ServiceUtil.getMapper(ResJobDetailMapper.class);
+    ResJobDetail instance = mapper.selectByPrimaryKey(taskId);
+    return instance;
+  }
 
+  public static String getTypeDesc(int typeId) {
+    ResTaskTypeCriteria rescriteria = new ResTaskTypeCriteria();
+    ResTaskTypeCriteria.Criteria criteria = rescriteria.createCriteria();
+    criteria.andTypeIdEqualTo(typeId);
+    ResTaskTypeMapper mapper = ServiceUtil.getMapper(ResTaskTypeMapper.class);
+    List<ResTaskType> list = mapper.selectByExample(rescriteria);
+    String typeDesc = list.get(0).getTypeDesc();
+    return typeDesc;
+  }
+
+  public static List<ResTaskLog> getResTaskLogs(String clusterId) {
+    ResTaskLogCriteria rescriteria = new ResTaskLogCriteria();
+    ResTaskLogCriteria.Criteria criteria = rescriteria.createCriteria();
+    criteria.andClusterIdEqualTo(clusterId);
+    ResTaskLogMapper mapper = ServiceUtil.getMapper(ResTaskLogMapper.class);
+    List<ResTaskLog> list = mapper.selectByExample(rescriteria);
+    return list;
+  }
+
+  public static String logStartDesc(String desc) {
+    return desc + ": started";
+  }
+
+  public static String logEndDesc(String desc, int state) {
+    String result = new String();
+    if (state == TaskUtil.FAILED) {
+      result = desc + ": failed";
+    } else {
+      result = desc + ": finished";
+    }
+    return result;
+  }
 }

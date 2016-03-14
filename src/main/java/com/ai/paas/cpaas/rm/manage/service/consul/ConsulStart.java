@@ -45,13 +45,13 @@ public class ConsulStart implements Tasklet {
       configvars.add("ansible_become_pass=" + password);
       configvars.add("datacenter=" + openParam.getDataCenter());
       configvars.add("domain=" + openParam.getExternalDomain());
-      String ip=list.get(i).getIp();
+      String ip = list.get(i).getIp();
       configvars.add("client_addr=" + ip);
-      configvars.add("ip="+ip);
+      configvars.add("ip=" + ip);
       configvars.add("node_name=" + TaskUtil.genMasterName(i + 1));
       configvars.add("hosts=" + TaskUtil.genMasterName(i + 1));
       configvars.add("bootstrap=false");
-      configvars.add("startjoin="+this.genStartJoin(i, list));
+      configvars.add("startjoin=" + this.genStartJoin(i, list));
       AnsibleCommand command =
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/consulstart.yml", "root",
               configvars);
@@ -63,36 +63,35 @@ public class ConsulStart implements Tasklet {
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
     String result = new String();
+    int status = TaskUtil.FINISHED;
     try {
       result = TaskUtil.executeFile("consulStart", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
       Log.error(e.toString());
       result = e.toString();
+      status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
           e.toString());
     } finally {
       // insert log and task record
       int taskId =
           TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
-              TaskUtil.getTypeId("consulStart"));
+              TaskUtil.getTypeId("consulStart"), status);
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
     return RepeatStatus.FINISHED;
   }
 
-  public String genStartJoin(int num,List<MesosInstance> list)
-  {
-	  StringBuffer context=new StringBuffer();
-	  for(int i=0;i<list.size();i++)
-	  {
-		  if(i!=num)
-		  {
-			  MesosInstance instance=list.get(i);
-			  context.append("\\\\\\\"").append(instance.getIp()).append("\\\\\\\"");
-			  context.append(",");
-		  }  
-	  }
-	  String result=context.substring(0, context.length()-1);
-	  return result;
+  public String genStartJoin(int num, List<MesosInstance> list) {
+    StringBuffer context = new StringBuffer();
+    for (int i = 0; i < list.size(); i++) {
+      if (i != num) {
+        MesosInstance instance = list.get(i);
+        context.append("\\\\\\\"").append(instance.getIp()).append("\\\\\\\"");
+        context.append(",");
+      }
+    }
+    String result = context.substring(0, context.length() - 1);
+    return result;
   }
 }

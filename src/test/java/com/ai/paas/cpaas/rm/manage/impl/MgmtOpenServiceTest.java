@@ -25,10 +25,11 @@ public class MgmtOpenServiceTest {
   IMgmtOpenService service;
 
 
-  public void testSelect(){
-	  String result=service.queryLog("7");
-	  System.out.println(result);
+  public void testSelect() {
+    String result = service.queryLog("7");
+    System.out.println(result);
   }
+
   @Test
   public void openServiceTest() {
     OpenResourceParamVo paramVo = new OpenResourceParamVo();

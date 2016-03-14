@@ -61,11 +61,13 @@ public class GenUserUtil {
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
     String result = new String();
+    int status=TaskUtil.FINISHED;
     try {
       result = TaskUtil.executeFile(fileName, shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
       Log.error(e.toString());
       result = e.toString();
+      status=TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
           e.toString());
     } finally {
@@ -76,7 +78,7 @@ public class GenUserUtil {
       // insert log and task record
       int taskId =
           TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
-              typeId);
+              typeId,status);
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
   }

@@ -72,25 +72,26 @@ public class ConsulInstall implements Tasklet {
     vars.add("ansible_become_pass=" + agentPass);
     vars.add(consulCluster.toString());
     AnsibleCommand configCommand =
-        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/configha.yml", "root",
-            vars);
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/configha.yml", "root", vars);
     shellContext.append(configCommand.toString()).append("\n");
 
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
     String result = new String();
+    int status = TaskUtil.FINISHED;
     try {
       result = TaskUtil.executeFile("installConsul", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
       Log.error(e.toString());
       result = e.toString();
+      status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
           e.toString());
     } finally {
       // insert log and task record
       int taskId =
           TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
-              TaskUtil.getTypeId("consulInstall"));
+              TaskUtil.getTypeId("consulInstall"), status);
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
     return RepeatStatus.FINISHED;

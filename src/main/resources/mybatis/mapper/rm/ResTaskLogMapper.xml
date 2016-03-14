@@ -3,7 +3,7 @@
 <mapper namespace="com.ai.paas.cpaas.rm.dao.interfaces.ResTaskLogMapper" >
   <resultMap id="BaseResultMap" type="com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog" >
     <id column="log_id" property="logId" jdbcType="BIGINT" />
-    <result column="cluster_id" property="clusterId" jdbcType="INTEGER" />
+    <result column="cluster_id" property="clusterId" jdbcType="VARCHAR" />
     <result column="task_id" property="taskId" jdbcType="INTEGER" />
     <result column="log_cnt" property="logCnt" jdbcType="VARCHAR" />
     <result column="log_time" property="logTime" jdbcType="TIMESTAMP" />
@@ -103,12 +103,9 @@
     </if>
   </delete>
   <insert id="insert" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog" >
-  <selectKey resultType="java.lang.Long" keyProperty="logId" order="AFTER" >
-		SELECT @@IDENTITY
-	</selectKey>
     insert into res_task_log (log_id, cluster_id, task_id, 
       log_cnt, log_time)
-    values (#{logId,jdbcType=BIGINT}, #{clusterId,jdbcType=INTEGER}, #{taskId,jdbcType=INTEGER}, 
+    values (#{logId,jdbcType=BIGINT}, #{clusterId,jdbcType=VARCHAR}, #{taskId,jdbcType=INTEGER}, 
       #{logCnt,jdbcType=VARCHAR}, #{logTime,jdbcType=TIMESTAMP})
   </insert>
   <insert id="insertSelective" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog" >
@@ -135,7 +132,7 @@
         #{logId,jdbcType=BIGINT},
       </if>
       <if test="clusterId != null" >
-        #{clusterId,jdbcType=INTEGER},
+        #{clusterId,jdbcType=VARCHAR},
       </if>
       <if test="taskId != null" >
         #{taskId,jdbcType=INTEGER},
@@ -161,7 +158,7 @@
         log_id = #{record.logId,jdbcType=BIGINT},
       </if>
       <if test="record.clusterId != null" >
-        cluster_id = #{record.clusterId,jdbcType=INTEGER},
+        cluster_id = #{record.clusterId,jdbcType=VARCHAR},
       </if>
       <if test="record.taskId != null" >
         task_id = #{record.taskId,jdbcType=INTEGER},
@@ -180,7 +177,7 @@
   <update id="updateByExample" parameterType="map" >
     update res_task_log
     set log_id = #{record.logId,jdbcType=BIGINT},
-      cluster_id = #{record.clusterId,jdbcType=INTEGER},
+      cluster_id = #{record.clusterId,jdbcType=VARCHAR},
       task_id = #{record.taskId,jdbcType=INTEGER},
       log_cnt = #{record.logCnt,jdbcType=VARCHAR},
       log_time = #{record.logTime,jdbcType=TIMESTAMP}
@@ -192,7 +189,7 @@
     update res_task_log
     <set >
       <if test="clusterId != null" >
-        cluster_id = #{clusterId,jdbcType=INTEGER},
+        cluster_id = #{clusterId,jdbcType=VARCHAR},
       </if>
       <if test="taskId != null" >
         task_id = #{taskId,jdbcType=INTEGER},
@@ -208,7 +205,7 @@
   </update>
   <update id="updateByPrimaryKey" parameterType="com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog" >
     update res_task_log
-    set cluster_id = #{clusterId,jdbcType=INTEGER},
+    set cluster_id = #{clusterId,jdbcType=VARCHAR},
       task_id = #{taskId,jdbcType=INTEGER},
       log_cnt = #{logCnt,jdbcType=VARCHAR},
       log_time = #{logTime,jdbcType=TIMESTAMP}

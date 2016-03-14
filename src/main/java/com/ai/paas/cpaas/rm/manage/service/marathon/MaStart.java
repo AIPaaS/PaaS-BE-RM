@@ -52,18 +52,20 @@ public class MaStart implements Tasklet {
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
     String result = new String();
+    int status = TaskUtil.FINISHED;
     try {
       result = TaskUtil.executeFile("marathonStart", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
       Log.error(e.toString());
       result = e.toString();
+      status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
           e.toString());
     } finally {
       // insert log and task record
       int taskId =
           TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
-              TaskUtil.getTypeId("maStart"));
+              TaskUtil.getTypeId("maStart"), status);
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
 

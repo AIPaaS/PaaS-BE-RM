@@ -1,19 +1,20 @@
 package com.ai.paas.cpaas.rm.manage.impl;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
 
 import com.ai.paas.cpaas.rm.dao.interfaces.ResReqInfoMapper;
-import com.ai.paas.cpaas.rm.dao.interfaces.ResTaskLogMapper;
+import com.ai.paas.cpaas.rm.dao.mapper.bo.ResJobDetail;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResReqInfo;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog;
-import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLogCriteria;
 import com.ai.paas.cpaas.rm.interfaces.IMgmtOpenService;
 import com.ai.paas.cpaas.rm.manage.service.ExecuteBatchJob;
 import com.ai.paas.cpaas.rm.util.ExceptionCodeConstants;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
+import com.ai.paas.cpaas.rm.vo.LogResult;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.cpaas.rm.vo.OpenResultParamVo;
 import com.ai.paas.ipaas.PaasException;
@@ -75,7 +76,7 @@ public class MgmtOpenService implements IMgmtOpenService {
     OpenResultParamVo openResultParam = new OpenResultParamVo();
     ResReqInfoMapper mapper = ServiceUtil.getMapper(ResReqInfoMapper.class);
     ResReqInfo resReqInfo = new ResReqInfo();
-    int status=0;
+    int status = TaskUtil.REQSUCCESS;
     try {
       if (StringUtils.isEmpty(param)) {
         throw new PaasException(ExceptionCodeConstants.DubboServiceCode.PARAM_IS_NULL,
@@ -86,16 +87,15 @@ public class MgmtOpenService implements IMgmtOpenService {
         throw new PaasException(ExceptionCodeConstants.TransServiceCode.ERROR_CODE,
             "it should be true for useAgent");
       }
-      //±‹√‚÷ÿ∏¥∞≤◊∞
-      String clusterId=openParam.getClusterId();
-      if(TaskUtil.clusterExist(clusterId))
-      {
-    	  throw new PaasException(ExceptionCodeConstants.TransServiceCode.ERROR_CODE,
-    	            "the clusterId existed");
+      // ignore repeat install
+      String clusterId = openParam.getClusterId();
+      if (TaskUtil.clusterExist(clusterId)) {
+        throw new PaasException(ExceptionCodeConstants.TransServiceCode.ERROR_CODE,
+            "the clusterId existed");
       }
-      
+
       resReqInfo.setClusterId(clusterId);
-      resReqInfo.setReqType(1);
+      resReqInfo.setReqType(TaskUtil.REQINSERT);
       resReqInfo.setReqCnt(param);
       resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));
 
@@ -103,15 +103,15 @@ public class MgmtOpenService implements IMgmtOpenService {
       executeBatchJob.executeOpenService(param);
       openResultParam.setResultCode(ExceptionCodeConstants.DubboServiceCode.SUCCESS_CODE);
       openResultParam.setResultMsg(ExceptionCodeConstants.DubboServiceCode.SUCCESS_MESSAGE);
-   
-      
+
+
     } catch (Exception e) {
-      logger.error(e.getMessage(),e);
+      logger.error(e.getMessage(), e);
       System.out.println(e.getMessage());
       openResultParam.setResultCode(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE);
       openResultParam.setResultMsg(e.toString());
-      status=1;
-    } 
+      status = TaskUtil.REQFAILED;
+    }
     resReqInfo.setReqState(status);
     resReqInfo.setReqResp(gson.toJson(openResultParam));
     resReqInfo.setRespTime(new Timestamp(System.currentTimeMillis()));
@@ -121,23 +121,34 @@ public class MgmtOpenService implements IMgmtOpenService {
 
   @Override
   public String queryLog(String param) {
-	Gson gson = new Gson();
-    String result=new String();
-	try {
-		if (StringUtils.isEmpty(param)) {
-		        throw new PaasException(ExceptionCodeConstants.DubboServiceCode.PARAM_IS_NULL,
-		            "the parameter for appllying database is null");
-		      }
-		ResTaskLogCriteria rescriteria=new ResTaskLogCriteria();
-		ResTaskLogCriteria.Criteria criteria=rescriteria.createCriteria();
-		criteria.andClusterIdEqualTo(new Integer(param));
-		ResTaskLogMapper mapper=ServiceUtil.getMapper(ResTaskLogMapper.class);
-		List<ResTaskLog> list=mapper.selectByExample(rescriteria);
-		result=gson.toJson(list);
-	} catch (PaasException e) {
-		logger.error(e.toString());
-	}
-	return result;
+    Gson gson = new Gson();
+    String result = new String();
+    try {
+      if (StringUtils.isEmpty(param)) {
+        throw new PaasException(ExceptionCodeConstants.DubboServiceCode.PARAM_IS_NULL,
+            "the parameter for appllying database is null");
+      }
+      List<ResTaskLog> list = TaskUtil.getResTaskLogs(param);
+      List<LogResult> resultList = new ArrayList<LogResult>();
+      for (ResTaskLog resTaskLog : list) {
+        int taskId = resTaskLog.getTaskId();
+        ResJobDetail resJobDetail = TaskUtil.getResJobDetail(taskId);
+        Timestamp startTime = resJobDetail.getTaskStartTime();
+        Timestamp endTime = resJobDetail.getTaskEndTime();
+
+        int typeId = resJobDetail.getTypeId();
+        String desc = TaskUtil.getTypeDesc(typeId);
+        String startdesc = TaskUtil.logStartDesc(desc);
+        String enddesc = TaskUtil.logEndDesc(desc, resJobDetail.getTaskState());
+
+        resultList.add(new LogResult(startdesc, startTime));
+        resultList.add(new LogResult(enddesc, endTime));
+      }
+      result = gson.toJson(resultList);
+    } catch (PaasException e) {
+      logger.error(e.toString());
+    }
+    return result;
   }
 
 }
