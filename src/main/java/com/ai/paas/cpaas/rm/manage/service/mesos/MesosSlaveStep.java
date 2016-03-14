@@ -64,6 +64,7 @@ public class MesosSlaveStep implements Tasklet {
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/meslaveinstall.yml",
               "rcmesos", vars);
       shellContext.append(command.toString());
+      shellContext.append("\n");
     }
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
