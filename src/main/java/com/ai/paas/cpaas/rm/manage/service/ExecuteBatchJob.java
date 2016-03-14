@@ -36,7 +36,7 @@ public class ExecuteBatchJob {
       JobExecution execution = jobLauncher.run(job, jobParameters);
       if (execution.getStatus().equals(BatchStatus.FAILED)) {
         openResultParam.setResultCode(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE);
-        openResultParam.setResultMsg(execution.getStepExecutions().toString());
+        openResultParam.setResultMsg(execution.getExitStatus().getExitDescription());
       } else {
         openResultParam.setResultCode(ExceptionCodeConstants.DubboServiceCode.SUCCESS_CODE);
         openResultParam.setResultMsg(ExceptionCodeConstants.DubboServiceCode.SUCCESS_MESSAGE);
