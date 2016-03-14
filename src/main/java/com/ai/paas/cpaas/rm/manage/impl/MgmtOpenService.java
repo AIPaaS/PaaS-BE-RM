@@ -13,6 +13,7 @@ import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLogCriteria;
 import com.ai.paas.cpaas.rm.interfaces.IMgmtOpenService;
 import com.ai.paas.cpaas.rm.manage.service.ExecuteBatchJob;
 import com.ai.paas.cpaas.rm.util.ExceptionCodeConstants;
+import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.cpaas.rm.vo.OpenResultParamVo;
 import com.ai.paas.ipaas.PaasException;
@@ -85,7 +86,15 @@ public class MgmtOpenService implements IMgmtOpenService {
         throw new PaasException(ExceptionCodeConstants.TransServiceCode.ERROR_CODE,
             "it should be true for useAgent");
       }
-      resReqInfo.setClusterId(openParam.getClusterId());
+      //±‹√‚÷ÿ∏¥∞≤◊∞
+      String clusterId=openParam.getClusterId();
+      if(TaskUtil.clusterExist(clusterId))
+      {
+    	  throw new PaasException(ExceptionCodeConstants.TransServiceCode.ERROR_CODE,
+    	            "the clusterId existed");
+      }
+      
+      resReqInfo.setClusterId(clusterId);
       resReqInfo.setReqType(1);
       resReqInfo.setReqCnt(param);
       resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));

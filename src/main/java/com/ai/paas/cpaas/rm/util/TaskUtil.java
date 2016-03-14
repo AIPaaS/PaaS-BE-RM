@@ -18,6 +18,7 @@ import com.ai.paas.cpaas.rm.dao.interfaces.ResTaskLogMapper;
 import com.ai.paas.cpaas.rm.dao.interfaces.ResTaskTypeMapper;
 import com.ai.paas.cpaas.rm.dao.interfaces.SysCodesMapper;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResClusterInfo;
+import com.ai.paas.cpaas.rm.dao.mapper.bo.ResClusterInfoCriteria;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResInstanceProps;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResJobDetail;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog;
@@ -157,6 +158,21 @@ public class TaskUtil {
     return list.get(0).getTypeId();
   }
 
+  public static Boolean clusterExist(String param)
+  {
+	  ResClusterInfoCriteria rescriteria=new ResClusterInfoCriteria();
+	  ResClusterInfoCriteria.Criteria criteria=rescriteria.createCriteria();
+	  criteria.andClusterIdEqualTo(param);
+	  ResClusterInfoMapper mapper=ServiceUtil.getMapper(ResClusterInfoMapper.class);
+	  List<ResClusterInfo> list=mapper.selectByExample(rescriteria);
+	  Boolean status=false;
+	  if(list!=null&&list.size()!=0)
+	  {
+		  status=true;
+	  }
+	  return status;
+	  
+  }
   public static String replaceIllegalCharacter(String source) {
     if (source == null) return source;
     /*
