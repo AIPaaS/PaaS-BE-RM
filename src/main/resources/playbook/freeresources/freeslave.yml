@@ -1,0 +1,25 @@
+--- 
+- hosts: slave
+  user: root
+  vars:
+     software: ['mesos','docker-engine','flannel']
+     users: ['rcmesos','rcflannel']
+     datapath: ['/var/log/mesos','/etc/mesos','/etc/mesos-master','/etc/mesos-slave']
+  tasks:
+     - name: remove software installed by yum
+       yum: name={{ item }} state=absent
+       with_items:
+         - "{{ software }}"
+     - name: remove users created
+       user: name={{ item }} state=absent remove=yes
+       with_items:
+         - "{{ users }}"
+       sudo: yes
+     - name: remove mesos's data and log
+       file: path={{ item }} state=absent
+       with_items:
+         - "{{ datapath }}"
+       sudo: yes
+     - name: delete docker data path
+       file: path={{ dockerpath }} state=absent
+       sudo: yes

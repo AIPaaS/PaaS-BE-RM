@@ -11,7 +11,8 @@ import com.ai.paas.cpaas.rm.dao.mapper.bo.ResJobDetail;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResReqInfo;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog;
 import com.ai.paas.cpaas.rm.interfaces.IMgmtOpenService;
-import com.ai.paas.cpaas.rm.manage.service.ExecuteBatchJob;
+import com.ai.paas.cpaas.rm.manage.service.ExecuteFreeResourceJob;
+import com.ai.paas.cpaas.rm.manage.service.ExecuteOpenBatchJob;
 import com.ai.paas.cpaas.rm.util.ExceptionCodeConstants;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.LogResult;
@@ -80,7 +81,7 @@ public class MgmtOpenService implements IMgmtOpenService {
     try {
       if (StringUtils.isEmpty(param)) {
         throw new PaasException(ExceptionCodeConstants.DubboServiceCode.PARAM_IS_NULL,
-            "the parameter for appllying database is null");
+            "the parameter for appllying cluster is null");
       }
       OpenResourceParamVo openParam = gson.fromJson(param, OpenResourceParamVo.class);
       if (!openParam.getUseAgent()) {
@@ -99,15 +100,10 @@ public class MgmtOpenService implements IMgmtOpenService {
       resReqInfo.setReqCnt(param);
       resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));
 
-      ExecuteBatchJob executeBatchJob = new ExecuteBatchJob();
+      ExecuteOpenBatchJob executeBatchJob = new ExecuteOpenBatchJob();
       executeBatchJob.executeOpenService(param, openResultParam);
-
-
-
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
-      System.out.println(e.getMessage());
-
       status = TaskUtil.REQFAILED;
     }
     resReqInfo.setReqState(status);
@@ -124,7 +120,7 @@ public class MgmtOpenService implements IMgmtOpenService {
     try {
       if (StringUtils.isEmpty(param)) {
         throw new PaasException(ExceptionCodeConstants.DubboServiceCode.PARAM_IS_NULL,
-            "the parameter for appllying database is null");
+            "the parameter for querying log is null");
       }
       List<ResTaskLog> list = TaskUtil.getResTaskLogs(param);
       List<LogResult> resultList = new ArrayList<LogResult>();
@@ -147,6 +143,42 @@ public class MgmtOpenService implements IMgmtOpenService {
       logger.error(e.toString());
     }
     return result;
+  }
+
+  @Override
+  public String freeResourcesService(String param) {
+    Gson gson = new Gson();
+    OpenResultParamVo openResultParam = new OpenResultParamVo();
+    ResReqInfoMapper mapper = ServiceUtil.getMapper(ResReqInfoMapper.class);
+    ResReqInfo resReqInfo = new ResReqInfo();
+    int status = TaskUtil.REQSUCCESS;
+    try {
+      if (StringUtils.isEmpty(param)) {
+        throw new PaasException(ExceptionCodeConstants.DubboServiceCode.PARAM_IS_NULL,
+            "the parameter for free resources is null");
+      }
+      OpenResourceParamVo openParam = gson.fromJson(param, OpenResourceParamVo.class);
+      if (!openParam.getUseAgent()) {
+        throw new PaasException(ExceptionCodeConstants.TransServiceCode.ERROR_CODE,
+            "it should be true for useAgent");
+      }
+      String clusterId = openParam.getClusterId();
+      resReqInfo.setClusterId(clusterId);
+      resReqInfo.setReqType(TaskUtil.REQINSERT);
+      resReqInfo.setReqCnt(param);
+      resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));
+
+      ExecuteFreeResourceJob job = new ExecuteFreeResourceJob();
+      job.executeOpenService(param, openResultParam);
+    } catch (Exception e) {
+      logger.error(e.getMessage(), e);
+      status = TaskUtil.REQFAILED;
+    }
+    resReqInfo.setReqState(status);
+    resReqInfo.setReqResp(gson.toJson(openResultParam));
+    resReqInfo.setRespTime(new Timestamp(System.currentTimeMillis()));
+    mapper.insert(resReqInfo);
+    return gson.toJson(openResultParam);
   }
 
 }

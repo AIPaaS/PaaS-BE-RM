@@ -1,0 +1,20 @@
+--- 
+- hosts: agent
+  user: root
+  vars:
+     software: ['haproxy','keepalived']
+     users: ['rchaproxy']
+     installpath: ['/etc/haproxy','/etc/keepalived']
+  tasks:
+     - name: remove software installed by yum
+       yum: name={{ item }} state=absent
+       with_items:
+         - "{{ software }}"
+     - name: remove users created
+       user: name={{ item }} state=absent remove=yes
+       with_items:
+         - "{{ users }}"
+     - name: delete haproxy and keepalived dir
+       file: path={{ item }} state=absent
+       with_items:
+         - "{{ installpath }}"

@@ -16,8 +16,12 @@ public interface IMgmtOpenService extends ISrvManager {
   @Path("/open")
   @POST
   public String openService(String param);
-  
+
   @Path("/queryLog")
   @POST
   public String queryLog(String param);
+
+  @Path("/free")
+  @POST
+  public String freeResourcesService(String param);
 }

@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<beans:beans xmlns ="http://www.springframework.org/schema/batch" 
+xmlns:beans="http://www.springframework.org/schema/beans"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+xsi:schemaLocation="http://www.springframework.org/schema/beans 
+http://www.springframework.org/schema/beans/spring-beans-3.0.xsd 
+http://www.springframework.org/schema/batch 
+http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
+	<beans:import resource="context.xml" />
+	<beans:bean id="freeMaster" class="com.ai.paas.cpaas.rm.manage.service.freeresources.FreeMaster"/>
+	<beans:bean id="freeSlave" class="com.ai.paas.cpaas.rm.manage.service.freeresources.FreeSlave"/>
+	<beans:bean id="freeAgent" class="com.ai.paas.cpaas.rm.manage.service.freeresources.FreeAgent"/>
+	<beans:bean id="eraseDnsInfo" class="com.ai.paas.cpaas.rm.manage.service.freeresources.EraseDnsInfo"/>
+	<beans:bean id="ansibleHostsConfig" class="com.ai.paas.cpaas.rm.manage.service.zookeeper.AnsibleHostsConfig"/>
+	<job id="freeResourcesService" xmlns="http://www.springframework.org/schema/batch">
+		<flow id="free" parent="freeresources"/>
+	</job>
+	<flow id="freeresources">
+		<step id="configAnsibleHosts" next="freeMasterStep">
+	    	<tasklet ref="ansibleHostsConfig"/>
+		</step>
+    	<step id="freeMasterStep" next="freeSlaveStep">
+				<tasklet ref="freeMaster"/>
+		</step>
+    	<step id="freeSlaveStep" next="freeAgentStep">
+	    	<tasklet ref="freeSlave"/>
+		</step>
+		<step id="freeAgentStep" next="eraseDnsInfoStep">
+				<tasklet ref="freeAgent"/>
+		</step>
+		<step id="eraseDnsInfoStep">
+				<tasklet ref="eraseDnsInfo"/>
+		</step>
+	</flow>
+</beans:beans>

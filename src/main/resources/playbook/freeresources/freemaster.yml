@@ -2,7 +2,7 @@
 - hosts: master
   user: root
   vars:
-     software: ['mesosphere-zookeeper','mesos','marathon','flannel','etcd','chronos']
+     software: ['mesosphere-zookeeper','mesos','marathon','flannel','etcd','chronos','docker-engine']
      users: ['rczkp01','rcmesos','rcmarathon','rcflannel','rcchronos','rcdns']
      installpath: ['/usr/bin/mesos-dns','/usr/local/bin/consul']
      datapath: ['/var/log/mesos','/opt/consul','/var/lib/etcd','/etc/zookeeper','/etc/mesos','/etc/mesos-master','/etc/marathon','/etc/consul']
@@ -27,4 +27,12 @@
        sudo: yes
      - name: delete zookeeper param
        lineinfile: dest=/etc/profile regexp=zookeeper? state=absent
+       sudo: yes
+     - name: delete userinfo in sudoers
+       lineinfile: dest=/etc/sudoers regexp={{ item }}? state=absent
+       with_items:
+         - "{{ users }}"
+       sudo: yes
+     - name: delete docker path
+       file: path={{ dockerpath }} state=absent
        sudo: yes

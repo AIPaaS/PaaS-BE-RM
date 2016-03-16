@@ -1,5 +1,5 @@
 ---
-- hosts: master1
+- hosts: nodes
   user: root
   vars:
   tasks:
