@@ -1,0 +1,10 @@
+---
+- hosts: master1
+  user: root
+  vars:
+  tasks:
+    - name: delete mesos-dns info from /etc/resolv.conf
+      lineinfile: dest=/etc/resolv.conf regexp='{{ item }}' state=absent
+      with_items:
+         - "{{ ips }}"
+      sudo: yes

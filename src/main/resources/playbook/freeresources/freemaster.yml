@@ -1,0 +1,30 @@
+--- 
+- hosts: master
+  user: root
+  vars:
+     software: ['mesosphere-zookeeper','mesos','marathon','flannel','etcd','chronos']
+     users: ['rczkp01','rcmesos','rcmarathon','rcflannel','rcchronos','rcdns']
+     installpath: ['/usr/bin/mesos-dns','/usr/local/bin/consul']
+     datapath: ['/var/log/mesos','/opt/consul','/var/lib/etcd','/etc/zookeeper','/etc/mesos','/etc/mesos-master','/etc/marathon','/etc/consul']
+  tasks:
+     - name: remove software installed by yum
+       yum: name={{ item }} state=absent
+       with_items:
+         - "{{ software }}"
+     - name: remove users created
+       user: name={{ item }} state=absent remove=yes
+       with_items:
+         - "{{ users }}"
+     - name: remove mesos-dns and consul
+       file: path={{ item }} state=absent
+       with_items:
+         - "{{ installpath }}"
+       sudo: yes
+     - name: remove consul's data and log
+       file: path={{ item }} state=absent
+       with_items:
+         - "{{ datapath }}"
+       sudo: yes
+     - name: delete zookeeper param
+       lineinfile: dest=/etc/profile regexp=zookeeper? state=absent
+       sudo: yes

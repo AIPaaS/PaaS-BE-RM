@@ -9,7 +9,7 @@
      - name: create the path of docker startup
        file: path={{ startup }} owner=root mode=0755 state=directory
        sudo: yes
-     - name: start consul
+     - name: systemctl  daemon-reload
        command: systemctl daemon-reload
        sudo: yes
      - name: restart docker service
