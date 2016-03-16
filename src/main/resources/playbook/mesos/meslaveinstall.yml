@@ -36,6 +36,12 @@
       args:
             chdir: /etc/mesos-slave
       sudo: yes
+    - name: stop mesos-master service
+      command: systemctl stop mesos-master.service
+      sudo: yes
+    - name: disabled mesos-master service
+      command: systemctl disable mesos-master.service
+      sudo: yes
     - name: start mesos-slave
       service: name=mesos-slave state=restarted  enabled=yes
       sudo: yes

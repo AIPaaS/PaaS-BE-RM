@@ -48,8 +48,9 @@ public class ConsulStart implements Tasklet {
       String ip = list.get(i).getIp();
       configvars.add("client_addr=" + ip);
       configvars.add("ip=" + ip);
-      configvars.add("node_name=" + TaskUtil.genMasterName(i + 1));
-      configvars.add("hosts=" + TaskUtil.genMasterName(i + 1));
+      int id = list.get(i).getId();
+      configvars.add("node_name=" + TaskUtil.genMasterName(id));
+      configvars.add("hosts=" + TaskUtil.genMasterName(id));
       configvars.add("bootstrap=false");
       configvars.add("startjoin=" + this.genStartJoin(i, list));
       AnsibleCommand command =

@@ -41,7 +41,8 @@ public class MaStart implements Tasklet {
       List<String> startVars = new ArrayList<String>();
       startVars.add("ansible_ssh_pass=" + password);
       startVars.add("ansible_become_pass=" + password);
-      startVars.add("hosts=" + TaskUtil.genMasterName(i + 1));
+      int id = mesosMaster.get(i).getId();
+      startVars.add("hosts=" + TaskUtil.genMasterName(id));
       startVars.add("hostname=" + masterInstance.getIp());
       AnsibleCommand masterStart =
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/startmarathon.yml",

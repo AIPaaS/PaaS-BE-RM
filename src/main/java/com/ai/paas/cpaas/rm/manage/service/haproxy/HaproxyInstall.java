@@ -46,11 +46,8 @@ public class HaproxyInstall implements Tasklet {
       List<String> configvars = new ArrayList<String>();
       configvars.add("ansible_ssh_pass=" + password);
       configvars.add("ansible_become_pass=" + password);
-      /*
-       * // TODO if (i == 0) { configvars.add("hosts=master1"); } else {
-       * configvars.add("hosts=master2"); }
-       */
-      configvars.add("hosts=" + TaskUtil.genAgentName(i + 1));
+      int id = agents.get(i).getId();
+      configvars.add("hosts=" + TaskUtil.genAgentName(id));
       configvars.add("ip=" + virtualIp);
       configvars.add("configfile=" + path + "/keepalived.conf");
       configvars.add("checkshell=" + path + "/check_haproxy.sh");

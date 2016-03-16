@@ -42,7 +42,8 @@ public class StartZkService implements Tasklet {
       startvars.add("ansible_ssh_pass=" + password);
       startvars.add("ansible_become_pass=" + password);
       startvars.add("myid=" + (i + 1));
-      startvars.add("hosts=" + TaskUtil.genMasterName(i + 1));
+      int id = mesosMaster.get(i).getId();
+      startvars.add("hosts=" + TaskUtil.genMasterName(id));
       AnsibleCommand startzkCommand =
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/zookeeperstart.yml",
               "root", startvars);

@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
+import org.springframework.stereotype.Service;
 
 import com.ai.paas.cpaas.rm.dao.interfaces.ResReqInfoMapper;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResJobDetail;
@@ -21,7 +22,6 @@ import com.ai.paas.cpaas.rm.vo.OpenResultParamVo;
 import com.ai.paas.ipaas.PaasException;
 import com.ai.paas.ipaas.ServiceUtil;
 import com.alibaba.dubbo.common.utils.StringUtils;
-import com.alibaba.dubbo.config.annotation.Service;
 import com.google.gson.Gson;
 
 @Service

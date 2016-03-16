@@ -19,5 +19,8 @@
        lineinfile: dest=/etc/mesos-dns/config.json line="  \"resolvers\":[{{ resolvers }}]," state=present insertafter="[{]" 
      - name: insert resolvers info
        lineinfile: dest=/etc/mesos-dns/config.json line="  \"domain\":{{ domain }}," state=present insertafter="[{]"
+     - name: enable mesos-dns
+       command: systemctl enable mesos-dns
+       sudo: yes
      - name: start mesos-dns service
        service: name=mesos-dns state=restarted  enabled=yes

@@ -12,7 +12,6 @@ import org.springframework.batch.repeat.RepeatStatus;
 
 import com.ai.paas.cpaas.rm.util.AnsibleCommand;
 import com.ai.paas.cpaas.rm.util.ExceptionCodeConstants;
-import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
@@ -27,7 +26,8 @@ public class ChronosInstall implements Tasklet {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     Boolean useAgent = openParam.getUseAgent();
     String aid = openParam.getAid();
-    InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/chronos/chronosinstall.yml");
+    InputStream in =
+        ChronosInstall.class.getResourceAsStream("/playbook/chronos/chronosinstall.yml");
     String content = TaskUtil.getFile(in);
     TaskUtil.uploadFile("chronosinstall.yml", content, useAgent, aid);
 

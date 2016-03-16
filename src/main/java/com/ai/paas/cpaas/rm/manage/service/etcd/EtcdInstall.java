@@ -50,9 +50,9 @@ public class EtcdInstall implements Tasklet {
 
     for (int i = 0; i < mesosMaster.size(); i++) {
       String url = "http://" + mesosMaster.get(i).getIp();
-
+      int id = mesosMaster.get(i).getId();
       List<String> vars = new ArrayList<String>();
-      vars.add("hosts=" + TaskUtil.genMasterName(i + 1));
+      vars.add("hosts=" + TaskUtil.genMasterName(id));
       vars.add("ansible_ssh_pass=" + passwd);
       vars.add("ansible_become_pass=" + passwd);
       vars.add("initial_cluster='" + initial_cluster + "'");

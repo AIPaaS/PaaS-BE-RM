@@ -50,13 +50,15 @@ public class FlannelInstall implements Tasklet {
     execstart.append("'");
 
     for (int i = 0; i < slaveList.size(); i++) {
+      int id = slaveList.get(i).getId();
       this.genCommand(slaveList.get(i), openParam, shellContext, flannelEtcd.toString(),
-          execstart.toString(), password, i, "slave");
+          execstart.toString(), password, id, "slave");
     }
 
     for (int i = 0; i < mesosMaster.size(); i++) {
+      int id = mesosMaster.get(i).getId();
       this.genCommand(mesosMaster.get(i), openParam, shellContext, flannelEtcd.toString(),
-          execstart.toString(), password, i, "master");
+          execstart.toString(), password, id, "master");
     }
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
@@ -88,9 +90,9 @@ public class FlannelInstall implements Tasklet {
     vars.add("ansible_ssh_pass=" + password);
     vars.add("ansible_become_pass=" + password);
     if (type.equals("slave")) {
-      vars.add("hosts=" + TaskUtil.genSlaveName(i + 1));
+      vars.add("hosts=" + TaskUtil.genSlaveName(i));
     } else {
-      vars.add("hosts=" + TaskUtil.genMasterName(i + 1));
+      vars.add("hosts=" + TaskUtil.genMasterName(i));
     }
     vars.add("flanneletcd='" + flannelEtcd.toString() + "'");
     vars.add("flanneletcdkey='FLANNEL_ETCD_KEY=" + "/" + openParam.getClusterId() + "/"
