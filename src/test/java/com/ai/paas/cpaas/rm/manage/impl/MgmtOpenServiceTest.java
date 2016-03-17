@@ -110,7 +110,6 @@ public class MgmtOpenServiceTest {
     agents.add(master1);
     proxy.setHosts(agents);
     paramVo.setWebHaproxy(proxy);
-
     Gson gson = new Gson();
     // String param = gson.toJson(paramVo);
     // System.out.println();
