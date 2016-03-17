@@ -13,7 +13,7 @@ public class MeUser implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
-    GenUserUtil.genUser(chunkContext, "genMesosUser", "rcmesos", "master",
+    GenUserUtil.genUser(chunkContext, "genMesosUser", "rcmesos", "nodes",
         TaskUtil.getTypeId("meUser"));
     return RepeatStatus.FINISHED;
   }

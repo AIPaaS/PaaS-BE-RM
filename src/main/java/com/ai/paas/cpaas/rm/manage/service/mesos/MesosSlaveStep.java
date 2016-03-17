@@ -58,8 +58,8 @@ public class MesosSlaveStep implements Tasklet {
       vars.add("timeout=5mins");
       vars.add("hostname=" + node.getIp());
       vars.add("ip=" + node.getIp());
-      // TODO
-      // vars.add("hosts" + node.getIp());
+      int id = node.getId();
+      vars.add("hosts=" + TaskUtil.genSlaveName(id));
       vars.add("attributes='zone:" + node.getZone() + "'");
       AnsibleCommand command =
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/meslaveinstall.yml",
