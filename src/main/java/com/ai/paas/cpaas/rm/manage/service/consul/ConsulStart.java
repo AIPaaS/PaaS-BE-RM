@@ -5,6 +5,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -17,9 +18,9 @@ import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.ipaas.PaasException;
-import com.esotericsoftware.minlog.Log;
 
 public class ConsulStart implements Tasklet {
+  private static Logger logger = Logger.getLogger(ConsulStart.class);
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
@@ -53,6 +54,7 @@ public class ConsulStart implements Tasklet {
       configvars.add("hosts=" + TaskUtil.genMasterName(id));
       configvars.add("bootstrap=false");
       configvars.add("startjoin=" + this.genStartJoin(i, list));
+      configvars.add("consului=" + TaskUtil.getSystemProperty("consului"));
       AnsibleCommand command =
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/consulstart.yml", "root",
               configvars);
@@ -68,7 +70,7 @@ public class ConsulStart implements Tasklet {
     try {
       result = TaskUtil.executeFile("consulStart", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
-      Log.error(e.toString());
+      logger.error(e.toString());
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

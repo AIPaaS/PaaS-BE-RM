@@ -3,6 +3,7 @@ package com.ai.paas.cpaas.rm.manage.service.zookeeper;
 import java.sql.Timestamp;
 import java.util.List;
 
+import org.apache.log4j.Logger;
 import org.springframework.batch.core.StepContribution;
 import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
@@ -14,14 +15,16 @@ import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.MesosSlave;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.ipaas.PaasException;
-import com.esotericsoftware.minlog.Log;
 
 public class AnsibleHostsConfig implements Tasklet {
+
+  private static Logger logger = Logger.getLogger(AnsibleHostsConfig.class);
 
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws PaasException {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
+    logger.debug("the param is:" + openParam.toString());
     String aid = openParam.getAid();
     // create execute file
     StringBuffer shellContext = TaskUtil.createBashFile();
@@ -106,7 +109,7 @@ public class AnsibleHostsConfig implements Tasklet {
     }
     shellContext.append("EOL");
     shellContext.append("\n");
-
+    logger.debug("the ansible hosts is" + shellContext.toString());
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
     String result = new String();
@@ -116,7 +119,7 @@ public class AnsibleHostsConfig implements Tasklet {
           TaskUtil.executeFile("configAnsibleHosts", shellContext.toString(),
               openParam.getUseAgent(), aid);
     } catch (Exception e) {
-      Log.error(e.toString());
+      logger.error(e.toString());
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

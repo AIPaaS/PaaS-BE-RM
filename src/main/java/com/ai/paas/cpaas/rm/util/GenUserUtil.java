@@ -7,15 +7,16 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.client.ClientProtocolException;
+import org.apache.log4j.Logger;
 import org.springframework.batch.core.scope.context.ChunkContext;
 
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.ipaas.PaasException;
 import com.ai.paas.ipaas.util.CiperUtil;
-import com.esotericsoftware.minlog.Log;
 
 public class GenUserUtil {
+  private static Logger logger = Logger.getLogger(GenUserUtil.class);
 
   public static void genUser(ChunkContext chunkContext, String fileName, String user, String hosts,
       int typeId) throws ClientProtocolException, IOException, PaasException {
@@ -61,13 +62,13 @@ public class GenUserUtil {
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
     String result = new String();
-    int status=TaskUtil.FINISHED;
+    int status = TaskUtil.FINISHED;
     try {
       result = TaskUtil.executeFile(fileName, shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
-      Log.error(e.toString());
+      logger.error(e.toString());
       result = e.toString();
-      status=TaskUtil.FAILED;
+      status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
           e.toString());
     } finally {
@@ -78,7 +79,7 @@ public class GenUserUtil {
       // insert log and task record
       int taskId =
           TaskUtil.insertResJobDetail(start, openParam.getClusterId(), shellContext.toString(),
-              typeId,status);
+              typeId, status);
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
   }
