@@ -29,7 +29,7 @@ public class ConsulInstall implements Tasklet {
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     Boolean useAgent = openParam.getUseAgent();
     String aid = openParam.getAid();
-    String[] files = {"installConsul.yml", "consul.json", "configha.yml", "consul.service"};
+    String[] files = {"installconsul.yml", "consul.json", "configha.yml", "consul.service"};
     for (String file : files) {
       InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/consul/" + file);
       String content = TaskUtil.getFile(in);
@@ -62,7 +62,7 @@ public class ConsulInstall implements Tasklet {
     // configvars.add(consulCluster.toString());
 
     AnsibleCommand installcommand =
-        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/installConsul.yml", "root",
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/installconsul.yml", "root",
             configvars);
     shellContext.append(installcommand.toString()).append("\n");
 

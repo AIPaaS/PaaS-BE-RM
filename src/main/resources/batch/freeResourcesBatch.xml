@@ -12,7 +12,7 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="freeAgent" class="com.ai.paas.cpaas.rm.manage.service.freeresources.FreeAgent"/>
 	<beans:bean id="eraseDnsInfo" class="com.ai.paas.cpaas.rm.manage.service.freeresources.EraseDnsInfo"/>
 	<beans:bean id="ansibleHostsConfig" class="com.ai.paas.cpaas.rm.manage.service.zookeeper.AnsibleHostsConfig"/>
-	<job id="freeResourcesService" xmlns="http://www.springframework.org/schema/batch">
+	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
 		<flow id="free" parent="freeresources"/>
 	</job>
 	<flow id="freeresources">

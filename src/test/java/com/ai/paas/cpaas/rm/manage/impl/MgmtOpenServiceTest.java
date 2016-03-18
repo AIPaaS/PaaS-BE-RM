@@ -40,34 +40,33 @@ public class MgmtOpenServiceTest {
     paramVo.setAid("dev");
     paramVo.setDataCenter("south-center");
     MesosInstance master = new MesosInstance();
-    master.setId(0);
+    master.setId(1);
     master.setIp("10.1.241.127");
     master.setRoot("root");
     master.setPasswd("Mfjjbsq7!@#");
     master.setZone("center");
 
     MesosInstance master1 = new MesosInstance();
-    master1.setId(0);
-    master1.setIp("10.1.241.128");
+    master1.setId(2);
+    master1.setIp("10.1.241.126");
     master1.setRoot("root");
     master1.setPasswd("Mfjjbsq7!@#");
     master1.setZone("center");
 
     MesosInstance master2 = new MesosInstance();
-    master2.setId(0);
-    master2.setIp("10.1.241.129");
+    master2.setId(3);
+    master2.setIp("10.1.241.130");
     master2.setRoot("root");
     master2.setPasswd("Mfjjbsq7!@#");
     master2.setZone("center");
 
     List<MesosInstance> masters = new ArrayList<MesosInstance>();
     masters.add(master);
-    masters.add(master1);
-    masters.add(master2);
+
 
     MesosSlave slave = new MesosSlave();
-    slave.setId(0);
-    slave.setIp("10.1.241.130");
+    slave.setId(4);
+    slave.setIp("10.1.241.128");
     slave.setRoot("root");
     slave.setPasswd("Mfjjbsq7!@#");
     slave.setZone("web");
@@ -77,8 +76,23 @@ public class MgmtOpenServiceTest {
     slave.setCpuOffer(6);
     slave.setMemTotal(8096);
     slave.setMemOffer(6144);
+
+    MesosSlave slave1 = new MesosSlave();
+    slave1.setId(5);
+    slave1.setIp("10.1.241.129");
+    slave1.setRoot("root");
+    slave1.setPasswd("Mfjjbsq7!@#");
+    slave1.setZone("web");
+    slave1
+        .setAttributes("ds:sth;jf:nj;rack:2;ex:ex1;model:hp-150;cpu:xe3;mem:ddr3;disk:ssd;netband:1G;");
+    slave1.setCpuTotal(8);
+    slave1.setCpuOffer(6);
+    slave1.setMemTotal(8096);
+    slave1.setMemOffer(6144);
+
     List<MesosSlave> slaves = new ArrayList<MesosSlave>();
     slaves.add(slave);
+    slaves.add(slave1);
 
     Attributes attributes1 = new Attributes();
     attributes1.setZone("web");
@@ -106,15 +120,18 @@ public class MgmtOpenServiceTest {
     proxy.setVirtualIp("10.1.241.14");
 
     List<MesosInstance> agents = new ArrayList<MesosInstance>();
-    agents.add(master);
+    agents.add(master2);
     agents.add(master1);
     proxy.setHosts(agents);
     paramVo.setWebHaproxy(proxy);
     Gson gson = new Gson();
-    // String param = gson.toJson(paramVo);
+    String param = gson.toJson(paramVo);
     // System.out.println();
-    String param =
-        "{\"externalDomain\":\"asiainfo.com\",\"dataCenter\":\"res-be-data\",\"imagePath\":\"/aifs01/docker\",\"loadVirtualIP\":\"10.1.1.10\",\"attributesList\":[{\"zone\":\"center\",\"network\":\"172.18.0.0/16\"},{\"zone\":\"visit\",\"network\":\"172.19.0.0/16\"},{\"zone\":\"web\",\"network\":\"172.21.0.0/16\"},{\"zone\":\"db\",\"network\":\"172.20.0.0/16\"}],\"clusterId\":\"121\",\"useAgent\":true,\"clusterName\":\"res-test\",\"domain\":\"home.com\",\"mesosMaster\":[{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"ip\":\"10.1.241.127\",\"root\":\"root\",\"id\":1},{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"ip\":\"10.1.241.128\",\"root\":\"root\",\"id\":2},{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"ip\":\"10.1.241.129\",\"root\":\"root\",\"id\":3}],\"mesosSlave\":[{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"cpuTotal\":800,\"memTotal\":8192,\"ip\":\"10.1.241.127\",\"root\":\"root\",\"memOffer\":4096,\"attributes\":\"ds:88;jf:74;rack:6;ex:111;cpu:8;mem:8192;disk:692224;netband:5000\",\"cpuOffer\":600,\"id\":1},{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"cpuTotal\":400,\"memTotal\":8192,\"ip\":\"10.1.241.128\",\"root\":\"root\",\"memOffer\":4096,\"attributes\":\"ds:88;jf:74;rack:122;ex:112;cpu:54;mem:8192;disk:352256;netband:3333\",\"cpuOffer\":300,\"id\":2}],\"webHaproxy\":{\"hosts\":[{\"passwd\":\"Mfjjbsq7!@#\",\"ip\":\"10.1.241.126\",\"root\":\"root\",\"id\":1},{\"passwd\":\"Mfjjbsq7!@#\",\"ip\":\"10.1.241.130\",\"root\":\"root\",\"id\":2}],\"loadOnly\":true,\"virtualIp\":\"10.1.241.14\"},\"aid\":\"dev\"}";
+    /*
+     * String param =
+     * "{\"externalDomain\":\"asiainfo.com\",\"dataCenter\":\"res-be-data\",\"imagePath\":\"/aifs01/docker\",\"loadVirtualIP\":\"10.1.1.10\",\"attributesList\":[{\"zone\":\"center\",\"network\":\"172.18.0.0/16\"},{\"zone\":\"visit\",\"network\":\"172.19.0.0/16\"},{\"zone\":\"web\",\"network\":\"172.21.0.0/16\"},{\"zone\":\"db\",\"network\":\"172.20.0.0/16\"}],\"clusterId\":\"121\",\"useAgent\":true,\"clusterName\":\"res-test\",\"domain\":\"home.com\",\"mesosMaster\":[{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"ip\":\"10.1.241.127\",\"root\":\"root\",\"id\":1},{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"ip\":\"10.1.241.128\",\"root\":\"root\",\"id\":2},{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"ip\":\"10.1.241.129\",\"root\":\"root\",\"id\":3}],\"mesosSlave\":[{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"cpuTotal\":800,\"memTotal\":8192,\"ip\":\"10.1.241.127\",\"root\":\"root\",\"memOffer\":4096,\"attributes\":\"ds:88;jf:74;rack:6;ex:111;cpu:8;mem:8192;disk:692224;netband:5000\",\"cpuOffer\":600,\"id\":1},{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"cpuTotal\":400,\"memTotal\":8192,\"ip\":\"10.1.241.128\",\"root\":\"root\",\"memOffer\":4096,\"attributes\":\"ds:88;jf:74;rack:122;ex:112;cpu:54;mem:8192;disk:352256;netband:3333\",\"cpuOffer\":300,\"id\":2}],\"webHaproxy\":{\"hosts\":[{\"passwd\":\"Mfjjbsq7!@#\",\"ip\":\"10.1.241.126\",\"root\":\"root\",\"id\":1},{\"passwd\":\"Mfjjbsq7!@#\",\"ip\":\"10.1.241.130\",\"root\":\"root\",\"id\":2}],\"loadOnly\":true,\"virtualIp\":\"10.1.241.14\"},\"aid\":\"dev\"}"
+     * ;
+     */
     service.openService(param);
 
   }

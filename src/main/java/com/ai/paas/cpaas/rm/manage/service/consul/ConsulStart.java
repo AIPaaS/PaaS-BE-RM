@@ -94,7 +94,10 @@ public class ConsulStart implements Tasklet {
         context.append(",");
       }
     }
-    String result = context.substring(0, context.length() - 1);
+    String result = new String();
+    if (context.length() != 0) {
+      result = context.substring(0, context.length() - 1);
+    }
     return result;
   }
 }
