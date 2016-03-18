@@ -1,4 +1,4 @@
-package com.ai.paas.cpaas.rm.manage.service;
+package com.ai.paas.cpaas.rm.manage.service.openservice;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,16 +16,17 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import com.ai.paas.cpaas.rm.util.ExceptionCodeConstants;
 import com.ai.paas.cpaas.rm.vo.OpenResultParamVo;
 
-public class ExecuteFreeResourceJob {
-  private static Logger logger = Logger.getLogger(ExecuteFreeResourceJob.class);
+public class ExecuteOpenBatchJob {
+
+  private static Logger logger = Logger.getLogger(ExecuteOpenBatchJob.class);
 
   public void executeOpenService(String param, OpenResultParamVo openResultParam) throws Exception {
     // TODO
-    String[] springConfig = {"batch/openServiceBatch.xml"};
-    // String[] springConfig = {"batch/freeResourcesBatch.xml"};
+    // String[] springConfig = {"batch/openServiceBatch.xml"};
+    String[] springConfig = {"batch/testBatch.xml"};
     ApplicationContext context = new ClassPathXmlApplicationContext(springConfig);
     JobLauncher jobLauncher = (JobLauncher) context.getBean("jobLauncher");
-    Job job = (Job) context.getBean("freeResourcesService");
+    Job job = (Job) context.getBean("openService");
     Map<String, JobParameter> parameters = new HashMap<String, JobParameter>();
     JobParameter jobparameter = new JobParameter(param);
     parameters.put("openParameter", jobparameter);
@@ -50,4 +51,28 @@ public class ExecuteFreeResourceJob {
       }
     }
   }
+  /*
+   * public static void main(String[] args) throws Exception {
+   * 
+   * String[] springConfig = {"batch/openServiceBatch.xml"}; ApplicationContext context = new
+   * ClassPathXmlApplicationContext(springConfig);
+   * 
+   * JobLauncher jobLauncher = (JobLauncher) context.getBean("jobLauncher");
+   * 
+   * Job job = (Job) context.getBean("firstBatchJob");
+   * 
+   * Map<String, JobParameter> parameters = new HashMap<String, JobParameter>(); JobParameter
+   * jobparameter = new JobParameter("phonenix"); parameters.put("river", jobparameter);
+   * 
+   * JobParameters jobParameters = new JobParameters(parameters); try { JobExecution execution =
+   * jobLauncher.run(job, jobParameters);
+   * 
+   * logger.info("Exit Status : " + execution.getStatus()); System.out.println("Exit Status : " +
+   * execution.getStatus());
+   * 
+   * } catch (Exception e) { e.printStackTrace(); throw e; } finally { if (context != null) {
+   * context = null; } }
+   * 
+   * }
+   */
 }
