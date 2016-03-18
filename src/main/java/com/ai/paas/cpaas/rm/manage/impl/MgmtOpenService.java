@@ -11,8 +11,7 @@ import com.ai.paas.cpaas.rm.dao.mapper.bo.ResJobDetail;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResReqInfo;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResTaskLog;
 import com.ai.paas.cpaas.rm.interfaces.IMgmtOpenService;
-import com.ai.paas.cpaas.rm.manage.service.ExecuteFreeResourceJob;
-import com.ai.paas.cpaas.rm.manage.service.ExecuteOpenBatchJob;
+import com.ai.paas.cpaas.rm.manage.service.openservice.ExecuteOpenBatchJob;
 import com.ai.paas.cpaas.rm.util.ExceptionCodeConstants;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.LogResult;
@@ -101,7 +100,7 @@ public class MgmtOpenService implements IMgmtOpenService {
       resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));
 
       ExecuteOpenBatchJob executeBatchJob = new ExecuteOpenBatchJob();
-      executeBatchJob.executeOpenService(param, openResultParam);
+      executeBatchJob.executeOpenService(param, openResultParam, "open");
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       status = TaskUtil.REQFAILED;
@@ -168,8 +167,8 @@ public class MgmtOpenService implements IMgmtOpenService {
       resReqInfo.setReqCnt(param);
       resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));
 
-      ExecuteFreeResourceJob job = new ExecuteFreeResourceJob();
-      job.executeOpenService(param, openResultParam);
+      ExecuteOpenBatchJob executeBatchJob = new ExecuteOpenBatchJob();
+      executeBatchJob.executeOpenService(param, openResultParam, "free");
     } catch (Exception e) {
       logger.error(e.getMessage(), e);
       status = TaskUtil.REQFAILED;

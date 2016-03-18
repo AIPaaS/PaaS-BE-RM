@@ -20,10 +20,23 @@ public class ExecuteOpenBatchJob {
 
   private static Logger logger = Logger.getLogger(ExecuteOpenBatchJob.class);
 
-  public void executeOpenService(String param, OpenResultParamVo openResultParam) throws Exception {
+  public void executeOpenService(String param, OpenResultParamVo openResultParam, String type)
+      throws Exception {
     // TODO
     // String[] springConfig = {"batch/openServiceBatch.xml"};
-    String[] springConfig = {"batch/testBatch.xml"};
+
+    String jobType;
+    switch (type) {
+      case "open":
+        jobType = "batch/openServiceBatch.xml";
+        break;
+      case "free":
+        jobType = "batch/freeResourcesBatch.xml";
+        break;
+      default:
+        throw new IllegalArgumentException(" there is no such batch service ");
+    }
+    String[] springConfig = {jobType};
     ApplicationContext context = new ClassPathXmlApplicationContext(springConfig);
     JobLauncher jobLauncher = (JobLauncher) context.getBean("jobLauncher");
     Job job = (Job) context.getBean("openService");
