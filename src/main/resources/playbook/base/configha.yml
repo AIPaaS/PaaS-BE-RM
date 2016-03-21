@@ -1,0 +1,8 @@
+---
+- hosts: agent
+  user: root
+  tasks:
+     - name: insert consul node info 
+       lineinfile: dest=/etc/haproxy/haproxy.cfg line="{{ item }}" state=present
+       with_items:
+          - "{{ lines }}"
