@@ -50,9 +50,13 @@ public class RemoteEnv implements ExecuteEnv {
             .setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
     System.out
         .println("=========================================================================================");
+    logger
+        .info("=========================================================================================");
     System.out.println("connectTimeout:" + config.getConnectTimeout()
         + ";connection request timeout:" + config.getConnectionRequestTimeout()
         + ";socket time out:" + config.getSocketTimeout());
+    logger.info("connectTimeout:" + config.getConnectTimeout() + ";connection request timeout:"
+        + config.getConnectionRequestTimeout() + ";socket time out:" + config.getSocketTimeout());
     System.out
         .println("=========================================================================================");
 
@@ -72,7 +76,7 @@ public class RemoteEnv implements ExecuteEnv {
         .println("=========================================================================================");
 
     System.out.println(" the start time is " + start + "; the end time is " + end);
-
+    logger.info(" the start time is " + start + "; the end time is " + end);
     HttpEntity entity = response.getEntity();
     String result = new String();
     if (entity != null) {
