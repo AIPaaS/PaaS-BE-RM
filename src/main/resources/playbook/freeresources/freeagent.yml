@@ -6,6 +6,10 @@
      users: ['rchaproxy']
      installpath: ['/etc/haproxy','/etc/keepalived']
   tasks:
+     - name: stop software service
+       service: name={{ item }} state=stopped
+       with_items:
+         - "{{ software }}"
      - name: remove software installed by yum
        yum: name={{ item }} state=absent
        with_items:

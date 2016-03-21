@@ -11,6 +11,7 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="freeSlave" class="com.ai.paas.cpaas.rm.manage.service.freeresources.FreeSlave"/>
 	<beans:bean id="freeAgent" class="com.ai.paas.cpaas.rm.manage.service.freeresources.FreeAgent"/>
 	<beans:bean id="eraseDnsInfo" class="com.ai.paas.cpaas.rm.manage.service.freeresources.EraseDnsInfo"/>
+	<beans:bean id="deleteClusterInfo" class="com.ai.paas.cpaas.rm.manage.service.freeresources.DeleteClusterInfo"/>
 	<beans:bean id="ansibleHostsConfig" class="com.ai.paas.cpaas.rm.manage.service.zookeeper.AnsibleHostsConfig"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
 		<flow id="free" parent="freeresources"/>
@@ -28,8 +29,11 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 		<step id="freeAgentStep" next="eraseDnsInfoStep">
 				<tasklet ref="freeAgent"/>
 		</step>
-		<step id="eraseDnsInfoStep">
+		<step id="eraseDnsInfoStep" next="deleteClusterInfoStep">
 				<tasklet ref="eraseDnsInfo"/>
+		</step>
+		<step id="deleteClusterInfoStep">
+				<tasklet ref="deleteClusterInfo"/>
 		</step>
 	</flow>
 </beans:beans>

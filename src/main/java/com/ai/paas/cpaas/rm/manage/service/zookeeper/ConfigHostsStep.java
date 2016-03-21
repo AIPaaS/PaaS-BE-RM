@@ -3,6 +3,7 @@ package com.ai.paas.cpaas.rm.manage.service.zookeeper;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -37,13 +38,18 @@ public class ConfigHostsStep implements Tasklet {
     StringBuffer shellContext = new StringBuffer();
     shellContext.append("lines=[");
     shellContext.append("'").append("127.0.0.1 localhost").append("'");
+
+    HashMap<String, String> hosts = new HashMap<String, String>();
+
     for (int i = 0; i < mesosMaster.size(); i++) {
       MesosInstance instance = mesosMaster.get(i);
       String ip = instance.getIp();
       String name =
           (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
               .getExecutionContext().get(ip);
-      this.genHostsLine(instance, name, shellContext);
+      if (!hosts.containsKey(ip)) {
+        hosts.put(ip, name);
+      }
     }
     for (int i = 0; i < mesosSlave.size(); i++) {
       MesosSlave instance = mesosSlave.get(i);
@@ -51,8 +57,16 @@ public class ConfigHostsStep implements Tasklet {
       String name =
           (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
               .getExecutionContext().get(ip);
-      this.genHostsLine(instance, name, shellContext);
+      if (!hosts.containsKey(ip)) {
+        hosts.put(ip, name);
+      }
     }
+
+    for (String ip : hosts.keySet()) {
+      String name = hosts.get(ip);
+      this.genHostsLine(ip, name, shellContext);
+    }
+
     shellContext.append("]");
     String password = mesosMaster.get(0).getPasswd();
     List<String> vars = new ArrayList<String>();
@@ -88,8 +102,7 @@ public class ConfigHostsStep implements Tasklet {
     return RepeatStatus.FINISHED;
   }
 
-  public void genHostsLine(MesosInstance instance, String name, StringBuffer shellContext) {
-    String ip = instance.getIp();
+  public void genHostsLine(String ip, String name, StringBuffer shellContext) {
     shellContext.append(",").append("'").append(ip + "  " + name).append("'");
 
   }

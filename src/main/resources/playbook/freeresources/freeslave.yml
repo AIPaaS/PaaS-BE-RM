@@ -4,8 +4,12 @@
   vars:
      software: ['mesos','docker-engine','flannel']
      users: ['rcmesos','rcflannel']
-     datapath: ['/var/log/mesos','/etc/mesos','/etc/mesos-master','/etc/mesos-slave']
+     datapath: ['/var/log/mesos','/etc/mesos','/etc/mesos-master','/etc/mesos-slave','/tmp/mesos']
   tasks:
+     - name: stop software
+       service: name={{ item }} state=stopped
+       with_items:
+         - "{{ software }}"
      - name: remove software installed by yum
        yum: name={{ item }} state=absent
        with_items:

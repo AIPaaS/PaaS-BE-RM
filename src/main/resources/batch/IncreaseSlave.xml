@@ -50,8 +50,9 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="restartKa" class="com.ai.paas.cpaas.rm.manage.service.consul.RestartKa"/>
 	<beans:bean id="insertClusterInfo" class="com.ai.paas.cpaas.rm.manage.service.cluster.InsertClusterInfo"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
-		<flow id="installDocker" parent="docker" next="installMesos"/>
-		<flow id="installMesos" parent="mesos" next="installMarathon"/>
+		<flow id="installZookeeper" parent="zookeeper" next="installMesos"/>
+		<flow id="installMesos" parent="mesos" next="installDocker"/>
+		<flow id="installDocker" parent="docker" next="installMarathon"/>
 		<flow id="installFlannel" parent="flannel" next="installMesosDns"/>
 		<flow id="installMesosDns" parent="mesosDns"/>
 	</job>

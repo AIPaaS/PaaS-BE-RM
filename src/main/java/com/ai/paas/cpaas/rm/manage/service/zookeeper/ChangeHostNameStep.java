@@ -3,6 +3,7 @@ package com.ai.paas.cpaas.rm.manage.service.zookeeper;
 import java.io.InputStream;
 import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import org.apache.log4j.Logger;
@@ -37,6 +38,8 @@ public class ChangeHostNameStep implements Tasklet {
     List<MesosSlave> mesosSlave = openParam.getMesosSlave();
     List<MesosInstance> agents = openParam.getWebHaproxy().getHosts();
 
+    HashMap<String, String> hosts = new HashMap<String, String>();
+    String password = mesosMaster.get(0).getPasswd();
     StringBuffer shellContext = TaskUtil.createBashFile();
     for (int i = 0; i < mesosMaster.size(); i++) {
       MesosInstance instance = mesosMaster.get(i);
@@ -44,7 +47,10 @@ public class ChangeHostNameStep implements Tasklet {
       String name =
           (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
               .getExecutionContext().get(ip);
-      this.genCommand(instance, shellContext, name);
+      if (!hosts.containsKey(ip)) {
+        hosts.put(ip, name);
+      }
+
     }
     for (int i = 0; i < mesosSlave.size(); i++) {
       MesosSlave instance = mesosSlave.get(i);
@@ -52,7 +58,9 @@ public class ChangeHostNameStep implements Tasklet {
       String name =
           (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
               .getExecutionContext().get(ip);
-      this.genCommand(instance, shellContext, name);
+      if (!hosts.containsKey(ip)) {
+        hosts.put(ip, name);
+      }
     }
 
     for (int i = 0; i < agents.size(); i++) {
@@ -61,8 +69,16 @@ public class ChangeHostNameStep implements Tasklet {
       String name =
           (String) chunkContext.getStepContext().getStepExecution().getJobExecution()
               .getExecutionContext().get(ip);
-      this.genCommand(instance, shellContext, name);
+      if (!hosts.containsKey(ip)) {
+        hosts.put(ip, name);
+      }
     }
+
+    for (String ip : hosts.keySet()) {
+      String name = hosts.get(ip);
+      this.genCommand(password, shellContext, name);
+    }
+
     Timestamp start = new Timestamp(System.currentTimeMillis());
     // upload shellContext and execute it
 
@@ -88,19 +104,18 @@ public class ChangeHostNameStep implements Tasklet {
     return RepeatStatus.FINISHED;
   }
 
-  public void genCommand(MesosInstance instance, StringBuffer shellContext, String hosts) {
+  public void genCommand(String password, StringBuffer shellContext, String hosts) {
     List<String> vars = new ArrayList<String>();
     StringBuffer hostname = new StringBuffer();
     hostname.append("hostname=");
     hostname.append(hosts);
     String hostsParam = "hosts=" + hosts;
-    String password = "ansible_ssh_pass=" + instance.getPasswd();
     vars.add(hostname.toString());
-    vars.add(password);
+    vars.add("ansible_ssh_pass=" + password);
     vars.add(hostsParam);
     AnsibleCommand ansibleCommand =
-        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/hostnamectl.yml",
-            instance.getRoot(), vars);
+        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/hostnamectl.yml", "root",
+            vars);
     shellContext.append(ansibleCommand.toString());
     shellContext.append("\n");
   }

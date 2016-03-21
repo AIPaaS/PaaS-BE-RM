@@ -1,7 +1,11 @@
 package com.ai.paas.cpaas.rm.manage.service.zookeeper;
 
 import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import org.apache.log4j.Logger;
 import org.springframework.batch.core.StepContribution;
@@ -34,79 +38,118 @@ public class AnsibleHostsConfig implements Tasklet {
     shellContext.append("\n");
 
     List<MesosInstance> mesosmaster = openParam.getMesosMaster();
-    List<MesosSlave> mesosSlave = openParam.getMesosSlave();
-    List<MesosInstance> agents = openParam.getWebHaproxy().getHosts();
-    for (int i = 0; i < mesosmaster.size(); i++) {
-      int id = mesosmaster.get(i).getId();
-      String masterName = TaskUtil.genMasterName(id);
-      String ip = mesosmaster.get(i).getIp();
+    if (mesosmaster == null) {
+      mesosmaster = new ArrayList<MesosInstance>();
+    }
 
+    List<MesosSlave> mesosSlave = openParam.getMesosSlave();
+    if (mesosSlave == null) {
+      mesosSlave = new ArrayList<MesosSlave>();
+    }
+
+    List<MesosInstance> agents = openParam.getWebHaproxy().getHosts();
+    if (agents == null) {
+      agents = new ArrayList<MesosInstance>();
+    }
+
+    HashMap<String, String> hosts = new HashMap<String, String>();
+    for (MesosInstance instance : mesosmaster) {
+      int id = instance.getId();
+      String masterName = TaskUtil.genMasterName(id);
+      String ip = instance.getIp();
       shellContext.append("[" + masterName + "]");
       shellContext.append("\n");
       shellContext.append(ip);
       shellContext.append("\n");
-      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext()
-          .put(ip, masterName);
+
+      hosts.put(ip, masterName);
 
     }
+
     shellContext.append("[master]");
     shellContext.append("\n");
-    for (int i = 0; i < mesosmaster.size(); i++) {
-      shellContext.append(mesosmaster.get(i).getIp());
+
+    for (MesosInstance instance : mesosmaster) {
+      String ip = instance.getIp();
+      shellContext.append(ip);
       shellContext.append("\n");
     }
 
-    for (int i = 0; i < mesosSlave.size(); i++) {
-      int id = mesosSlave.get(i).getId();
+    for (MesosSlave slave : mesosSlave) {
+      int id = slave.getId();
       String slaveName = TaskUtil.genSlaveName(id);
-      String ip = mesosSlave.get(i).getIp();
-
+      String ip = slave.getIp();
       shellContext.append("[" + slaveName + "]");
       shellContext.append("\n");
       shellContext.append(ip);
       shellContext.append("\n");
-      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext()
-          .put(ip, slaveName);
+
+      if (!hosts.containsKey(ip)) {
+        hosts.put(ip, slaveName);
+      }
+
     }
+
     shellContext.append("[slave]");
     shellContext.append("\n");
-    for (int i = 0; i < mesosSlave.size(); i++) {
-      shellContext.append(mesosSlave.get(i).getIp());
+    for (MesosSlave slave : mesosSlave) {
+      String ip = slave.getIp();
+      shellContext.append(ip);
       shellContext.append("\n");
     }
 
-
-    for (int i = 0; i < agents.size(); i++) {
-      int id = agents.get(i).getId();
+    for (MesosInstance agent : agents) {
+      int id = agent.getId();
       String agentName = TaskUtil.genAgentName(id);
-      String ip = agents.get(i).getIp();
+      String ip = agent.getIp();
       shellContext.append("[" + agentName + "]");
       shellContext.append("\n");
       shellContext.append(ip);
       shellContext.append("\n");
-      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext()
-          .put(ip, agentName);
+      if (!hosts.containsKey(ip)) {
+        hosts.put(ip, agentName);
+      }
 
     }
 
+    for (String ip : hosts.keySet()) {
+      String name = hosts.get(ip);
+      chunkContext.getStepContext().getStepExecution().getJobExecution().getExecutionContext()
+          .put(ip, name);
+    }
     shellContext.append("[agent]");
     shellContext.append("\n");
-    for (int i = 0; i < agents.size(); i++) {
-      shellContext.append(agents.get(i).getIp());
+    for (MesosInstance agent : agents) {
+      shellContext.append(agent.getIp());
       shellContext.append("\n");
     }
-
 
     shellContext.append("[nodes]");
     shellContext.append("\n");
-    for (int i = 0; i < mesosmaster.size(); i++) {
-      shellContext.append(mesosmaster.get(i).getIp());
+
+    List<String> nodes = new ArrayList<String>();
+    for (MesosInstance instance : mesosmaster) {
+      nodes.add(instance.getIp());
+    }
+
+    for (MesosSlave slave : mesosSlave) {
+      nodes.add(slave.getIp());
+    }
+
+    for (MesosInstance agent : agents) {
+      nodes.add(agent.getIp());
+    }
+    // 去重
+    Set<String> hs = new HashSet<>();
+    hs.addAll(nodes);
+    nodes.clear();
+    nodes.addAll(hs);
+
+    for (String ip : nodes) {
+      shellContext.append(ip);
       shellContext.append("\n");
     }
-    for (int i = 0; i < mesosSlave.size(); i++) {
-      shellContext.append(mesosSlave.get(i).getIp());
-      shellContext.append("\n");
-    }
+
     shellContext.append("EOL");
     shellContext.append("\n");
     logger.debug("the ansible hosts is" + shellContext.toString());

@@ -167,11 +167,12 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 		</step>
 	</flow>
 	<flow id="haproxy">
-		<step id="installHaproxyStep" next="genHaUserStep">
-			<tasklet ref="haproxyInstall"/>
-		</step>
-		<step id="genHaUserStep">
+		
+		<step id="genHaUserStep" next="installHaproxyStep">
 			<tasklet ref="genHaUser"/>
+		</step>
+		<step id="installHaproxyStep" >
+			<tasklet ref="haproxyInstall"/>
 		</step>
 	</flow>
 	<flow id="chronos">
