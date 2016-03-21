@@ -156,6 +156,11 @@ public class MgmtOpenService implements IMgmtOpenService {
         throw new PaasException(ExceptionCodeConstants.DubboServiceCode.PARAM_IS_NULL,
             "the parameter for free resources is null");
       }
+      logger
+          .error("=========================================================================================");
+      logger.error("the param is :" + param);
+      logger
+          .error("=========================================================================================");
       OpenResourceParamVo openParam = gson.fromJson(param, OpenResourceParamVo.class);
       if (!openParam.getUseAgent()) {
         throw new PaasException(ExceptionCodeConstants.TransServiceCode.ERROR_CODE,
@@ -163,12 +168,6 @@ public class MgmtOpenService implements IMgmtOpenService {
       }
       String clusterId = openParam.getClusterId();
       resReqInfo.setClusterId(clusterId);
-      logger
-          .error("=========================================================================================");
-      logger.error("reqinsert is " + TaskUtil.REQINSERT);
-      logger
-          .error("=========================================================================================");
-
       resReqInfo.setReqType(TaskUtil.REQINSERT);
       resReqInfo.setReqCnt(param);
       resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));
@@ -182,11 +181,6 @@ public class MgmtOpenService implements IMgmtOpenService {
     resReqInfo.setReqState(status);
     resReqInfo.setReqResp(gson.toJson(openResultParam));
     resReqInfo.setRespTime(new Timestamp(System.currentTimeMillis()));
-    logger
-        .error("=========================================================================================");
-    logger.error("reqinfo is " + resReqInfo.toString());
-    logger
-        .error("=========================================================================================");
     mapper.insert(resReqInfo);
     return gson.toJson(openResultParam);
   }
