@@ -42,7 +42,7 @@ public class RemoteEnv implements ExecuteEnv {
   public static String sendRequest(String url, StringEntity paramEntity)
       throws ClientProtocolException, IOException, PaasException {
     // HttpClient httpClient = HttpClients.createDefault();
-    int timeout = 50;
+    int timeout = 5000;
     RequestConfig config =
         RequestConfig.custom().setConnectTimeout(timeout * 1000)
             .setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
