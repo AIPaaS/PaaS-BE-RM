@@ -15,6 +15,8 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.log4j.Logger;
 
 import com.ai.paas.cpaas.rm.vo.TransResultVo;
@@ -41,6 +43,12 @@ public class RemoteEnv implements ExecuteEnv {
   public static String sendRequest(String url, StringEntity paramEntity)
       throws ClientProtocolException, IOException, PaasException {
     HttpClient httpClient = HttpClients.createDefault();
+    int timeout = 500; // seconds
+    HttpParams httpParams = httpClient.getParams();
+    HttpConnectionParams.setConnectionTimeout(httpParams, timeout * 1000); // http.connection.timeout
+    HttpConnectionParams.setSoTimeout(httpParams, timeout * 1000);
+
+
     HttpPost httpPost = new HttpPost(url);
     httpPost.setEntity(paramEntity);
     HttpResponse response = httpClient.execute(httpPost);
