@@ -168,6 +168,7 @@ public class MgmtOpenService implements IMgmtOpenService {
       logger.error("reqinsert is " + TaskUtil.REQINSERT);
       logger
           .error("=========================================================================================");
+
       resReqInfo.setReqType(TaskUtil.REQINSERT);
       resReqInfo.setReqCnt(param);
       resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));
