@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,6 +14,7 @@ import org.apache.http.HttpResponse;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.config.RequestConfig;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
@@ -46,13 +48,31 @@ public class RemoteEnv implements ExecuteEnv {
     RequestConfig config =
         RequestConfig.custom().setConnectTimeout(timeout * 1000)
             .setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
+    System.out
+        .println("=========================================================================================");
+    System.out.println("connectTimeout:" + config.getConnectTimeout()
+        + ";connection request timeout:" + config.getConnectionRequestTimeout()
+        + ";socket time out:" + config.getSocketTimeout());
+    System.out
+        .println("=========================================================================================");
+
     CloseableHttpClient httpClient =
         HttpClientBuilder.create().setDefaultRequestConfig(config).build();
 
 
     HttpPost httpPost = new HttpPost(url);
     httpPost.setEntity(paramEntity);
+    Timestamp start = new Timestamp(System.currentTimeMillis());
+
     HttpResponse response = httpClient.execute(httpPost);
+
+    Timestamp end = new Timestamp(System.currentTimeMillis());
+
+    System.out
+        .println("=========================================================================================");
+
+    System.out.println(" the start time is " + start + "; the end time is " + end);
+
     HttpEntity entity = response.getEntity();
     String result = new String();
     if (entity != null) {
@@ -139,7 +159,9 @@ public class RemoteEnv implements ExecuteEnv {
     object.addProperty("content", content);
     object.addProperty("fileName", filename);;
     object.addProperty("path", path);
-    StringEntity entity = new StringEntity(object.toString(), "application/json", "UTF-8");
+    // StringEntity entity = new StringEntity(object.toString(), "application/json", "UTF-8");
+    StringEntity entity =
+        new StringEntity(object.toString(), ContentType.create("application/json", "UTF-8"));
     return entity;
   }
 
@@ -148,7 +170,11 @@ public class RemoteEnv implements ExecuteEnv {
     JsonObject object = new JsonObject();
     object.addProperty("aid", aid);
     object.addProperty("command", command);
-    StringEntity entity = new StringEntity(object.toString(), "application/json", "UTF-8");
+    // StringEntity entity = new StringEntity(object.toString(), "application/json", "UTF-8");
+
+    StringEntity entity =
+        new StringEntity(object.toString(), ContentType.create("application/json", "UTF-8"));
+
     return entity;
   }
 
