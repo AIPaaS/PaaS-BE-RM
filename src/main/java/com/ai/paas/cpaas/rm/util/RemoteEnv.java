@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
-import java.sql.Timestamp;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -48,17 +47,6 @@ public class RemoteEnv implements ExecuteEnv {
     RequestConfig config =
         RequestConfig.custom().setConnectTimeout(timeout * 1000)
             .setConnectionRequestTimeout(timeout * 1000).setSocketTimeout(timeout * 1000).build();
-    System.out
-        .println("=========================================================================================");
-    logger
-        .info("=========================================================================================");
-    System.out.println("connectTimeout:" + config.getConnectTimeout()
-        + ";connection request timeout:" + config.getConnectionRequestTimeout()
-        + ";socket time out:" + config.getSocketTimeout());
-    logger.info("connectTimeout:" + config.getConnectTimeout() + ";connection request timeout:"
-        + config.getConnectionRequestTimeout() + ";socket time out:" + config.getSocketTimeout());
-    System.out
-        .println("=========================================================================================");
 
     CloseableHttpClient httpClient =
         HttpClientBuilder.create().setDefaultRequestConfig(config).build();
@@ -66,17 +54,8 @@ public class RemoteEnv implements ExecuteEnv {
 
     HttpPost httpPost = new HttpPost(url);
     httpPost.setEntity(paramEntity);
-    Timestamp start = new Timestamp(System.currentTimeMillis());
-
     HttpResponse response = httpClient.execute(httpPost);
 
-    Timestamp end = new Timestamp(System.currentTimeMillis());
-
-    System.out
-        .println("=========================================================================================");
-
-    System.out.println(" the start time is " + start + "; the end time is " + end);
-    logger.info(" the start time is " + start + "; the end time is " + end);
     HttpEntity entity = response.getEntity();
     String result = new String();
     if (entity != null) {

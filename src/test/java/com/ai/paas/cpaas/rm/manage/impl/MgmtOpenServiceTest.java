@@ -141,13 +141,17 @@ public class MgmtOpenServiceTest {
     proxy.setHosts(agents);
     paramVo.setWebHaproxy(proxy);
     Gson gson = new Gson();
-    String param = gson.toJson(paramVo);
-    // System.out.println();
+    /*
+     * String param =
+     * "{\"clusterName\":\"test-real-pingtai\",\"externalDomain\":\"out.com\",\"useAgent\":true,\"mesosMaster\":[{\"id\":1,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"zone\":\"center\",\"ip\":\"10.1.130.11\"},{\"id\":2,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"zone\":\"center\",\"ip\":\"10.1.130.12\"},{\"id\":3,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"zone\":\"center\",\"ip\":\"10.1.130.13\"}],\"imagePath\":\"/aifs01/docker\",\"loadVirtualIP\":\"10.1.1.10\",\"webHaproxy\":{\"virtualIp\":\"10.1.2.22\",\"hosts\":[{\"id\":1,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"ip\":\"10.1.130.14\"},{\"id\":2,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"ip\":\"10.1.130.15\"}],\"loadOnly\":true},\"domain\":\"inner.com\",\"mesosSlave\":[{\"id\":1,\"passwd\":\"xdjr0lxGu#\",\"memTotal\":8192,\"root\":\"root\",\"cpuTotal\":200,\"cpuOffer\":100,\"attributes\":\"ds:109;jf:120;rack:;ex:;cpu:;mem:8192;disk:204800;netband:null\",\"memOffer\":7168,\"zone\":\"test\",\"ip\":\"10.1.130.12\"}],\"aid\":\"133\",\"dataCenter\":\"test-real-dataCenter\",\"clusterId\":\"133\",\"attributesList\":[{\"zone\":\"center\",\"network\":\"172.18.0.0/16\"},{\"zone\":\"visit\",\"network\":\"172.19.0.0/16\"},{\"zone\":\"test\",\"network\":\"172.20.0.0/16\"}]}"
+     * ;
+     */// System.out.println();
     /*
      * String param =
      * "{\"externalDomain\":\"asiainfo.com\",\"dataCenter\":\"res-be-data\",\"imagePath\":\"/aifs01/docker\",\"loadVirtualIP\":\"10.1.1.10\",\"attributesList\":[{\"zone\":\"center\",\"network\":\"172.18.0.0/16\"},{\"zone\":\"visit\",\"network\":\"172.19.0.0/16\"},{\"zone\":\"web\",\"network\":\"172.21.0.0/16\"},{\"zone\":\"db\",\"network\":\"172.20.0.0/16\"}],\"clusterId\":\"121\",\"useAgent\":true,\"clusterName\":\"res-test\",\"domain\":\"home.com\",\"mesosMaster\":[{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"ip\":\"10.1.241.127\",\"root\":\"root\",\"id\":1},{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"ip\":\"10.1.241.128\",\"root\":\"root\",\"id\":2},{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"ip\":\"10.1.241.129\",\"root\":\"root\",\"id\":3}],\"mesosSlave\":[{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"cpuTotal\":800,\"memTotal\":8192,\"ip\":\"10.1.241.127\",\"root\":\"root\",\"memOffer\":4096,\"attributes\":\"ds:88;jf:74;rack:6;ex:111;cpu:8;mem:8192;disk:692224;netband:5000\",\"cpuOffer\":600,\"id\":1},{\"passwd\":\"Mfjjbsq7!@#\",\"zone\":\"center\",\"cpuTotal\":400,\"memTotal\":8192,\"ip\":\"10.1.241.128\",\"root\":\"root\",\"memOffer\":4096,\"attributes\":\"ds:88;jf:74;rack:122;ex:112;cpu:54;mem:8192;disk:352256;netband:3333\",\"cpuOffer\":300,\"id\":2}],\"webHaproxy\":{\"hosts\":[{\"passwd\":\"Mfjjbsq7!@#\",\"ip\":\"10.1.241.126\",\"root\":\"root\",\"id\":1},{\"passwd\":\"Mfjjbsq7!@#\",\"ip\":\"10.1.241.130\",\"root\":\"root\",\"id\":2}],\"loadOnly\":true,\"virtualIp\":\"10.1.241.14\"},\"aid\":\"dev\"}"
      * ;
      */
+    String param = gson.toJson(paramVo);
     service.openService(param);
 
   }
@@ -264,7 +268,18 @@ public class MgmtOpenServiceTest {
     proxy.setHosts(agents);
     paramVo.setWebHaproxy(proxy);
     Gson gson = new Gson();
-    String param = gson.toJson(paramVo);
+    // String param = gson.toJson(paramVo);
+    String param =
+        "{\"useAgent\":true,\"mesosMaster\":[{\"id\":1,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"zone\":\"center\",\"ip\":\"10.1.130.11\"},{\"id\":2,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"zone\":\"center\",\"ip\":\"10.1.130.12\"},{\"id\":3,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"zone\":\"center\",\"ip\":\"10.1.130.13\"}],\"imagePath\":\"/aifs01/docker\",\"webHaproxy\":{\"virtualIp\":\"10.1.2.22\",\"hosts\":[{\"id\":1,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"ip\":\"10.1.130.14\"},{\"id\":2,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"ip\":\"10.1.130.15\"}],\"loadOnly\":true},\"mesosSlave\":[{\"id\":1,\"passwd\":\"xdjr0lxGu#\",\"memTotal\":8192,\"root\":\"root\",\"cpuTotal\":200,\"cpuOffer\":100,\"attributes\":\"ds:109;jf:120;rack:;ex:;cpu:;mem:8192;disk:204800;netband:null\",\"memOffer\":7168,\"zone\":\"test\",\"ip\":\"10.1.130.12\"}],\"aid\":\"133\",\"clusterId\":\"133\"}";
     service.freeResourcesService(param);
+  }
+
+
+  public void judgeParam() {
+    String param =
+        "{\"useAgent\":true,\"mesosMaster\":[{\"id\":1,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"zone\":\"center\",\"ip\":\"10.1.130.11\"},{\"id\":2,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"zone\":\"center\",\"ip\":\"10.1.130.12\"},{\"id\":3,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"zone\":\"center\",\"ip\":\"10.1.130.13\"}],\"imagePath\":\"/aifs01/docker\",\"webHaproxy\":{\"virtualIp\":\"10.1.2.22\",\"hosts\":[{\"id\":1,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"ip\":\"10.1.130.14\"},{\"id\":2,\"passwd\":\"xdjr0lxGu#\",\"root\":\"root\",\"ip\":\"10.1.130.15\"}],\"loadOnly\":true},\"mesosSlave\":[{\"id\":1,\"passwd\":\"xdjr0lxGu#\",\"memTotal\":8192,\"root\":\"root\",\"cpuTotal\":200,\"cpuOffer\":100,\"attributes\":\"ds:109;jf:120;rack:;ex:;cpu:;mem:8192;disk:204800;netband:null\",\"memOffer\":7168,\"zone\":\"test\",\"ip\":\"10.1.130.12\"}],\"aid\":\"133\",\"clusterId\":\"133\"}";
+    Gson gson = new Gson();
+    OpenResourceParamVo openParam = gson.fromJson(param, OpenResourceParamVo.class);
+    System.out.println(openParam.toString());
   }
 }

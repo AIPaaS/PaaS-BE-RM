@@ -17,7 +17,6 @@ import com.ai.paas.cpaas.rm.util.OpenPortUtil;
 import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
-import com.ai.paas.cpaas.rm.vo.WebHaproxy;
 import com.ai.paas.ipaas.PaasException;
 
 public class ConsulInstall implements Tasklet {
@@ -38,20 +37,12 @@ public class ConsulInstall implements Tasklet {
     StringBuffer shellContext = TaskUtil.createBashFile();
 
     List<MesosInstance> list = openParam.getMesosMaster();
-    MesosInstance master = openParam.getMesosMaster().get(0);
+    MesosInstance master = list.get(0);
     String password = master.getPasswd();
     String consulPath = TaskUtil.getSystemProperty("consul");
     String configFile = TaskUtil.getSystemProperty("filepath") + "/consul.json";
     String consulService = TaskUtil.getSystemProperty("filepath") + "/consul.service";
-    StringBuffer consulCluster = new StringBuffer();
-    consulCluster.append("lines=[").append("'").append(this.genConsulInfo(0, master.getIp()))
-        .append("'");
-    for (int i = 1; i < list.size(); i++) {
-      consulCluster.append(",");
-      MesosInstance instance = list.get(i);
-      consulCluster.append("'").append(this.genConsulInfo(i, instance.getIp())).append("'");
-    }
-    consulCluster.append("]");
+
 
     List<String> configvars = new ArrayList<String>();
     configvars.add("ansible_ssh_pass=" + password);
@@ -66,15 +57,7 @@ public class ConsulInstall implements Tasklet {
             configvars);
     shellContext.append(installcommand.toString()).append("\n");
 
-    WebHaproxy webHaproxy = openParam.getWebHaproxy();
-    String agentPass = webHaproxy.getHosts().get(0).getPasswd();
-    List<String> vars = new ArrayList<String>();
-    vars.add("ansible_ssh_pass=" + agentPass);
-    vars.add("ansible_become_pass=" + agentPass);
-    vars.add(consulCluster.toString());
-    AnsibleCommand configCommand =
-        new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/configha.yml", "root", vars);
-    shellContext.append(configCommand.toString()).append("\n");
+
 
     Timestamp start = new Timestamp(System.currentTimeMillis());
 
@@ -99,6 +82,6 @@ public class ConsulInstall implements Tasklet {
   }
 
   public String genConsulInfo(int i, String ip) {
-    return "server master" + (i + 1) + " " + ip + ":8600 check";
+    return "server master" + i + " " + ip + ":8600 check";
   }
 }

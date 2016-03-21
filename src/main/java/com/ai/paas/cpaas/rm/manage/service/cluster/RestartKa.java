@@ -1,4 +1,4 @@
-package com.ai.paas.cpaas.rm.manage.service.consul;
+package com.ai.paas.cpaas.rm.manage.service.cluster;
 
 import java.io.InputStream;
 import java.sql.Timestamp;
@@ -30,7 +30,7 @@ public class RestartKa implements Tasklet {
     String aid = openParam.getAid();
     String[] files = {"restartKa.yml"};
     for (String file : files) {
-      InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/consul/" + file);
+      InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/base/" + file);
       String content = TaskUtil.getFile(in);
       TaskUtil.uploadFile(file, content, useAgent, aid);
     }

@@ -28,7 +28,7 @@ public class ExecuteOpenBatchJob {
     String jobType;
     switch (type) {
       case "open":
-        jobType = "batch/openServiceBatch.xml";
+        jobType = "batch/testBatch.xml";
         break;
       case "free":
         jobType = "batch/freeResourcesBatch.xml";

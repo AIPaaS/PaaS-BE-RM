@@ -47,8 +47,9 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="openConsulPort" class="com.ai.paas.cpaas.rm.manage.service.consul.OpenConsulPort"/>
 	<beans:bean id="consulInstall" class="com.ai.paas.cpaas.rm.manage.service.consul.ConsulInstall"/>
 	<beans:bean id="consulStart" class="com.ai.paas.cpaas.rm.manage.service.consul.ConsulStart"/>	
-	<beans:bean id="restartKa" class="com.ai.paas.cpaas.rm.manage.service.consul.RestartKa"/>
+	<beans:bean id="restartKa" class="com.ai.paas.cpaas.rm.manage.service.cluster.RestartKa"/>
 	<beans:bean id="insertClusterInfo" class="com.ai.paas.cpaas.rm.manage.service.cluster.InsertClusterInfo"/>
+	<beans:bean id="configHa" class="com.ai.paas.cpaas.rm.manage.service.cluster.ConfigHa"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
 	    <flow id="installzookeeper" parent="zookeeper" next="installDocker"/>
 		<flow id="installDocker" parent="docker" next="installMesos"/>
@@ -199,16 +200,19 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 		<step id="consulInstallStep" next="consulStartStep">
 			<tasklet ref="consulInstall"/>
 		</step>
-		<step id="consulStartStep" next="restartKaStep">
+		<step id="consulStartStep">
 			<tasklet ref="consulStart"/>
-		</step>
-		<step id="restartKaStep">
-			<tasklet ref="restartKa"/>
 		</step>
 	</flow>
 	<flow id="cluster">
-		<step id="clusterStep">
+		<step id="clusterStep" next="configHaStep">
 			<tasklet ref="insertClusterInfo"/>
+		</step>		
+		<step id="configHaStep" next="restartKaStep">
+			<tasklet ref="configHa"/>
+		</step>
+		<step id="restartKaStep">
+			<tasklet ref="restartKa"/>
 		</step>
 	</flow>
 </beans:beans>
