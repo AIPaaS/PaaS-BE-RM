@@ -92,7 +92,7 @@ public class ConfigHa implements Tasklet {
     try {
       resultMessage = TaskUtil.executeFile("configha", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("config haproxy:", e);
       resultMessage = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

@@ -49,7 +49,7 @@ public class FreeAgent implements Tasklet {
     try {
       result = TaskUtil.executeFile("freeAgent", dockerinstall.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("free agent resources:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

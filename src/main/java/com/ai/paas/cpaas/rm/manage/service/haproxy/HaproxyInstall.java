@@ -73,7 +73,7 @@ public class HaproxyInstall implements Tasklet {
     try {
       result = TaskUtil.executeFile("haproxyinstall", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("install haproxy:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

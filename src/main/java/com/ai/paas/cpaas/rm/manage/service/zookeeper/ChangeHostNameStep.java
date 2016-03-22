@@ -87,7 +87,7 @@ public class ChangeHostNameStep implements Tasklet {
     try {
       result = TaskUtil.executeFile("changehostnames", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("change host name :", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

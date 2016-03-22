@@ -76,7 +76,7 @@ public class EtcdInstall implements Tasklet {
     try {
       result = TaskUtil.executeFile("etcdInstall", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("install etcd:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

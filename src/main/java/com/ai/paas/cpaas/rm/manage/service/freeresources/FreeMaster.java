@@ -50,7 +50,7 @@ public class FreeMaster implements Tasklet {
     try {
       result = TaskUtil.executeFile("freeMaster", dockerinstall.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("free master resources:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

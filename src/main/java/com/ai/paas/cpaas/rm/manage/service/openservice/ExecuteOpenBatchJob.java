@@ -56,7 +56,7 @@ public class ExecuteOpenBatchJob {
       }
       logger.info("Exit Status : " + execution.getStatus());
     } catch (Exception e) {
-      logger.error(e);
+      logger.error("execute batch job:", e);
       throw e;
     } finally {
       if (context != null) {

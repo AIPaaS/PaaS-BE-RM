@@ -57,7 +57,7 @@ public class ModifyZkConf implements Tasklet {
     try {
       result = TaskUtil.executeFile("zookeeperinstall", zookeeperinstall.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("modify zookeeper config:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

@@ -57,7 +57,7 @@ public class MeMasterStart implements Tasklet {
     try {
       result = TaskUtil.executeFile("mesosMasterStart", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("start mesos-master:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

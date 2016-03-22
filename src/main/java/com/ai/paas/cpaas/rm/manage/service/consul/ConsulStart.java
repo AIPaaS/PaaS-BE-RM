@@ -70,7 +70,7 @@ public class ConsulStart implements Tasklet {
     try {
       result = TaskUtil.executeFile("consulStart", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("start consul:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

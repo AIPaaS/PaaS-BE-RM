@@ -58,7 +58,7 @@ public class ConfigDNS implements Tasklet {
     try {
       result = TaskUtil.executeFile("configDNS", command.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("config mesos-dns:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

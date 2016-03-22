@@ -53,7 +53,7 @@ public class VerifyChronos implements Tasklet {
     try {
       result = TaskUtil.executeFile("verifychronos", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("verify chronos :", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

@@ -75,7 +75,7 @@ public class MesosSlaveStep implements Tasklet {
     try {
       result = TaskUtil.executeFile("mesosSlaveStep", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("install mesos-slave:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

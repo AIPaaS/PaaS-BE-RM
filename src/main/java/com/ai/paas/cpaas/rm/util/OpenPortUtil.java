@@ -55,7 +55,7 @@ public class OpenPortUtil {
           TaskUtil.executeFile("openportUtil", openPortCommand.toString(), openParam.getUseAgent(),
               aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("open port util:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

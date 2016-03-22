@@ -11,8 +11,6 @@ import org.springframework.batch.core.scope.context.ChunkContext;
 import org.springframework.batch.core.step.tasklet.Tasklet;
 import org.springframework.batch.repeat.RepeatStatus;
 
-import com.ai.paas.cpaas.rm.dao.interfaces.ResClusterInfoMapper;
-import com.ai.paas.cpaas.rm.dao.mapper.bo.ResClusterInfo;
 import com.ai.paas.cpaas.rm.util.AnsibleCommand;
 import com.ai.paas.cpaas.rm.util.ExceptionCodeConstants;
 import com.ai.paas.cpaas.rm.util.OpenPortUtil;
@@ -20,7 +18,6 @@ import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
 import com.ai.paas.ipaas.PaasException;
-import com.ai.paas.ipaas.ServiceUtil;
 
 public class MaInstall implements Tasklet {
   private static Logger logger = Logger.getLogger(MaInstall.class);
@@ -70,7 +67,7 @@ public class MaInstall implements Tasklet {
     try {
       result = TaskUtil.executeFile("marathoninstall", installCommand.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("install marathon:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
@@ -82,18 +79,6 @@ public class MaInstall implements Tasklet {
               TaskUtil.getTypeId("maInstall"), status);
       TaskUtil.insertResTaskLog(openParam.getClusterId(), taskId, result);
     }
-
-    // insert record in cluster info
-    ResClusterInfoMapper resClusterInfoMapper = ServiceUtil.getMapper(ResClusterInfoMapper.class);
-    ResClusterInfo resClusterInfo = new ResClusterInfo();
-    resClusterInfo.setClusterId(openParam.getClusterId());
-    resClusterInfo.setClusterName(openParam.getClusterName());
-    resClusterInfo.setExternalDomain(openParam.getExternalDomain());
-    resClusterInfo.setMesosDomain(master.toString());
-    resClusterInfo.setMarathonAddr(zk.toString());
-    // TODO
-    // lack of chronos
-    // resClusterInfoMapper.insert(resClusterInfo);
 
     return RepeatStatus.FINISHED;
   }

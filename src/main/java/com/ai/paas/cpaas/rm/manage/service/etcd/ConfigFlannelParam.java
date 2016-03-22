@@ -59,7 +59,7 @@ public class ConfigFlannelParam implements Tasklet {
     try {
       result = TaskUtil.executeFile("flannelConfig", shellContext.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("config flannel param:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

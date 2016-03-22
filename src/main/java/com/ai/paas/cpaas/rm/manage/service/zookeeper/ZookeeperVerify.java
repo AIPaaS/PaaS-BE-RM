@@ -58,7 +58,7 @@ public class ZookeeperVerify implements Tasklet {
     try {
       result = TaskUtil.executeFile("zookeeperverify", command.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("verify zookeeper service:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

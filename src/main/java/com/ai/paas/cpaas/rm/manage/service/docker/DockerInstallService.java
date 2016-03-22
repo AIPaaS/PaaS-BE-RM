@@ -49,7 +49,7 @@ public class DockerInstallService implements Tasklet {
     try {
       result = TaskUtil.executeFile("dockerinstall", dockerinstall.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("install docker:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

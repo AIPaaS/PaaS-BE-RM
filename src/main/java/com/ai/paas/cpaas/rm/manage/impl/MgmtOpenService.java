@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.log4j.Logger;
-import org.springframework.stereotype.Service;
 
 import com.ai.paas.cpaas.rm.dao.interfaces.ResReqInfoMapper;
 import com.ai.paas.cpaas.rm.dao.mapper.bo.ResJobDetail;
@@ -21,6 +20,7 @@ import com.ai.paas.cpaas.rm.vo.OpenResultParamVo;
 import com.ai.paas.ipaas.PaasException;
 import com.ai.paas.ipaas.ServiceUtil;
 import com.alibaba.dubbo.common.utils.StringUtils;
+import com.alibaba.dubbo.config.annotation.Service;
 import com.google.gson.Gson;
 
 @Service
@@ -102,7 +102,7 @@ public class MgmtOpenService implements IMgmtOpenService {
       ExecuteOpenBatchJob executeBatchJob = new ExecuteOpenBatchJob();
       executeBatchJob.executeOpenService(param, openResultParam, "open");
     } catch (Exception e) {
-      logger.error(e.getMessage(), e);
+      logger.error("open service:", e);
       status = TaskUtil.REQFAILED;
     }
     resReqInfo.setReqState(status);
@@ -139,7 +139,7 @@ public class MgmtOpenService implements IMgmtOpenService {
       }
       result = gson.toJson(resultList);
     } catch (PaasException e) {
-      logger.error(e.toString());
+      logger.error("query log:", e);
     }
     return result;
   }
@@ -170,7 +170,7 @@ public class MgmtOpenService implements IMgmtOpenService {
       ExecuteOpenBatchJob executeBatchJob = new ExecuteOpenBatchJob();
       executeBatchJob.executeOpenService(param, openResultParam, "free");
     } catch (Exception e) {
-      logger.error(e.getMessage(), e);
+      logger.error("free resources:", e);
       status = TaskUtil.REQFAILED;
     }
     resReqInfo.setReqState(status);

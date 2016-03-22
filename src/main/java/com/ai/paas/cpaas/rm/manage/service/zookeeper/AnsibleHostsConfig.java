@@ -162,7 +162,7 @@ public class AnsibleHostsConfig implements Tasklet {
           TaskUtil.executeFile("configAnsibleHosts", shellContext.toString(),
               openParam.getUseAgent(), aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("config ansible hosts:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,

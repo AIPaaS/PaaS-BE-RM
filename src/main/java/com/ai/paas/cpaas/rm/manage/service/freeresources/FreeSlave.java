@@ -50,7 +50,7 @@ public class FreeSlave implements Tasklet {
     try {
       result = TaskUtil.executeFile("freeSlave", dockerinstall.toString(), useAgent, aid);
     } catch (Exception e) {
-      logger.error(e.toString());
+      logger.error("free slave resources:", e);
       result = e.toString();
       status = TaskUtil.FAILED;
       throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
