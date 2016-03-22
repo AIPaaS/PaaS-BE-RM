@@ -3,6 +3,7 @@
   user: root
   vars:
      software: ['mesosphere-zookeeper','mesos','marathon','flannel','etcd','chronos','docker-engine']
+     services: ['zookeeper','mesos-master','marathon','flannel','etcd','chronos','docker']
      users: ['rczkp01','rcmesos','rcmarathon','rcflannel','rcchronos','rcdns']
      installpath: ['/usr/bin/mesos-dns','/usr/local/bin/consul','/etc/systemd/system/consul.service','/etc/systemd/system/mesos-dns.service']
      datapath: ['/var/log/mesos','/opt/consul','/var/lib/etcd','/etc/zookeeper','/etc/mesos','/etc/mesos-master','/etc/marathon','/etc/consul','/tmp/mesos']
@@ -10,7 +11,7 @@
      - name: stop software service
        service: name={{ item }} state=stopped
        with_items:
-         - "{{ software }}"
+         - "{{ services }}"
      - name: remove software installed by yum
        yum: name={{ item }} state=absent
        with_items:
