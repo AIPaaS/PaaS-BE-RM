@@ -37,7 +37,7 @@ public class MgmtOpenServiceTest {
     paramVo.setDomain("asiainfo.com");
     paramVo.setExternalDomain("asia.com");
     paramVo.setLoadVirtualIP("10.1.1.10");
-    paramVo.setAid("dev");
+    paramVo.setAid("A");
     paramVo.setDataCenter("south-center");
     MesosInstance master = new MesosInstance();
     master.setId(1);

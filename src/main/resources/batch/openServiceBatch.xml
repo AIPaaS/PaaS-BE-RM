@@ -27,6 +27,7 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="meMasterOpenPort" class="com.ai.paas.cpaas.rm.manage.service.mesos.MasterOpenPort"/>
 	<beans:bean id="meMasterStart" class="com.ai.paas.cpaas.rm.manage.service.mesos.MeMasterStart"/>
 	<beans:bean id="meSlaveStep" class="com.ai.paas.cpaas.rm.manage.service.mesos.MesosSlaveStep"/>
+	<beans:bean id="meSlavePortStep" class="com.ai.paas.cpaas.rm.manage.service.mesos.MeSlavePort"/>
 	<beans:bean id="meServiceVerify" class="com.ai.paas.cpaas.rm.manage.service.mesos.MeServiceVerify"/>
 	<beans:bean id="openEtcdPort" class="com.ai.paas.cpaas.rm.manage.service.etcd.OpenEtcdPort"/>
 	<beans:bean id="genEtcdUser" class="com.ai.paas.cpaas.rm.manage.service.etcd.GenEtcdUser"/>
@@ -132,8 +133,11 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 		<step id="mesosMasterOpenPort" next="mesosMasterStart">
 				<tasklet ref="meMasterOpenPort"/>
 		</step>
-		<step id="mesosMasterStart" next="mesosSlaveStep">
+		<step id="mesosMasterStart" next="mesosSlaveOpenPort">
 				<tasklet ref="meMasterStart"/>
+		</step>	
+		<step id="mesosSlaveOpenPort" next="mesosSlaveStep">
+				<tasklet ref="meSlavePortStep"/>
 		</step>
 		<step id="mesosSlaveStep" next="mesosServiceVerify">
 				<tasklet ref="meSlaveStep"/>

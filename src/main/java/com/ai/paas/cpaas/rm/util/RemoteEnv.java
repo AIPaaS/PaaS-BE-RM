@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.TimeUnit;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -54,8 +55,12 @@ public class RemoteEnv implements ExecuteEnv {
 
     HttpPost httpPost = new HttpPost(url);
     httpPost.setEntity(paramEntity);
+    long start = System.nanoTime();
     HttpResponse response = httpClient.execute(httpPost);
-
+    long end = System.nanoTime();
+    long used = end - start;
+    System.out.println("used:" + TimeUnit.NANOSECONDS.toMillis(used) + " ms");
+    // logger.info("start time is :" + start + ";the end time is " + end);
     HttpEntity entity = response.getEntity();
     String result = new String();
     if (entity != null) {
@@ -73,48 +78,57 @@ public class RemoteEnv implements ExecuteEnv {
 
     if (!url.contains("upload")) {
       String excResult = resultVo.getMsg();
-      JsonParser parser = new JsonParser();
-      JsonObject o = parser.parse(excResult).getAsJsonObject();
-      String stderr = o.get("stderr").getAsString();
-      String stdout = o.get("stdout").getAsString();
-      // judge the result with stderr and stdout
-      if (!resultVo.getCode().equals(ExceptionCodeConstants.TransServiceCode.SUCCESS_CODE)) {
-        System.out.println(stderr);
-        logger.error(stderr);
-        throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
-            resultVo.getMsg());
-      }
-      // analyze stdout
-      if (stdout.contains("unreachable")) {
-        String pattern = "unreachable=[1-9]";
-        Pattern r = Pattern.compile(pattern);
-        Matcher m = r.matcher(stdout);
-        if (m.find()) {
-          System.out.println(stdout);
-          logger.error(stdout);
+
+      if (excResult.contains("stdout")) {
+        JsonParser parser = new JsonParser();
+        JsonObject o = parser.parse(excResult).getAsJsonObject();
+        String stderr = o.get("stderr").getAsString();
+        String stdout = o.get("stdout").getAsString();
+        // judge the result with stderr and stdout
+        if (!resultVo.getCode().equals(ExceptionCodeConstants.TransServiceCode.SUCCESS_CODE)) {
+          System.out.println(stderr);
+          logger.error(stderr);
           throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
               resultVo.getMsg());
         }
-      }
-      if (stdout.contains("failed")) {
-        String pattern = "failed=[1-9]";
-        Pattern r = Pattern.compile(pattern);
-        Matcher m = r.matcher(stdout);
-        if (m.find()) {
-          System.out.println(stdout);
-          logger.error(stdout);
+        // analyze stdout
+        if (stdout.contains("unreachable")) {
+          String pattern = "unreachable=[1-9]";
+          Pattern r = Pattern.compile(pattern);
+          Matcher m = r.matcher(stdout);
+          if (m.find()) {
+            System.out.println(stdout);
+            logger.error(stdout);
+            throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+                resultVo.getMsg());
+          }
+        }
+        if (stdout.contains("failed")) {
+          String pattern = "failed=[1-9]";
+          Pattern r = Pattern.compile(pattern);
+          Matcher m = r.matcher(stdout);
+          if (m.find()) {
+            System.out.println(stdout);
+            logger.error(stdout);
+            throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
+                resultVo.getMsg());
+          }
+        }
+        if (!StringUtils.isEmpty(stderr)) {
+          System.out.println(stderr);
+          logger.error(stderr);
           throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
               resultVo.getMsg());
         }
-      }
-      if (!StringUtils.isEmpty(stderr)) {
-        System.out.println(stderr);
-        logger.error(stderr);
+        System.out
+            .println("code:" + resultVo.getCode() + ";stderr:" + stdout + ";stderr:" + stderr);
+        logger.debug("code:" + resultVo.getCode() + ";stderr:" + stdout + ";stderr:" + stderr);
+      } else if (excResult.contains("timeout")) {
         throw new PaasException(ExceptionCodeConstants.DubboServiceCode.SYSTEM_ERROR_CODE,
             resultVo.getMsg());
+      } else {
+        logger.info(resultVo);
       }
-      System.out.println("code:" + resultVo.getCode() + ";stderr:" + stdout + ";stderr:" + stderr);
-      logger.debug("code:" + resultVo.getCode() + ";stderr:" + stdout + ";stderr:" + stderr);
     }
 
     return result;
