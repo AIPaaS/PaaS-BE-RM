@@ -26,6 +26,7 @@ public class ConfigHostsStep implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("config hosts step ");
     InputStream in = ConfigHostsStep.class.getResourceAsStream("/playbook/confighosts.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);

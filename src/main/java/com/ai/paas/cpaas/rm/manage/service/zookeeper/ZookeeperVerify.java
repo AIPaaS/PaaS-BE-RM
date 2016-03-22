@@ -25,6 +25,7 @@ public class ZookeeperVerify implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("verify zookeeper service ");
     InputStream in =
         OpenPortUtil.class.getResourceAsStream("/playbook/zookeeper/zookeeperverify.yml");
     String content = TaskUtil.getFile(in);

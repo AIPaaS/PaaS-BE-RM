@@ -28,6 +28,7 @@ public class ChangeHostNameStep implements Tasklet {
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
     // upload hostnamectl.yml
+    logger.info("change host name step ");
     InputStream in = ChangeHostNameStep.class.getResourceAsStream("/playbook/hostnamectl.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);

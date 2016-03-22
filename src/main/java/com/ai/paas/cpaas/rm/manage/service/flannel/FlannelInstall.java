@@ -25,6 +25,7 @@ public class FlannelInstall implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("install flannel step ");
     InputStream in =
         FlannelInstall.class.getResourceAsStream("/playbook/flannel/flannelinstall.yml");
     String content = TaskUtil.getFile(in);

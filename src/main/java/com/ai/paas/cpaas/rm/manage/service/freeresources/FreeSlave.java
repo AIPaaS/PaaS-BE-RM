@@ -25,6 +25,7 @@ public class FreeSlave implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info(" free slave resources ");
     InputStream in =
         OpenPortUtil.class.getResourceAsStream("/playbook/freeresources/freeslave.yml");
     String content = TaskUtil.getFile(in);

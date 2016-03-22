@@ -25,6 +25,7 @@ public class FreeAgent implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("free agent resources ");
     InputStream in =
         OpenPortUtil.class.getResourceAsStream("/playbook/freeresources/freeagent.yml");
     String content = TaskUtil.getFile(in);

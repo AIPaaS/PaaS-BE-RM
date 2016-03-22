@@ -21,6 +21,7 @@ public class GenUserUtil {
   public static void genUser(ChunkContext chunkContext, String fileName, String user, String hosts,
       int typeId) throws ClientProtocolException, IOException, PaasException {
     String password = TaskUtil.generatePasswd();
+    logger.info("generate user:" + user + " step ");
     GenUserUtil.genUser(chunkContext, fileName, user, hosts, typeId, password);
 
   }

@@ -24,4 +24,8 @@ public interface IMgmtOpenService extends ISrvManager {
   @Path("/free")
   @POST
   public String freeResourcesService(String param);
+
+  @Path("/increase")
+  @POST
+  public String increaseSlaveService(String param);
 }

@@ -25,6 +25,7 @@ public class EraseDnsInfo implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("erase dns info ");
     InputStream in =
         OpenPortUtil.class.getResourceAsStream("/playbook/freeresources/erasednsinfo.yml");
     String content = TaskUtil.getFile(in);

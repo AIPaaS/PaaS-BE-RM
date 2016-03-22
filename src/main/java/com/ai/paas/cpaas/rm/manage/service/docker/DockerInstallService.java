@@ -25,6 +25,7 @@ public class DockerInstallService implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("start install docker ");
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/docker/dockerinstall.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);

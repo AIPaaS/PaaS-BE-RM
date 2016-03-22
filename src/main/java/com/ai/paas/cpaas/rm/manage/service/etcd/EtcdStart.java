@@ -25,6 +25,7 @@ public class EtcdStart implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("start etcd service ");
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/etcd/etcdstart.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);

@@ -19,6 +19,7 @@ public class OpenPortUtil {
 
   public static RepeatStatus openPort(ChunkContext chunkContext, String portParam, String user,
       int typeId) throws ClientProtocolException, IOException, PaasException {
+    logger.info("open port step");
     // upload openport.yml
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/openport.yml");
     String content = TaskUtil.getFile(in);

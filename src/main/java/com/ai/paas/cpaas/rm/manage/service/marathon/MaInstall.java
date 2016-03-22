@@ -25,6 +25,7 @@ public class MaInstall implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("install marathon service ");
     InputStream in =
         OpenPortUtil.class.getResourceAsStream("/playbook/marathon/marathoninstall.yml");
     String content = TaskUtil.getFile(in);

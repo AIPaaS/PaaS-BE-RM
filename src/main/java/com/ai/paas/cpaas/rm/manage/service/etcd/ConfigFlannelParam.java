@@ -26,6 +26,7 @@ public class ConfigFlannelParam implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("config flannel param ");
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/etcd/flannelConfig.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);

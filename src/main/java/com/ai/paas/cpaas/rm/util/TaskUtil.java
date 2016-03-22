@@ -55,7 +55,13 @@ public class TaskUtil {
 
   public static int REQFAILED = 1;
 
-  public static int REQINSERT = 1;
+  public static int REQINSERT = 1; // 资源中心初始化
+
+  public static int REQFREE = 2; // 资源中心资源释放
+
+  public static int REQQUERY = 3;// 资源中心日志查询
+
+  public static int REQINCREASE = 4;// 资源中心扩容
 
   public static int nextValue() {
     return counter.getAndIncrement();

@@ -25,6 +25,7 @@ public class StartZkService implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("start zookeeper service ");
     InputStream in =
         OpenPortUtil.class.getResourceAsStream("/playbook/zookeeper/zookeeperstart.yml");
     String content = TaskUtil.getFile(in);

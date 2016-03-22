@@ -25,6 +25,7 @@ public class FreeMaster implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("free master resources ");
     InputStream in =
         OpenPortUtil.class.getResourceAsStream("/playbook/freeresources/freemaster.yml");
     String content = TaskUtil.getFile(in);

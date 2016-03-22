@@ -25,6 +25,7 @@ public class MeMasterInstall implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("install mesos-master ");
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/mesos/mesosmaster.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);

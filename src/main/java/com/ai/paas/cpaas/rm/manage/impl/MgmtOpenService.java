@@ -123,20 +123,23 @@ public class MgmtOpenService implements IMgmtOpenService {
       }
       List<ResTaskLog> list = TaskUtil.getResTaskLogs(param);
       List<LogResult> resultList = new ArrayList<LogResult>();
-      for (ResTaskLog resTaskLog : list) {
-        int taskId = resTaskLog.getTaskId();
-        ResJobDetail resJobDetail = TaskUtil.getResJobDetail(taskId);
-        Timestamp startTime = resJobDetail.getTaskStartTime();
-        Timestamp endTime = resJobDetail.getTaskEndTime();
+      if (list != null && list.size() != 0) {
+        for (ResTaskLog resTaskLog : list) {
+          int taskId = resTaskLog.getTaskId();
+          ResJobDetail resJobDetail = TaskUtil.getResJobDetail(taskId);
+          Timestamp startTime = resJobDetail.getTaskStartTime();
+          Timestamp endTime = resJobDetail.getTaskEndTime();
 
-        int typeId = resJobDetail.getTypeId();
-        String desc = TaskUtil.getTypeDesc(typeId);
-        String startdesc = TaskUtil.logStartDesc(desc);
-        String enddesc = TaskUtil.logEndDesc(desc, resJobDetail.getTaskState());
+          int typeId = resJobDetail.getTypeId();
+          String desc = TaskUtil.getTypeDesc(typeId);
+          String startdesc = TaskUtil.logStartDesc(desc);
+          String enddesc = TaskUtil.logEndDesc(desc, resJobDetail.getTaskState());
 
-        resultList.add(new LogResult(startdesc, startTime));
-        resultList.add(new LogResult(enddesc, endTime));
+          resultList.add(new LogResult(startdesc, startTime));
+          resultList.add(new LogResult(enddesc, endTime));
+        }
       }
+
       result = gson.toJson(resultList);
     } catch (PaasException e) {
       logger.error("query log:", e);
@@ -163,12 +166,53 @@ public class MgmtOpenService implements IMgmtOpenService {
       }
       String clusterId = openParam.getClusterId();
       resReqInfo.setClusterId(clusterId);
-      resReqInfo.setReqType(TaskUtil.REQINSERT);
+      resReqInfo.setReqType(TaskUtil.REQFREE);
       resReqInfo.setReqCnt(param);
       resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));
 
       ExecuteOpenBatchJob executeBatchJob = new ExecuteOpenBatchJob();
       executeBatchJob.executeOpenService(param, openResultParam, "free");
+    } catch (Exception e) {
+      logger.error("free resources:", e);
+      status = TaskUtil.REQFAILED;
+    }
+    resReqInfo.setReqState(status);
+    resReqInfo.setReqResp(gson.toJson(openResultParam));
+    resReqInfo.setRespTime(new Timestamp(System.currentTimeMillis()));
+    mapper.insert(resReqInfo);
+    return gson.toJson(openResultParam);
+  }
+
+  @Override
+  public String increaseSlaveService(String param) {
+    Gson gson = new Gson();
+    OpenResultParamVo openResultParam = new OpenResultParamVo();
+    ResReqInfoMapper mapper = ServiceUtil.getMapper(ResReqInfoMapper.class);
+    ResReqInfo resReqInfo = new ResReqInfo();
+    int status = TaskUtil.REQSUCCESS;
+    try {
+      if (StringUtils.isEmpty(param)) {
+        throw new PaasException(ExceptionCodeConstants.DubboServiceCode.PARAM_IS_NULL,
+            "the parameter for free resources is null");
+      }
+      OpenResourceParamVo openParam = gson.fromJson(param, OpenResourceParamVo.class);
+      if (!openParam.getUseAgent()) {
+        throw new PaasException(ExceptionCodeConstants.TransServiceCode.ERROR_CODE,
+            "it should be true for useAgent");
+      }
+      String clusterId = openParam.getClusterId();
+
+      // TODO
+      // 将clusterId相关信息查询出来，提取master信息，插入到param中
+
+
+      resReqInfo.setClusterId(clusterId);
+      resReqInfo.setReqType(TaskUtil.REQINCREASE);
+      resReqInfo.setReqCnt(param);
+      resReqInfo.setReqTime(new Timestamp(System.currentTimeMillis()));
+
+      ExecuteOpenBatchJob executeBatchJob = new ExecuteOpenBatchJob();
+      executeBatchJob.executeOpenService(param, openResultParam, "increase");
     } catch (Exception e) {
       logger.error("free resources:", e);
       status = TaskUtil.REQFAILED;

@@ -25,6 +25,7 @@ public class ModifyZkConf implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("modify zookeeper config ");
     InputStream in =
         OpenPortUtil.class.getResourceAsStream("/playbook/zookeeper/zookeeperinstall.yml");
     String content = TaskUtil.getFile(in);

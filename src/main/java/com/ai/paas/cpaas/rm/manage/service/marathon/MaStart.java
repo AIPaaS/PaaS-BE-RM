@@ -25,6 +25,7 @@ public class MaStart implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("start marathon service ");
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/marathon/startmarathon.yml");
     String content = TaskUtil.getFile(in);
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);

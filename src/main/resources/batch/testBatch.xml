@@ -51,8 +51,156 @@ http://www.springframework.org/schema/batch/spring-batch-3.0.xsd">
 	<beans:bean id="insertClusterInfo" class="com.ai.paas.cpaas.rm.manage.service.cluster.InsertClusterInfo"/>
 	<beans:bean id="configHa" class="com.ai.paas.cpaas.rm.manage.service.cluster.ConfigHa"/>
 	<job id="openService" xmlns="http://www.springframework.org/schema/batch">
+	    <flow id="installzookeeper" parent="zookeeper" next="installDocker"/>
+		<flow id="installDocker" parent="docker" next="installMesos"/>
+		<flow id="installMesos" parent="mesos" next="installMarathon"/>
+		<flow id="installMarathon" parent="marathon" next="installEtcd"/>
+		<flow id="installEtcd" parent="etcd" next="installFlannel"/>
+		<flow id="installFlannel" parent="flannel" next="installMesosDns"/>
+		<flow id="installMesosDns" parent="mesosDns" next="installHaproxy" />
+		<flow id="installHaproxy" parent="haproxy" next="installChronos"/>
+		<flow id="installChronos" parent="chronos" next="installConsul"/>
+		<flow id="installConsul" parent="consul" next="insertCluster"/>
 		<flow id="insertCluster" parent="cluster"/>
 	</job>
+	<flow id="flannel">
+		<step id="flannelInstallStep">
+				<tasklet ref="flannelInstall"/>
+		</step>
+	</flow>
+	<flow id="etcd">
+    	<step id="genEtcdUserStep" next="openEtcdPortStep">
+				<tasklet ref="genEtcdUser"/>
+		</step>
+    	<step id="openEtcdPortStep" next="etcdInstallStep">
+	    	<tasklet ref="openEtcdPort"/>
+		</step>
+		<step id="etcdInstallStep" next="etcdStartStep">
+				<tasklet ref="etcdInstall"/>
+		</step>
+		<step id="etcdStartStep" next="configflannelStep">
+				<tasklet ref="etcdStart"/>
+		</step>
+		<step id="configflannelStep">
+				<tasklet ref="configFlannelParam"/>
+		</step>
+	</flow>
+	<flow id="zookeeper">
+    	<step id="configAnsibleHosts" next="configHostname">
+	    	<tasklet ref="ansibleHostsConfig"/>
+		</step>
+		<step id="configHostname" next="configHosts">
+				<tasklet ref="changeHostNameStep"/>
+		</step>
+		<step id="configHosts" next="genZkUser">
+				<tasklet ref="configHostsStep"/>
+		</step>
+		<step id="genZkUser" next="openZkPort">
+				<tasklet ref="genZkUserStep"/>
+		</step>
+		<step id="openZkPort" next="modifyZkConf">
+				<tasklet ref="openZkPortStep"/>
+		</step>
+		<step id="modifyZkConf" next="startZkService">
+				<tasklet ref="modifyZkConfStep"/>
+		</step>
+		<step id="startZkService" next="zookeeperVerify">
+				<tasklet ref="startZkServiceStep"/>
+		</step>
+		<step id="zookeeperVerify">
+				<tasklet ref="zookeeperVerifyStep"/>
+		</step>
+	</flow>
+	<flow id="docker">
+		<step id="dockerInstall" next="verifyDockerStep">
+				<tasklet ref="dockerInstallService"/>
+		</step>
+		<step id="verifyDockerStep">
+				<tasklet ref="dockerVerify"/>
+		</step>
+	</flow>
+	<flow id="mesos">
+		<step id="mesosUser" next="mesosMasterInstall">
+				<tasklet ref="meUser"/>
+		</step>
+		<step id="mesosMasterInstall" next="mesosMasterOpenPort">
+				<tasklet ref="meMasterInstall"/>
+		</step>
+		<step id="mesosMasterOpenPort" next="mesosMasterStart">
+				<tasklet ref="meMasterOpenPort"/>
+		</step>
+		<step id="mesosMasterStart" next="mesosSlaveStep">
+				<tasklet ref="meMasterStart"/>
+		</step>
+		<step id="mesosSlaveStep" next="mesosServiceVerify">
+				<tasklet ref="meSlaveStep"/>
+		</step>
+		<step id="mesosServiceVerify">
+				<tasklet ref="meServiceVerify"/>
+		</step>
+	</flow>
+	<flow id="marathon">
+		<step id="marathonUser" next="marathonPort">
+			<tasklet ref="genMaUser"/>
+		</step>
+		<step id="marathonPort" next="installMarathonStep">
+			<tasklet ref="openMaPort"/>
+		</step>
+		<step id="installMarathonStep" next="startMarathon">
+			<tasklet ref="maInstall"/>
+		</step>
+		<step id="startMarathon" next="verifyMarathon">
+			<tasklet ref="maStart"/>
+		</step>
+		<step id="verifyMarathon">
+			<tasklet ref="maServiceVerify"/>
+		</step>
+	</flow>
+	<flow id="mesosDns">
+		<step id="installMesosDnsStep" next="configSlaveDns">
+			<tasklet ref="mesosDnsInstall"/>
+		</step>
+		<step id="configSlaveDns">
+			<tasklet ref="configDNS"/>
+		</step>
+	</flow>
+	<flow id="haproxy">
+		
+		<step id="genHaUserStep" next="installHaproxyStep">
+			<tasklet ref="genHaUser"/>
+		</step>
+		<step id="installHaproxyStep" >
+			<tasklet ref="haproxyInstall"/>
+		</step>
+	</flow>
+	<flow id="chronos">
+		<step id="genChronosUserStep" next="openChronosPortStep">
+			<tasklet ref="genChronosUser"/>
+		</step>
+		<step id="openChronosPortStep" next="chronosInstallStep">
+			<tasklet ref="openChronosPort"/>
+		</step>
+		<step id="chronosInstallStep" next="verifyChronosStep">
+			<tasklet ref="chronosInstall"/>
+		</step>
+		<step id="verifyChronosStep">
+			<tasklet ref="verifyChronos"/>
+		</step>
+	</flow>
+	<flow id="consul">
+		<step id="genConUserStep" next="openConsulStep">
+			<tasklet ref="genConUser"/>
+		</step>
+		<step id="openConsulStep" next="consulInstallStep">
+			<tasklet ref="openConsulPort"/>
+		</step>
+		<step id="consulInstallStep" next="consulStartStep">
+			<tasklet ref="consulInstall"/>
+		</step>
+		<step id="consulStartStep">
+			<tasklet ref="consulStart"/>
+		</step>
+	</flow>
 	<flow id="cluster">
 		<step id="clusterStep" next="configHaStep">
 			<tasklet ref="insertClusterInfo"/>

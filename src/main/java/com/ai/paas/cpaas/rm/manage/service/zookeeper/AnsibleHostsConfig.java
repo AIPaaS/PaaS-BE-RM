@@ -27,6 +27,7 @@ public class AnsibleHostsConfig implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws PaasException {
+    logger.info("config ansible hosts step ");
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     logger.debug("the param is:" + openParam.toString());
     String aid = openParam.getAid();

@@ -25,6 +25,7 @@ public class DockerVerify implements Tasklet {
   @Override
   public RepeatStatus execute(StepContribution contribution, ChunkContext chunkContext)
       throws Exception {
+    logger.info("verify docker service");
     OpenResourceParamVo openParam = TaskUtil.createOpenParam(chunkContext);
     String aid = openParam.getAid();
     InputStream in = OpenPortUtil.class.getResourceAsStream("/playbook/docker/dockerVerify.yml");
