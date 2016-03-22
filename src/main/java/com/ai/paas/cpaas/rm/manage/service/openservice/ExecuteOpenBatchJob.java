@@ -28,10 +28,13 @@ public class ExecuteOpenBatchJob {
     String jobType;
     switch (type) {
       case "open":
-        jobType = "batch/testBatch.xml";
+        jobType = "batch/openServiceBatch.xml";
         break;
       case "free":
         jobType = "batch/freeResourcesBatch.xml";
+        break;
+      case "increase":
+        jobType = "batch/IncreaseSlave.xml";
         break;
       default:
         throw new IllegalArgumentException(" there is no such batch service ");
