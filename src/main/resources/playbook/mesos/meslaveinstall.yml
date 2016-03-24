@@ -1,6 +1,6 @@
 ---
 - hosts: '{{ hosts }}'
-  user: rcmesos
+  user: root
   vars:
   tasks:
     - name: install mesos rpm from a local file

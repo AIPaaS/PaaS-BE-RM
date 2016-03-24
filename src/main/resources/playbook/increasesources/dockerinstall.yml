@@ -1,0 +1,17 @@
+---
+- hosts: slave
+  user: root
+  vars:
+  tasks:
+     - name: yum install docker
+       yum: name=docker-engine state=latest
+       sudo: yes
+     - name: create the path of docker startup
+       file: path={{ startup }} owner=root mode=0755 state=directory
+       sudo: yes
+     - name: systemctl  daemon-reload
+       command: systemctl daemon-reload
+       sudo: yes
+     - name: restart docker service
+       service: name=docker state=restarted  enabled=yes
+       sudo: yes

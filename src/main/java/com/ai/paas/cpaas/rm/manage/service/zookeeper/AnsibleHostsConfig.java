@@ -18,6 +18,7 @@ import com.ai.paas.cpaas.rm.util.TaskUtil;
 import com.ai.paas.cpaas.rm.vo.MesosInstance;
 import com.ai.paas.cpaas.rm.vo.MesosSlave;
 import com.ai.paas.cpaas.rm.vo.OpenResourceParamVo;
+import com.ai.paas.cpaas.rm.vo.WebHaproxy;
 import com.ai.paas.ipaas.PaasException;
 
 public class AnsibleHostsConfig implements Tasklet {
@@ -48,10 +49,15 @@ public class AnsibleHostsConfig implements Tasklet {
       mesosSlave = new ArrayList<MesosSlave>();
     }
 
-    List<MesosInstance> agents = openParam.getWebHaproxy().getHosts();
-    if (agents == null) {
-      agents = new ArrayList<MesosInstance>();
+    WebHaproxy webHaproxy = openParam.getWebHaproxy();
+    List<MesosInstance> agents = new ArrayList<MesosInstance>();
+    if (webHaproxy != null) {
+      agents = openParam.getWebHaproxy().getHosts();
+      if (agents == null) {
+        agents = new ArrayList<MesosInstance>();
+      }
     }
+
 
     HashMap<String, String> hosts = new HashMap<String, String>();
     for (MesosInstance instance : mesosmaster) {

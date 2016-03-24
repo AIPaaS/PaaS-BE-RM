@@ -1,0 +1,8 @@
+---
+- hosts: slave
+  user: root
+  tasks:
+     - name: change /etc/resolv.conf
+       command: sed -i '1s/^/nameserver {{ item }}\n /' /etc/resolv.conf
+       with_items:
+          - "{{ nodes }}"

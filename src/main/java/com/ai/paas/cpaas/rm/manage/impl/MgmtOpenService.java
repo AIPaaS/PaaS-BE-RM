@@ -79,19 +79,23 @@ public class MgmtOpenService implements IMgmtOpenService {
     int status = TaskUtil.REQSUCCESS;
     try {
       if (StringUtils.isEmpty(param)) {
+        logger.error("the parameter for appllying cluster is null");
         throw new PaasException(ExceptionCodeConstants.DubboServiceCode.PARAM_IS_NULL,
             "the parameter for appllying cluster is null");
       }
       OpenResourceParamVo openParam = gson.fromJson(param, OpenResourceParamVo.class);
       if (!openParam.getUseAgent()) {
+        logger.error("it should be true for useAgent");
         throw new PaasException(ExceptionCodeConstants.TransServiceCode.ERROR_CODE,
             "it should be true for useAgent");
       }
       // ignore repeat install
       String clusterId = openParam.getClusterId();
       if (TaskUtil.clusterExist(clusterId)) {
-        throw new PaasException(ExceptionCodeConstants.TransServiceCode.ERROR_CODE,
-            "the clusterId existed");
+        logger.error("the clusterId existed");
+        openResultParam.setResultCode(ExceptionCodeConstants.DubboServiceCode.EXIST_CODE);
+        openResultParam.setResultMsg("the clusterId is exist");
+        return gson.toJson(openResultParam);
       }
 
       resReqInfo.setClusterId(clusterId);

@@ -1,0 +1,8 @@
+---
+- hosts: '{{hosts}}'
+  user: root
+  vars:
+  tasks:
+     - name: change hostname
+       command: hostnamectl set-hostname {{hostname}} --static
+       sudo: yes

@@ -1,0 +1,7 @@
+---
+- hosts: slave
+  user: root
+  tasks:
+     - name: start mesos-slave
+       service: name=mesos-slave state=restarted  enabled=yes
+       sudo: yes

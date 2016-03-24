@@ -7,6 +7,8 @@ public class ExceptionCodeConstants {
 
     public static final String SUCCESS_CODE = "000000";
 
+    public static final String EXIST_CODE = "999998";
+
     public static final String SUCCESS_MESSAGE = "success";
 
     public static final String SYSTEM_ERROR_CODE = "999999";

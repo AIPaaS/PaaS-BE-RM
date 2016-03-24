@@ -29,7 +29,7 @@ public class MgmtOpenServiceTest {
     System.out.println(result);
   }
 
-  @Test
+
   public void openServiceTest() {
     OpenResourceParamVo paramVo = new OpenResourceParamVo();
     paramVo.setClusterId("7");
@@ -284,6 +284,63 @@ public class MgmtOpenServiceTest {
     service.freeResourcesService(param);
   }
 
+  @Test
+  public void increaseSlave() {
+    OpenResourceParamVo paramVo = new OpenResourceParamVo();
+    paramVo.setClusterId("7");
+    paramVo.setClusterName("pheonixcenter");
+    paramVo.setAid("A");
+    MesosInstance master = new MesosInstance();
+    master.setId(1);
+    master.setIp("10.1.241.127");
+    master.setRoot("root");
+    master.setPasswd("Mfjjbsq7!@#");
+    master.setZone("center");
+
+    MesosInstance master1 = new MesosInstance();
+    master1.setId(2);
+    master1.setIp("10.1.241.128");
+    master1.setRoot("root");
+    master1.setPasswd("Mfjjbsq7!@#");
+    master1.setZone("center");
+
+    MesosInstance master2 = new MesosInstance();
+    master2.setId(3);
+    master2.setIp("10.1.241.129");
+    master2.setRoot("root");
+    master2.setPasswd("Mfjjbsq7!@#");
+    master2.setZone("center");
+
+    List<MesosInstance> masters = new ArrayList<MesosInstance>();
+    masters.add(master);
+    masters.add(master1);
+    masters.add(master2);
+
+    MesosSlave slave = new MesosSlave();
+    slave.setId(11);
+    slave.setIp("10.1.241.129");
+    slave.setRoot("root");
+    slave.setPasswd("Mfjjbsq7!@#");
+    slave.setZone("web");
+    slave
+        .setAttributes("ds:sth;jf:nj;rack:2;ex:ex1;model:hp-150;cpu:xe3;mem:ddr3;disk:ssd;netband:1G;");
+    slave.setCpuTotal(8);
+    slave.setCpuOffer(6);
+    slave.setMemTotal(8096);
+    slave.setMemOffer(6144);
+
+    List<MesosSlave> slaves = new ArrayList<MesosSlave>();
+    slaves.add(slave);
+
+    paramVo.setMesosMaster(masters);
+    paramVo.setMesosSlave(slaves);
+    paramVo.setUseAgent(Boolean.TRUE);
+    paramVo.setImagePath("/aifs01/docker");
+
+    Gson gson = new Gson();
+    String param = gson.toJson(paramVo);
+    service.increaseSlaveService(param);
+  }
 
   public void judgeParam() {
     String param =
