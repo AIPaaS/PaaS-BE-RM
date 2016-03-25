@@ -75,6 +75,20 @@ public class ConfigHa implements Tasklet {
     int end = lines.length() - 1;
     result.append(lines.subSequence(0, end));
     consulCluster.append(result);
+
+    consulCluster.append(",").append("frontend test.com");
+    consulCluster.append(",").append("bind *:80");
+    consulCluster.append(",").append("mode http");
+    consulCluster.append(",").append("#httpacl");
+    consulCluster.append(",").append("#httpusebackend");
+    consulCluster.append(",").append("#httpbackend");
+    consulCluster.append(",").append("frontend testtcp.com");
+    consulCluster.append(",").append("bind *:8090");
+    consulCluster.append(",").append("mode tcp");
+    consulCluster.append(",").append("#tcpacl");
+    consulCluster.append(",").append("#tcpusebackend");
+    consulCluster.append(",").append("#tcpbackend");
+
     consulCluster.append("]");
 
     WebHaproxy webHaproxy = openParam.getWebHaproxy();
