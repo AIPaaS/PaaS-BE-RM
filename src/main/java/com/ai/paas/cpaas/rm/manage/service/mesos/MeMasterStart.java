@@ -43,7 +43,7 @@ public class MeMasterStart implements Tasklet {
       List<String> startVars = new ArrayList<String>();
       startVars.add("ansible_ssh_pass=" + passwd);
       startVars.add("ansible_become_pass=" + passwd);
-      startVars.add("hosts=" + TaskUtil.genMasterName(i + 1));
+      startVars.add("hosts=" + TaskUtil.genMasterName(masterInstance.getId()));
       startVars.add("hostname=" + masterInstance.getIp());
       AnsibleCommand masterStart =
           new AnsibleCommand(TaskUtil.getSystemProperty("filepath") + "/memasterstart.yml", root,
