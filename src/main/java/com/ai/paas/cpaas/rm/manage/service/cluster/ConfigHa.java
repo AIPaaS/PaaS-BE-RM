@@ -76,18 +76,18 @@ public class ConfigHa implements Tasklet {
     result.append(lines.subSequence(0, end));
     consulCluster.append(result);
 
-    consulCluster.append(",").append("frontend test.com");
-    consulCluster.append(",").append("bind *:80");
-    consulCluster.append(",").append("mode http");
-    consulCluster.append(",").append("#httpacl");
-    consulCluster.append(",").append("#httpusebackend");
-    consulCluster.append(",").append("#httpbackend");
-    consulCluster.append(",").append("frontend testtcp.com");
-    consulCluster.append(",").append("bind *:8090");
-    consulCluster.append(",").append("mode tcp");
-    consulCluster.append(",").append("#tcpacl");
-    consulCluster.append(",").append("#tcpusebackend");
-    consulCluster.append(",").append("#tcpbackend");
+    consulCluster.append(",").append("'").append("frontend test.com").append("'");
+    consulCluster.append(",").append("'").append("bind *:80").append("'");
+    consulCluster.append(",").append("'").append("mode http").append("'");
+    consulCluster.append(",").append("'").append("#httpacl").append("'");
+    consulCluster.append(",").append("'").append("#httpusebackend").append("'");
+    consulCluster.append(",").append("'").append("#httpbackend").append("'");
+    consulCluster.append(",").append("'").append("frontend testtcp.com").append("'");
+    consulCluster.append(",").append("'").append("bind *:8090").append("'");
+    consulCluster.append(",").append("'").append("mode tcp").append("'");
+    consulCluster.append(",").append("'").append("#tcpacl").append("'");
+    consulCluster.append(",").append("'").append("#tcpusebackend").append("'");
+    consulCluster.append(",").append("'").append("#tcpbackend").append("'");
 
     consulCluster.append("]");
 
